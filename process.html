@@ -2353,7 +2353,7 @@ function scrollToContactForm(event) {
                 '이메일': form.email.value,
                 '지역': form.region.value,
                 '통화가능시간': form.consultTime.value,
-                '지원받고 싶은 자금종류': Array.from(fundTypes).map(cb => cb.value)
+                '자금종류': Array.from(fundTypes).map(cb => cb.value).join(', ')
             };
 
             // 선택 필드 추가 (값이 있을 때만)

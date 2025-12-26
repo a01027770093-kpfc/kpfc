@@ -550,10 +550,10 @@ async function handleSubmit(request, env) {
       // 필드명 변환 (프론트 → Airtable)
       const fields = { ...rawFields };
 
-      // "지원받고 싶은 자금종류" 배열을 문자열로 변환
-      if (rawFields['지원받고 싶은 자금종류']) {
-        const fundTypes = rawFields['지원받고 싶은 자금종류'];
-        fields['지원받고 싶은 자금종류'] = Array.isArray(fundTypes) ? fundTypes.join(', ') : fundTypes;
+      // "자금종류" 배열을 문자열로 변환 (이미 문자열이면 그대로 사용)
+      if (rawFields['자금종류']) {
+        const fundTypes = rawFields['자금종류'];
+        fields['자금종류'] = Array.isArray(fundTypes) ? fundTypes.join(', ') : fundTypes;
       }
 
       // 체크박스 필드 제거 (Airtable에 없음)
@@ -727,9 +727,9 @@ function buildTelegramMessage(fields, submitDate, submitTime) {
   msg += '└ 통화가능: <b>' + escapeHtml(fields['통화가능시간']) + '</b>\n\n';
 
   msg += '💰 <b>자금정보</b>\n';
-  const fundTypes = fields['지원받고 싶은 자금종류'];
-  if (Array.isArray(fundTypes)) {
-    msg += '├ 자금종류: ' + fundTypes.join(', ') + '\n';
+  const fundTypes = fields['자금종류'];
+  if (fundTypes) {
+    msg += '├ 자금종류: ' + escapeHtml(fundTypes) + '\n';
   }
   if (fields['필요자금규모']) msg += '├ 필요규모: ' + escapeHtml(fields['필요자금규모']) + '\n';
   if (fields['업종']) msg += '├ 업종: ' + escapeHtml(fields['업종']) + '\n';
@@ -789,7 +789,7 @@ async function handleLeadsAPI(request, env, path) {
         직전년도매출: record.fields['직전년도매출'],
         통화가능시간: record.fields['통화가능시간'],
         필요자금규모: record.fields['필요자금규모'],
-        자금종류: record.fields['지원받고 싶은 자금종류'],
+        자금종류: record.fields['자금종류'],
         문의사항: record.fields['문의사항'],
         상태: record.fields['상태'] || '신규',
         메모: record.fields['메모'] || ''
