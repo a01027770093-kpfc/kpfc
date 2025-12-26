@@ -240,6 +240,7 @@
           <table class="data-table">
             <thead>
               <tr>
+                <th style="width:70px">썸네일</th>
                 <th>작성일</th>
                 <th>제목</th>
                 <th>카테고리</th>
@@ -249,7 +250,7 @@
             </thead>
             <tbody id="recentPostsBody">
               <tr>
-                <td colspan="5" style="text-align: center; padding: 40px; color: var(--neutral-400);">
+                <td colspan="6" style="text-align: center; padding: 40px; color: var(--neutral-400);">
                   데이터를 불러오는 중...
                 </td>
               </tr>
@@ -339,7 +340,7 @@
     }
 
     // API URL
-    const API_URL = 'https://kfpc.a01027770093.workers.dev';
+    const API_URL = 'https://kpfc-analytics.a01027770093.workers.dev';
 
     // 페이지 로드 시 초기화
     document.addEventListener('DOMContentLoaded', function() {
@@ -441,6 +442,17 @@
 
           tbody.innerHTML = recentPosts.map(post => `
             <tr>
+              <td data-label="썸네일">
+                ${post.썸네일URL
+                  ? `<img src="${post.썸네일URL}" alt="" style="width:60px; height:40px; object-fit:cover; border-radius:4px; background:#f3f4f6;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                     <div style="display:none; width:60px; height:40px; background:#f3f4f6; border-radius:4px; align-items:center; justify-content:center; color:#9ca3af;">
+                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                     </div>`
+                  : `<div style="width:60px; height:40px; background:#f3f4f6; border-radius:4px; display:flex; align-items:center; justify-content:center; color:#9ca3af;">
+                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                     </div>`
+                }
+              </td>
               <td data-label="작성일">${post.createdTime ? post.createdTime.split('T')[0] : '-'}</td>
               <td data-label="제목">${post.제목 || post.title || '-'}</td>
               <td data-label="카테고리"><span class="category-badge ${getCategoryClass(post.카테고리 || post.category)}">${post.카테고리 || post.category || '-'}</span></td>
@@ -451,7 +463,7 @@
         } else {
           tbody.innerHTML = `
             <tr>
-              <td colspan="5" style="text-align: center; padding: 40px; color: var(--neutral-400);">
+              <td colspan="6" style="text-align: center; padding: 40px; color: var(--neutral-400);">
                 게시글이 없습니다.
               </td>
             </tr>
@@ -461,7 +473,7 @@
         console.error('Recent posts load error:', error);
         tbody.innerHTML = `
           <tr>
-            <td colspan="5" style="text-align: center; padding: 40px; color: var(--neutral-400);">
+            <td colspan="6" style="text-align: center; padding: 40px; color: var(--neutral-400);">
               게시판 연동이 필요합니다.
             </td>
           </tr>
