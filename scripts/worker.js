@@ -26,6 +26,53 @@ const CORS_HEADERS = {
 // 유틸리티 함수
 // ================================================
 
+// AWS Signature V4 헬퍼 함수
+async function sha256(message) {
+  const msgBuffer = typeof message === 'string'
+    ? new TextEncoder().encode(message)
+    : message;
+  return await crypto.subtle.digest('SHA-256', msgBuffer);
+}
+
+async function sha256Hex(message) {
+  const hashBuffer = await sha256(message);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function hmac(key, message) {
+  const keyBuffer = typeof key === 'string'
+    ? new TextEncoder().encode(key)
+    : key;
+  const msgBuffer = typeof message === 'string'
+    ? new TextEncoder().encode(message)
+    : message;
+
+  const cryptoKey = await crypto.subtle.importKey(
+    'raw',
+    keyBuffer,
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+
+  return await crypto.subtle.sign('HMAC', cryptoKey, msgBuffer);
+}
+
+async function hmacHex(key, message) {
+  const signBuffer = await hmac(key, message);
+  const signArray = Array.from(new Uint8Array(signBuffer));
+  return signArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function getSignatureKey(key, dateStamp, regionName, serviceName) {
+  const kDate = await hmac('AWS4' + key, dateStamp);
+  const kRegion = await hmac(kDate, regionName);
+  const kService = await hmac(kRegion, serviceName);
+  const kSigning = await hmac(kService, 'aws4_request');
+  return kSigning;
+}
+
 // Base64URL 인코딩
 function base64url(str) {
   return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
@@ -1242,6 +1289,136 @@ export default {
         }), {
           headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
         });
+      }
+
+      // ================================================
+      // 이미지 업로드 API (POST /upload)
+      // R2 S3 호환 API를 사용하여 이미지 저장
+      // ================================================
+      if (path === '/upload' && request.method === 'POST') {
+        try {
+          // R2 자격 증명 확인
+          if (!env.R2_ACCESS_KEY_ID || !env.R2_SECRET_ACCESS_KEY) {
+            return new Response(JSON.stringify({
+              success: false,
+              error: 'R2 credentials not configured'
+            }), {
+              status: 500,
+              headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+            });
+          }
+
+          const formData = await request.formData();
+          const file = formData.get('file');
+
+          if (!file) {
+            return new Response(JSON.stringify({
+              success: false,
+              error: 'No file provided'
+            }), {
+              status: 400,
+              headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+            });
+          }
+
+          // 파일명 생성 (timestamp + random)
+          const timestamp = Date.now();
+          const randomStr = Math.random().toString(36).substring(2, 8);
+          const ext = file.name.split('.').pop() || 'webp';
+          const fileName = `board/${timestamp}-${randomStr}.${ext}`;
+
+          // R2 S3 호환 API로 업로드
+          const accountId = 'bf39e5c4b6ef41af31941676cc384300';
+          const bucketName = 'kpfc';
+          const r2Endpoint = `https://${accountId}.r2.cloudflarestorage.com`;
+
+          const arrayBuffer = await file.arrayBuffer();
+          const contentType = file.type || 'image/webp';
+
+          // AWS Signature Version 4 서명 생성
+          const date = new Date();
+          const amzDate = date.toISOString().replace(/[:-]|\.\d{3}/g, '');
+          const dateStamp = amzDate.slice(0, 8);
+          const region = 'auto';
+          const service = 's3';
+
+          const canonicalUri = `/${bucketName}/${fileName}`;
+          const canonicalQueryString = '';
+          const payloadHash = await sha256Hex(arrayBuffer);
+
+          const canonicalHeaders = [
+            `content-type:${contentType}`,
+            `host:${accountId}.r2.cloudflarestorage.com`,
+            `x-amz-content-sha256:${payloadHash}`,
+            `x-amz-date:${amzDate}`
+          ].join('\n') + '\n';
+
+          const signedHeaders = 'content-type;host;x-amz-content-sha256;x-amz-date';
+
+          const canonicalRequest = [
+            'PUT',
+            canonicalUri,
+            canonicalQueryString,
+            canonicalHeaders,
+            signedHeaders,
+            payloadHash
+          ].join('\n');
+
+          const algorithm = 'AWS4-HMAC-SHA256';
+          const credentialScope = `${dateStamp}/${region}/${service}/aws4_request`;
+          const stringToSign = [
+            algorithm,
+            amzDate,
+            credentialScope,
+            await sha256Hex(canonicalRequest)
+          ].join('\n');
+
+          const signingKey = await getSignatureKey(env.R2_SECRET_ACCESS_KEY, dateStamp, region, service);
+          const signature = await hmacHex(signingKey, stringToSign);
+
+          const authorizationHeader = `${algorithm} Credential=${env.R2_ACCESS_KEY_ID}/${credentialScope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
+
+          // R2에 PUT 요청
+          const r2Response = await fetch(`${r2Endpoint}${canonicalUri}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': contentType,
+              'x-amz-content-sha256': payloadHash,
+              'x-amz-date': amzDate,
+              'Authorization': authorizationHeader
+            },
+            body: arrayBuffer
+          });
+
+          if (!r2Response.ok) {
+            const errorText = await r2Response.text();
+            throw new Error(`R2 upload failed: ${r2Response.status} - ${errorText}`);
+          }
+
+          // 공개 URL (R2 공개 도메인)
+          const publicUrl = env.R2_PUBLIC_URL
+            ? `${env.R2_PUBLIC_URL}/${fileName}`
+            : `https://pub-bf39e5c4b6ef41af31941676cc384300.r2.dev/${fileName}`;
+
+          console.log('✅ Image uploaded:', fileName);
+
+          return new Response(JSON.stringify({
+            success: true,
+            url: publicUrl,
+            fileName: fileName
+          }), {
+            headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+          });
+        } catch (error) {
+          console.error('❌ Upload error:', error.message);
+          return new Response(JSON.stringify({
+            success: false,
+            error: error.message
+          }), {
+            status: 500,
+            headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+          });
+        }
       }
 
       // ================================================

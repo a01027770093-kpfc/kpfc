@@ -300,8 +300,69 @@
             stroke: var(--text-muted);
         }
 
-        .thumbnail-url-input {
-            margin-top: 16px;
+        .thumbnail-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .btn-upload {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            border-radius: 8px;
+            color: var(--primary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-upload:hover {
+            background: rgba(59, 130, 246, 0.25);
+        }
+
+        .btn-upload svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .btn-delete {
+            padding: 12px 16px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            color: var(--danger);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-delete:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .upload-status {
+            margin-top: 12px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .upload-status.success {
+            color: var(--success);
+        }
+
+        .upload-status.error {
+            color: var(--danger);
+        }
+
+        .upload-status.uploading {
+            color: var(--primary);
         }
 
         /* 스위치 토글 */
@@ -537,7 +598,7 @@
                         <h2 class="card-title">썸네일 이미지</h2>
                     </div>
                     <div class="card-body">
-                        <div class="thumbnail-upload" id="thumbnailUpload" onclick="document.getElementById('thumbnailUrlInput').focus()">
+                        <div class="thumbnail-upload" id="thumbnailUpload">
                             <img class="thumbnail-preview" id="thumbnailPreview" alt="썸네일 미리보기">
                             <div class="thumbnail-placeholder" id="thumbnailPlaceholder">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -545,12 +606,24 @@
                                     <circle cx="8.5" cy="8.5" r="1.5"></circle>
                                     <polyline points="21 15 16 10 5 21"></polyline>
                                 </svg>
-                                <p>썸네일 URL을 입력하세요</p>
+                                <p>이미지를 업로드하세요</p>
+                                <small style="opacity: 0.7;">WebP 자동 변환, 100KB 이하 압축</small>
                             </div>
                         </div>
-                        <div class="thumbnail-url-input">
-                            <input type="url" class="form-input" id="thumbnailUrlInput" placeholder="https://example.com/image.jpg" oninput="updateThumbnailPreview()">
+                        <input type="file" id="thumbnailFileInput" accept="image/*" style="display: none;">
+                        <input type="hidden" id="thumbnailUrl">
+                        <div class="thumbnail-actions">
+                            <button type="button" class="btn-upload" onclick="document.getElementById('thumbnailFileInput').click()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                이미지 업로드
+                            </button>
+                            <button type="button" class="btn-delete" id="thumbnailDeleteBtn" onclick="clearThumbnail()" style="display: none;">삭제</button>
                         </div>
+                        <div class="upload-status" id="uploadStatus"></div>
                     </div>
                 </div>
             </div>
@@ -598,8 +671,10 @@
                 document.getElementById('postTags').value = post.tags || '';
                 document.getElementById('postDate').value = post.date || '';
                 document.getElementById('postStatus').checked = post.isPublic !== false;
-                document.getElementById('thumbnailUrlInput').value = post.thumbnail || '';
-                updateThumbnailPreview();
+                if (post.thumbnail) {
+                    document.getElementById('thumbnailUrl').value = post.thumbnail;
+                    showThumbnailPreview(post.thumbnail);
+                }
             } else {
                 alert('게시글을 찾을 수 없습니다.');
                 goBack();
@@ -627,7 +702,7 @@
             '제목': title,
             '내용': content,
             '요약': document.getElementById('postSummary').value.trim(),
-            '썸네일URL': document.getElementById('thumbnailUrlInput').value.trim() || null,
+            '썸네일URL': document.getElementById('thumbnailUrl').value.trim() || null,
             '태그': document.getElementById('postTags').value.trim() || null,
             '카테고리': document.getElementById('postCategory').value,
             '작성일': document.getElementById('postDate').value,
@@ -673,22 +748,139 @@
         }
     }
 
-    function updateThumbnailPreview() {
-        const url = document.getElementById('thumbnailUrlInput').value.trim();
+    // 썸네일 미리보기 표시
+    function showThumbnailPreview(url) {
         const preview = document.getElementById('thumbnailPreview');
         const placeholder = document.getElementById('thumbnailPlaceholder');
+        const deleteBtn = document.getElementById('thumbnailDeleteBtn');
         const upload = document.getElementById('thumbnailUpload');
 
-        if (url) {
-            preview.src = url;
-            preview.classList.add('visible');
-            placeholder.style.display = 'none';
-            upload.classList.add('has-image');
-        } else {
-            preview.classList.remove('visible');
-            placeholder.style.display = 'block';
-            upload.classList.remove('has-image');
+        preview.src = url;
+        preview.classList.add('visible');
+        placeholder.style.display = 'none';
+        deleteBtn.style.display = 'block';
+        upload.classList.add('has-image');
+    }
+
+    // 썸네일 삭제
+    function clearThumbnail() {
+        document.getElementById('thumbnailUrl').value = '';
+        document.getElementById('thumbnailPreview').classList.remove('visible');
+        document.getElementById('thumbnailPlaceholder').style.display = 'block';
+        document.getElementById('thumbnailDeleteBtn').style.display = 'none';
+        document.getElementById('thumbnailUpload').classList.remove('has-image');
+        document.getElementById('thumbnailFileInput').value = '';
+        document.getElementById('uploadStatus').textContent = '';
+        document.getElementById('uploadStatus').className = 'upload-status';
+    }
+
+    // 파일 업로드 핸들러
+    document.getElementById('thumbnailFileInput').addEventListener('change', async function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const statusEl = document.getElementById('uploadStatus');
+        statusEl.textContent = 'WebP 변환 및 압축 중...';
+        statusEl.className = 'upload-status uploading';
+
+        try {
+            // WebP로 변환하고 100KB 이하로 압축
+            const webpBlob = await compressToWebp(file, 100 * 1024);
+            const sizeKB = (webpBlob.size / 1024).toFixed(1);
+
+            statusEl.textContent = `업로드 중... (${sizeKB}KB)`;
+
+            // FormData로 업로드
+            const formData = new FormData();
+            formData.append('file', webpBlob, file.name.replace(/\.[^/.]+$/, '.webp'));
+
+            const response = await fetch(`${WORKER_URL}/upload`, {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                document.getElementById('thumbnailUrl').value = result.url;
+                showThumbnailPreview(result.url);
+                statusEl.textContent = `업로드 완료 (${sizeKB}KB)`;
+                statusEl.className = 'upload-status success';
+            } else {
+                throw new Error(result.error || '업로드 실패');
+            }
+        } catch (error) {
+            statusEl.textContent = error.message;
+            statusEl.className = 'upload-status error';
         }
+    });
+
+    // WebP 변환 및 100KB 이하 압축 함수
+    async function compressToWebp(file, maxSize) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = async () => {
+                const canvas = document.createElement('canvas');
+                let width = img.width;
+                let height = img.height;
+
+                // 최대 크기 제한 (1200px)
+                const maxDim = 1200;
+                if (width > maxDim || height > maxDim) {
+                    if (width > height) {
+                        height = Math.round(height * maxDim / width);
+                        width = maxDim;
+                    } else {
+                        width = Math.round(width * maxDim / height);
+                        height = maxDim;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // 품질을 낮춰가며 100KB 이하가 될 때까지 시도
+                let quality = 0.9;
+                let blob = null;
+
+                while (quality >= 0.1) {
+                    blob = await new Promise(r => canvas.toBlob(r, 'image/webp', quality));
+
+                    if (blob.size <= maxSize) {
+                        resolve(blob);
+                        return;
+                    }
+
+                    quality -= 0.1;
+                }
+
+                // 품질 최저로도 안되면 이미지 크기 축소
+                let scale = 0.8;
+                while (scale >= 0.3) {
+                    canvas.width = Math.round(width * scale);
+                    canvas.height = Math.round(height * scale);
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    blob = await new Promise(r => canvas.toBlob(r, 'image/webp', 0.7));
+
+                    if (blob.size <= maxSize) {
+                        resolve(blob);
+                        return;
+                    }
+
+                    scale -= 0.1;
+                }
+
+                // 최종 결과 반환 (100KB 초과해도)
+                resolve(blob);
+            };
+
+            img.onerror = () => reject(new Error('이미지 로드 실패'));
+            img.src = URL.createObjectURL(file);
+        });
     }
 
     function previewPost() {
