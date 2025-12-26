@@ -7,7 +7,7 @@ bizen 홈페이지 디자인을 기반으로 한국정책자금지원센터(KPFC
 
 ### 1.2 기본 정보
 - **클라이언트**: 한국정책자금지원센터
-- **도메인**: kpfc.co.kr
+- **도메인**: kpfc.kr
 - **기반 템플릿**: bizen (F:\pola_homepage\1.14th_jeonyejin_bizen)
 - **개발 방식**: 순수 HTML 파일 직접 편집 (빌드 시스템 미사용)
 
@@ -139,8 +139,8 @@ index.html에서 모든 페이지로 접근 가능한 구조:
 ### 5.3 도메인/URL 치환
 | 기존 | 변경 |
 |------|------|
-| bizen.co.kr | kpfc.co.kr |
-| https://bizen.co.kr | https://kpfc.co.kr |
+| bizen.co.kr | kpfc.kr |
+| https://bizen.co.kr | https://kpfc.kr |
 
 ### 5.4 주소 치환
 | 기존 | 변경 |
@@ -218,7 +218,7 @@ index.html에서 모든 페이지로 접근 가능한 구조:
 - [ ] 로고 교체
 - [ ] 대표번호: 1588-9097
 - [ ] 주소, 이메일, 사업자번호
-- [ ] 도메인: bizen.co.kr → kpfc.co.kr
+- [ ] 도메인: bizen.co.kr → kpfc.kr
 - [ ] OG 이미지, 파비콘
 - [ ] 브랜드 컬러 적용 (#1D00AD 기반)
 
@@ -272,7 +272,7 @@ index.html에서 모든 페이지로 접근 가능한 구조:
 | **대표번호** | 1588-9097 |
 | **핸드폰** | 010-2777-0093 |
 | **이메일** | gunme7@naver.com |
-| **홈페이지** | https://kpfc.co.kr |
+| **홈페이지** | https://kpfc.kr |
 | **주소** | 서울특별시 강남구 강남대로 92길 31, 6층 |
 | **사업자등록번호** | 168-60-00727 |
 
@@ -367,7 +367,7 @@ PRD 문서: PRD-KPFC-homepage.md
 - **이메일**: gunme7@naver.com
 - **주소**: 서울특별시 강남구 강남대로 92길 31, 6층
 - **사업자등록번호**: 168-60-00727
-- **도메인**: kpfc.co.kr
+- **도메인**: kpfc.kr
 
 ---
 
