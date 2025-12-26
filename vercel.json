@@ -1,3 +1,16 @@
 {
-  "outputDirectory": "dist"
+  "outputDirectory": "dist",
+  "redirects": [
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "admin.kpfc.co.kr"
+        }
+      ],
+      "destination": "/admin/",
+      "permanent": false
+    }
+  ]
 }
