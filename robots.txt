@@ -1,4 +1,4 @@
-# robots.txt for 한국정책자금지원센터 KPFC (k-pfc.co.kr)
+# robots.txt for 한국정책자금지원센터 KPFC (kpfc.kr)
 # Last updated: 2025-01
 
 # 모든 크롤러 허용
@@ -94,13 +94,13 @@ Disallow: /api/
 # ========================================
 # 사이트맵 위치
 # ========================================
-Sitemap: https://k-pfc.co.kr/sitemap.xml
+Sitemap: https://kpfc.kr/sitemap.xml
 
 # ========================================
 # AI 전용 정보 파일
 # ========================================
 # AI 크롤러는 llms.txt 파일을 참조하세요
-# https://k-pfc.co.kr/llms.txt
+# https://kpfc.kr/llms.txt
 
 # Host
-Host: https://k-pfc.co.kr
+Host: https://kpfc.kr

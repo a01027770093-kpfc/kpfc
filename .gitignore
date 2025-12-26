@@ -27,3 +27,5 @@ npm-debug.log*
 # 임시 파일
 *.tmp
 *.temp
+
+.vercel
