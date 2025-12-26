@@ -260,6 +260,81 @@
     .month-detail-row:hover {
       background: var(--neutral-50);
     }
+    /* 페이지네이션 스타일 */
+    .pagination-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 0;
+      border-top: 1px solid var(--neutral-100);
+      margin-top: 8px;
+    }
+    .pagination-info {
+      font-size: 13px;
+      color: var(--neutral-500);
+    }
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .pagination-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 32px;
+      height: 32px;
+      padding: 0 8px;
+      border: 1px solid var(--neutral-200);
+      background: white;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      color: var(--neutral-600);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .pagination-btn:hover:not(:disabled) {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .pagination-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+    .pagination-btn.nav-btn {
+      padding: 0 12px;
+    }
+    .page-size-selector {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--neutral-600);
+    }
+    .page-size-selector select {
+      padding: 6px 8px;
+      border: 1px solid var(--neutral-200);
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      cursor: pointer;
+    }
+    @media (max-width: 768px) {
+      .pagination-container {
+        flex-direction: column;
+        gap: 12px;
+      }
+      .pagination-info {
+        order: 2;
+      }
+      .page-size-selector {
+        order: 3;
+      }
+    }
   </style>
 </head>
 <body>
@@ -614,6 +689,24 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+          <!-- 페이지네이션 -->
+          <div class="pagination-container" id="history-pagination">
+            <div class="pagination-info" id="pagination-info">
+              총 0개 중 0-0
+            </div>
+            <div class="pagination-controls" id="pagination-controls">
+              <!-- JavaScript로 동적 생성 -->
+            </div>
+            <div class="page-size-selector">
+              <span>페이지당</span>
+              <select id="page-size-select" onchange="changePageSize(this.value)">
+                <option value="10">10개</option>
+                <option value="20" selected>20개</option>
+                <option value="50">50개</option>
+                <option value="100">100개</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
@@ -1134,6 +1227,11 @@
     let historyChart = null;
     let historyData = null;
 
+    // 페이지네이션 상태
+    let currentPage = 1;
+    let pageSize = 20;
+    let allHistoryData = []; // 전체 데이터 저장
+
     // 기간 선택 버튼 초기화
     function initDaysSelector() {
       const btns = document.querySelectorAll('.days-btn');
@@ -1152,6 +1250,9 @@
     // 히스토리 데이터 로드 (Airtable 캐시 우선 조회)
     async function loadHistoryData(forceRefresh = false) {
       if (!GA4_API_URL) return;
+
+      // 기간 변경 시 페이지 초기화
+      currentPage = 1;
 
       try {
         // 기본적으로 Airtable 캐시 조회 (API 제한 방지)
@@ -1342,11 +1443,15 @@
       }).join('');
     }
 
-    // 히스토리 테이블 렌더링 (월별 그룹화 + 접힘/펼침)
+    // 히스토리 테이블 렌더링 (페이지네이션 적용)
     function renderHistoryTable(data) {
-      const tbody = document.getElementById('history-table-body');
+      // 전체 데이터 저장
+      allHistoryData = data || [];
 
-      if (!data || data.length === 0) {
+      const tbody = document.getElementById('history-table-body');
+      const paginationContainer = document.getElementById('history-pagination');
+
+      if (!allHistoryData || allHistoryData.length === 0) {
         tbody.innerHTML = `
           <tr>
             <td colspan="5" class="table-empty">
@@ -1354,14 +1459,31 @@
             </td>
           </tr>
         `;
+        paginationContainer.style.display = 'none';
         return;
       }
 
-      const sortedData = [...data].sort((a, b) => b.date.localeCompare(a.date));
+      // 페이지네이션 표시
+      paginationContainer.style.display = 'flex';
 
-      // 월별로 그룹화
+      // 데이터 정렬 (최신순)
+      const sortedData = [...allHistoryData].sort((a, b) => b.date.localeCompare(a.date));
+
+      // 페이지네이션 계산
+      const totalItems = sortedData.length;
+      const totalPages = Math.ceil(totalItems / pageSize);
+
+      // 현재 페이지가 범위를 벗어나면 조정
+      if (currentPage > totalPages) currentPage = totalPages;
+      if (currentPage < 1) currentPage = 1;
+
+      const startIndex = (currentPage - 1) * pageSize;
+      const endIndex = Math.min(startIndex + pageSize, totalItems);
+      const pageData = sortedData.slice(startIndex, endIndex);
+
+      // 월별로 그룹화 (현재 페이지 데이터만)
       const groupedByMonth = {};
-      sortedData.forEach(row => {
+      pageData.forEach(row => {
         const monthKey = row.date.substring(0, 7);
         if (!groupedByMonth[monthKey]) {
           groupedByMonth[monthKey] = [];
@@ -1376,7 +1498,7 @@
       monthKeys.forEach((monthKey, idx) => {
         const monthData = groupedByMonth[monthKey];
         const isCurrentMonth = monthKey === currentMonth;
-        const isExpanded = idx === 0;
+        const isExpanded = true; // 페이지네이션 적용 시 기본 펼침
 
         const totalVisitors = monthData.reduce((sum, r) => sum + (r.visitors || 0), 0);
         const totalPageviews = monthData.reduce((sum, r) => sum + (r.pageviews || 0), 0);
@@ -1418,6 +1540,85 @@
       });
 
       tbody.innerHTML = html;
+
+      // 페이지네이션 UI 업데이트
+      renderPagination(totalItems, totalPages, startIndex, endIndex);
+    }
+
+    // 페이지네이션 UI 렌더링
+    function renderPagination(totalItems, totalPages, startIndex, endIndex) {
+      const infoEl = document.getElementById('pagination-info');
+      const controlsEl = document.getElementById('pagination-controls');
+
+      // 정보 표시
+      infoEl.textContent = `총 ${totalItems.toLocaleString()}개 중 ${startIndex + 1}-${endIndex}`;
+
+      // 페이지 버튼 생성
+      let controlsHtml = '';
+
+      // 이전 버튼
+      controlsHtml += `
+        <button class="pagination-btn nav-btn" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+          ◀ 이전
+        </button>
+      `;
+
+      // 페이지 번호 버튼 (최대 5개 표시)
+      const maxVisiblePages = 5;
+      let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+      let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+
+      if (endPage - startPage < maxVisiblePages - 1) {
+        startPage = Math.max(1, endPage - maxVisiblePages + 1);
+      }
+
+      if (startPage > 1) {
+        controlsHtml += `<button class="pagination-btn" onclick="goToPage(1)">1</button>`;
+        if (startPage > 2) {
+          controlsHtml += `<span style="padding: 0 4px; color: var(--neutral-400)">...</span>`;
+        }
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        controlsHtml += `
+          <button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>
+        `;
+      }
+
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          controlsHtml += `<span style="padding: 0 4px; color: var(--neutral-400)">...</span>`;
+        }
+        controlsHtml += `<button class="pagination-btn" onclick="goToPage(${totalPages})">${totalPages}</button>`;
+      }
+
+      // 다음 버튼
+      controlsHtml += `
+        <button class="pagination-btn nav-btn" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+          다음 ▶
+        </button>
+      `;
+
+      controlsEl.innerHTML = controlsHtml;
+    }
+
+    // 페이지 이동
+    function goToPage(page) {
+      const totalPages = Math.ceil(allHistoryData.length / pageSize);
+      if (page < 1 || page > totalPages) return;
+
+      currentPage = page;
+      renderHistoryTable(allHistoryData);
+
+      // 테이블 상단으로 스크롤
+      document.getElementById('history-table-body').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // 페이지 크기 변경
+    function changePageSize(newSize) {
+      pageSize = parseInt(newSize);
+      currentPage = 1; // 페이지 크기 변경 시 첫 페이지로
+      renderHistoryTable(allHistoryData);
     }
 
     // 월별 그룹 접힘/펼침 토글
