@@ -748,23 +748,16 @@
       });
     });
 
-    // 게시글 로드 (샘플 데이터 - 실제 API 연동 시 수정)
+    // 게시글 로드 (API 연동 필요)
     async function loadPosts() {
       showLoading(true);
       try {
-        // TODO: 실제 API 연동 시 수정
+        // TODO: 실제 API 연동 후 활성화
         // const response = await fetch(`${WORKER_URL}/board/all`);
         // const result = await response.json();
+        // allPosts = result.records || [];
 
-        // 샘플 데이터
-        allPosts = [
-          { id: '1', 제목: '2025년 정책자금 신청 가이드', 카테고리: '정보', 작성일: '2024-12-26', 조회수: 256, 게시여부: true, 요약: '정책자금 신청 방법 안내', 썸네일URL: '' },
-          { id: '2', 제목: '중소기업 대출 성공사례 - (주)테크솔루션', 카테고리: '성공사례', 작성일: '2024-12-25', 조회수: 189, 게시여부: true, 요약: '3억원 대출 승인 사례', 썸네일URL: '' },
-          { id: '3', 제목: '신규 정책자금 안내', 카테고리: '공지', 작성일: '2024-12-24', 조회수: 342, 게시여부: true, 요약: '2025년 신규 정책자금 안내', 썸네일URL: '' },
-          { id: '4', 제목: '기업 신용평가 향상 방법', 카테고리: '정보', 작성일: '2024-12-23', 조회수: 127, 게시여부: true, 요약: '신용평가 점수 올리는 방법', 썸네일URL: '' },
-          { id: '5', 제목: '창업자금 지원 프로그램', 카테고리: '뉴스', 작성일: '2024-12-22', 조회수: 98, 게시여부: false, 요약: '정부 창업자금 지원 프로그램', 썸네일URL: '' },
-        ];
-
+        allPosts = [];
         filterAndRenderPosts();
       } catch (error) {
         console.error('Load posts error:', error);

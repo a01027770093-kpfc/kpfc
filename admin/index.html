@@ -193,31 +193,9 @@
           <div class="chart-header">
             <h3 class="chart-title">인기 검색 키워드</h3>
           </div>
-          <ul class="keyword-list">
-            <li class="keyword-item">
-              <span class="keyword-rank">1</span>
-              <span class="keyword-text">정책자금</span>
-              <span class="keyword-count">128</span>
-            </li>
-            <li class="keyword-item">
-              <span class="keyword-rank">2</span>
-              <span class="keyword-text">중소기업 대출</span>
-              <span class="keyword-count">95</span>
-            </li>
-            <li class="keyword-item">
-              <span class="keyword-rank">3</span>
-              <span class="keyword-text">정부지원금</span>
-              <span class="keyword-count">82</span>
-            </li>
-            <li class="keyword-item">
-              <span class="keyword-rank">4</span>
-              <span class="keyword-text">창업자금</span>
-              <span class="keyword-count">67</span>
-            </li>
-            <li class="keyword-item">
-              <span class="keyword-rank">5</span>
-              <span class="keyword-text">기업 컨설팅</span>
-              <span class="keyword-count">54</span>
+          <ul class="keyword-list" id="keywordList">
+            <li style="text-align: center; padding: 40px; color: var(--neutral-400);">
+              데이터 없음
             </li>
           </ul>
         </div>
@@ -367,78 +345,57 @@
       loadRecentPosts();
     });
 
-    // 통계 로드 (샘플 데이터)
+    // 통계 로드 (API 연동 필요)
     async function loadStats() {
       try {
-        // TODO: 실제 API 연동 시 수정
-        document.getElementById('totalLeads').textContent = '47';
-        document.getElementById('totalLeadsChange').textContent = '전체 접수 건수';
+        // TODO: 실제 API 연동 후 활성화
+        document.getElementById('totalLeads').textContent = '0';
+        document.getElementById('totalLeadsChange').textContent = 'API 연동 필요';
         document.getElementById('totalLeadsChange').className = 'stat-change';
 
-        document.getElementById('pendingLeads').textContent = '12';
-        document.getElementById('pendingLeadsChange').textContent = '처리 필요';
-        document.getElementById('pendingLeadsChange').className = 'stat-change negative';
+        document.getElementById('pendingLeads').textContent = '0';
+        document.getElementById('pendingLeadsChange').textContent = '-';
+        document.getElementById('pendingLeadsChange').className = 'stat-change';
 
-        document.getElementById('completedLeads').textContent = '32';
-        document.getElementById('completedLeadsChange').textContent = '처리 완료';
-        document.getElementById('completedLeadsChange').className = 'stat-change positive';
+        document.getElementById('completedLeads').textContent = '0';
+        document.getElementById('completedLeadsChange').textContent = '-';
+        document.getElementById('completedLeadsChange').className = 'stat-change';
 
-        document.getElementById('totalPosts').textContent = '15';
-        document.getElementById('totalPostsChange').textContent = '12개 게시 중';
-        document.getElementById('totalPostsChange').className = 'stat-change positive';
+        document.getElementById('totalPosts').textContent = '0';
+        document.getElementById('totalPostsChange').textContent = '-';
+        document.getElementById('totalPostsChange').className = 'stat-change';
 
       } catch (error) {
         console.error('Stats load error:', error);
       }
     }
 
-    // 최근 접수 내역 로드 (샘플 데이터)
+    // 최근 접수 내역 로드 (API 연동 필요)
     async function loadRecentLeads() {
       const tbody = document.getElementById('recentLeadsBody');
 
-      // 샘플 데이터
-      const leads = [
-        { date: '2024-12-26', company: '(주)테크솔루션', name: '김민수', phone: '010-1234-5678', amount: '3억원', status: '대기중' },
-        { date: '2024-12-25', company: '스마트커머스', name: '이영희', phone: '010-2345-6789', amount: '5천만원', status: '상담중' },
-        { date: '2024-12-24', company: '푸드테크', name: '박철수', phone: '010-3456-7890', amount: '1억원', status: '완료' },
-        { date: '2024-12-23', company: '그린에너지', name: '최지은', phone: '010-4567-8901', amount: '2억원', status: '상담중' },
-        { date: '2024-12-22', company: '디지털마케팅', name: '정수민', phone: '010-5678-9012', amount: '8천만원', status: '대기중' }
-      ];
-
-      tbody.innerHTML = leads.map(lead => `
+      // TODO: 실제 API 연동 후 활성화
+      tbody.innerHTML = `
         <tr>
-          <td>${lead.date}</td>
-          <td>${lead.company}</td>
-          <td>${lead.name}</td>
-          <td>${lead.phone}</td>
-          <td>${lead.amount}</td>
-          <td><span class="status-badge ${getStatusClass(lead.status)}">${lead.status}</span></td>
+          <td colspan="6" style="text-align: center; padding: 40px; color: var(--neutral-400);">
+            접수 내역이 없습니다. (API 연동 필요)
+          </td>
         </tr>
-      `).join('');
+      `;
     }
 
-    // 최근 게시글 로드 (샘플 데이터)
+    // 최근 게시글 로드 (API 연동 필요)
     async function loadRecentPosts() {
       const tbody = document.getElementById('recentPostsBody');
 
-      // 샘플 데이터
-      const posts = [
-        { date: '2024-12-26', title: '2025년 정책자금 신청 가이드', category: '정보', views: 256, published: true },
-        { date: '2024-12-25', title: '중소기업 대출 성공사례', category: '성공사례', views: 189, published: true },
-        { date: '2024-12-24', title: '신규 정책자금 안내', category: '공지', views: 342, published: true },
-        { date: '2024-12-23', title: '기업 신용평가 향상 방법', category: '정보', views: 127, published: true },
-        { date: '2024-12-22', title: '창업자금 지원 프로그램', category: '뉴스', views: 98, published: false }
-      ];
-
-      tbody.innerHTML = posts.map(post => `
+      // TODO: 실제 API 연동 후 활성화
+      tbody.innerHTML = `
         <tr>
-          <td>${post.date}</td>
-          <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${post.title}</td>
-          <td><span class="status-badge ${getCategoryClass(post.category)}">${post.category}</span></td>
-          <td>${post.views.toLocaleString()}</td>
-          <td><span class="status-badge ${post.published ? 'complete' : 'pending'}">${post.published ? '공개' : '비공개'}</span></td>
+          <td colspan="5" style="text-align: center; padding: 40px; color: var(--neutral-400);">
+            게시글이 없습니다. (API 연동 필요)
+          </td>
         </tr>
-      `).join('');
+      `;
     }
 
     // 상태 클래스
