@@ -338,6 +338,9 @@
       }
     }
 
+    // API URL
+    const API_URL = 'https://kfpc.a01027770093.workers.dev';
+
     // 페이지 로드 시 초기화
     document.addEventListener('DOMContentLoaded', function() {
       loadStats();
@@ -345,57 +348,125 @@
       loadRecentPosts();
     });
 
-    // 통계 로드 (API 연동 필요)
+    // 통계 로드
     async function loadStats() {
       try {
-        // TODO: 실제 API 연동 후 활성화
-        document.getElementById('totalLeads').textContent = '0';
-        document.getElementById('totalLeadsChange').textContent = 'API 연동 필요';
-        document.getElementById('totalLeadsChange').className = 'stat-change';
+        const response = await fetch(`${API_URL}/leads`);
+        const data = await response.json();
 
-        document.getElementById('pendingLeads').textContent = '0';
-        document.getElementById('pendingLeadsChange').textContent = '-';
-        document.getElementById('pendingLeadsChange').className = 'stat-change';
+        if (data.success && data.leads) {
+          const leads = data.leads;
+          const total = leads.length;
+          const pending = leads.filter(l => l.상태 === '신규').length;
+          const completed = leads.filter(l => l.상태 === '완료').length;
 
-        document.getElementById('completedLeads').textContent = '0';
-        document.getElementById('completedLeadsChange').textContent = '-';
-        document.getElementById('completedLeadsChange').className = 'stat-change';
+          document.getElementById('totalLeads').textContent = total;
+          document.getElementById('totalLeadsChange').textContent = '전체 접수';
+          document.getElementById('totalLeadsChange').className = 'stat-change';
 
-        document.getElementById('totalPosts').textContent = '0';
-        document.getElementById('totalPostsChange').textContent = '-';
+          document.getElementById('pendingLeads').textContent = pending;
+          document.getElementById('pendingLeadsChange').textContent = '신규 접수';
+          document.getElementById('pendingLeadsChange').className = 'stat-change';
+
+          document.getElementById('completedLeads').textContent = completed;
+          document.getElementById('completedLeadsChange').textContent = '처리 완료';
+          document.getElementById('completedLeadsChange').className = 'stat-change positive';
+        }
+
+        // 게시글 수는 별도 API 필요
+        document.getElementById('totalPosts').textContent = '-';
+        document.getElementById('totalPostsChange').textContent = '연동 필요';
         document.getElementById('totalPostsChange').className = 'stat-change';
 
       } catch (error) {
         console.error('Stats load error:', error);
+        document.getElementById('totalLeads').textContent = '0';
+        document.getElementById('totalLeadsChange').textContent = '로드 실패';
       }
     }
 
-    // 최근 접수 내역 로드 (API 연동 필요)
+    // 최근 접수 내역 로드
     async function loadRecentLeads() {
       const tbody = document.getElementById('recentLeadsBody');
 
-      // TODO: 실제 API 연동 후 활성화
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="6" style="text-align: center; padding: 40px; color: var(--neutral-400);">
-            접수 내역이 없습니다. (API 연동 필요)
-          </td>
-        </tr>
-      `;
+      try {
+        const response = await fetch(`${API_URL}/leads`);
+        const data = await response.json();
+
+        if (data.success && data.leads && data.leads.length > 0) {
+          // 최근 5개만 표시
+          const recentLeads = data.leads.slice(0, 5);
+
+          tbody.innerHTML = recentLeads.map(lead => `
+            <tr>
+              <td data-label="접수일">${lead.createdTime ? lead.createdTime.split('T')[0] : '-'}</td>
+              <td data-label="기업명">${lead.기업명 || '-'}</td>
+              <td data-label="대표자">${lead.대표자명 || '-'}</td>
+              <td data-label="연락처">${lead.연락처 || '-'}</td>
+              <td data-label="필요자금">${lead.필요자금규모 || '-'}</td>
+              <td data-label="상태"><span class="status-badge ${getStatusClass(lead.상태)}">${lead.상태 || '신규'}</span></td>
+            </tr>
+          `).join('');
+        } else {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="6" style="text-align: center; padding: 40px; color: var(--neutral-400);">
+                접수 내역이 없습니다.
+              </td>
+            </tr>
+          `;
+        }
+      } catch (error) {
+        console.error('Recent leads load error:', error);
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align: center; padding: 40px; color: var(--neutral-400);">
+              데이터를 불러올 수 없습니다.
+            </td>
+          </tr>
+        `;
+      }
     }
 
-    // 최근 게시글 로드 (API 연동 필요)
+    // 최근 게시글 로드
     async function loadRecentPosts() {
       const tbody = document.getElementById('recentPostsBody');
 
-      // TODO: 실제 API 연동 후 활성화
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="5" style="text-align: center; padding: 40px; color: var(--neutral-400);">
-            게시글이 없습니다. (API 연동 필요)
-          </td>
-        </tr>
-      `;
+      try {
+        const response = await fetch(`${API_URL}/posts`);
+        const data = await response.json();
+
+        if (data.success && data.posts && data.posts.length > 0) {
+          const recentPosts = data.posts.slice(0, 5);
+
+          tbody.innerHTML = recentPosts.map(post => `
+            <tr>
+              <td data-label="작성일">${post.createdTime ? post.createdTime.split('T')[0] : '-'}</td>
+              <td data-label="제목">${post.제목 || post.title || '-'}</td>
+              <td data-label="카테고리"><span class="category-badge ${getCategoryClass(post.카테고리 || post.category)}">${post.카테고리 || post.category || '-'}</span></td>
+              <td data-label="조회수">${post.조회수 || post.views || 0}</td>
+              <td data-label="상태"><span class="status-badge ${post.공개 ? 'complete' : 'pending'}">${post.공개 ? '공개' : '비공개'}</span></td>
+            </tr>
+          `).join('');
+        } else {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="5" style="text-align: center; padding: 40px; color: var(--neutral-400);">
+                게시글이 없습니다.
+              </td>
+            </tr>
+          `;
+        }
+      } catch (error) {
+        console.error('Recent posts load error:', error);
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 40px; color: var(--neutral-400);">
+              게시판 연동이 필요합니다.
+            </td>
+          </tr>
+        `;
+      }
     }
 
     // 상태 클래스

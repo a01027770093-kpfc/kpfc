@@ -355,26 +355,54 @@
       loadLeads();
     });
 
-    // 접수 목록 로드 (샘플 데이터)
+    // API URL
+    const API_URL = 'https://kfpc.a01027770093.workers.dev';
+
+    // 접수 목록 로드 (API 호출)
     async function loadLeads() {
-      // 샘플 데이터
-      allLeads = [
-        { id: 1, date: '2024-12-26', company: '(주)테크솔루션', name: '김민수', phone: '010-1234-5678', email: 'kim@tech.com', business: 'IT/소프트웨어', region: '서울 강남', amount: '3억원', callTime: '오전', revenue: '5억원', status: 'pending', memo: '', content: '정책자금 상담 희망' },
-        { id: 2, date: '2024-12-25', company: '스마트커머스', name: '이영희', phone: '010-2345-6789', email: 'lee@smart.com', business: '유통/도소매', region: '경기 수원', amount: '5천만원', callTime: '오후', revenue: '2억원', status: 'progress', memo: '내일 재통화 예정', content: '창업자금 문의' },
-        { id: 3, date: '2024-12-24', company: '푸드테크', name: '박철수', phone: '010-3456-7890', email: 'park@food.com', business: '식품/음료', region: '부산 해운대', amount: '1억원', callTime: '상관없음', revenue: '8억원', status: 'complete', memo: '승인 완료', content: '시설자금 지원 요청' },
-        { id: 4, date: '2024-12-23', company: '그린에너지', name: '최지은', phone: '010-4567-8901', email: 'choi@green.com', business: '환경/에너지', region: '대전 유성', amount: '2억원', callTime: '오전', revenue: '10억원', status: 'progress', memo: '', content: '신재생에너지 사업 자금' },
-        { id: 5, date: '2024-12-22', company: '디지털마케팅', name: '정수민', phone: '010-5678-9012', email: 'jung@digital.com', business: '광고/마케팅', region: '서울 마포', amount: '8천만원', callTime: '오후', revenue: '3억원', status: 'pending', memo: '', content: '마케팅 비용 지원' },
-        { id: 6, date: '2024-12-21', company: '헬스케어앤', name: '강민호', phone: '010-6789-0123', email: 'kang@health.com', business: '의료/헬스케어', region: '서울 송파', amount: '5억원', callTime: '오전', revenue: '15억원', status: 'pending', memo: '', content: '의료기기 개발 자금' },
-        { id: 7, date: '2024-12-20', company: '패션브랜드', name: '윤서연', phone: '010-7890-1234', email: 'yoon@fashion.com', business: '패션/의류', region: '서울 강남', amount: '1억5천만원', callTime: '상관없음', revenue: '6억원', status: 'complete', memo: '지원 완료', content: '온라인 사업 확장' },
-        { id: 8, date: '2024-12-19', company: '물류솔루션', name: '송태훈', phone: '010-8901-2345', email: 'song@logistics.com', business: '물류/운송', region: '인천 연수', amount: '3억원', callTime: '오후', revenue: '20억원', status: 'cancel', memo: '본인 취소', content: '물류센터 확장' },
-        { id: 9, date: '2024-12-18', company: '교육플랫폼', name: '한예진', phone: '010-9012-3456', email: 'han@edu.com', business: '교육/출판', region: '서울 서초', amount: '7천만원', callTime: '오전', revenue: '1억5천만원', status: 'progress', memo: '서류 준비 중', content: '온라인 교육 플랫폼 개발' },
-        { id: 10, date: '2024-12-17', company: '스타트업허브', name: '오준혁', phone: '010-0123-4567', email: 'oh@startup.com', business: 'IT/소프트웨어', region: '판교', amount: '2억원', callTime: '오후', revenue: '3억원', status: 'pending', memo: '', content: '시드 투자 유치 준비' },
-        { id: 11, date: '2024-12-16', company: '바이오텍', name: '임수정', phone: '010-1111-2222', email: 'lim@bio.com', business: '바이오/제약', region: '대전 유성', amount: '10억원', callTime: '오전', revenue: '50억원', status: 'progress', memo: '대출 심사 중', content: 'R&D 자금 지원' },
-        { id: 12, date: '2024-12-15', company: '콘텐츠팩토리', name: '배성민', phone: '010-3333-4444', email: 'bae@content.com', business: '미디어/엔터', region: '서울 강동', amount: '1억원', callTime: '상관없음', revenue: '4억원', status: 'complete', memo: '지원금 수령 완료', content: '콘텐츠 제작 자금' }
-      ];
+      try {
+        const response = await fetch(`${API_URL}/leads`);
+        const data = await response.json();
+
+        if (data.success && data.leads) {
+          // API 데이터를 테이블 형식으로 변환
+          allLeads = data.leads.map(lead => ({
+            id: lead.id,
+            date: lead.createdTime ? lead.createdTime.split('T')[0] : '-',
+            company: lead.기업명 || '-',
+            name: lead.대표자명 || '-',
+            phone: lead.연락처 || '-',
+            email: lead.이메일 || '',
+            business: lead.업종 || '-',
+            region: lead.지역 || '-',
+            amount: lead.필요자금규모 || '-',
+            callTime: lead.통화가능시간 || '-',
+            revenue: lead.직전년도매출 || '-',
+            status: mapStatus(lead.상태),
+            memo: lead.메모 || '',
+            content: lead.문의사항 || '-'
+          }));
+        } else {
+          allLeads = [];
+        }
+      } catch (error) {
+        console.error('API 호출 실패:', error);
+        allLeads = [];
+      }
 
       filteredLeads = [...allLeads];
       renderLeads();
+    }
+
+    // 상태값 매핑
+    function mapStatus(status) {
+      const statusMap = {
+        '신규': 'pending',
+        '상담중': 'progress',
+        '완료': 'complete',
+        '취소': 'cancel'
+      };
+      return statusMap[status] || 'pending';
     }
 
     // 접수 목록 렌더링
