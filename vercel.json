@@ -6,7 +6,7 @@
       "has": [
         {
           "type": "host",
-          "value": "admin.kpfc.co.kr"
+          "value": "admin.kpfc.kr"
         }
       ],
       "destination": "/admin/",
