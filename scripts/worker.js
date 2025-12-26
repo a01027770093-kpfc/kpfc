@@ -1396,9 +1396,7 @@ export default {
           }
 
           // 공개 URL (R2 공개 도메인)
-          const publicUrl = env.R2_PUBLIC_URL
-            ? `${env.R2_PUBLIC_URL}/${fileName}`
-            : `https://pub-bf39e5c4b6ef41af31941676cc384300.r2.dev/${fileName}`;
+          const publicUrl = `https://pub-a042ac0503284c5d8ed82f5ea918f615.r2.dev/${fileName}`;
 
           console.log('✅ Image uploaded:', fileName);
 
