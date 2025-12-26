@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>KPFC OG</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            width: 1200px;
+            height: 630px;
+            font-family: 'Noto Sans KR', sans-serif;
+            overflow: hidden;
+        }
+        .og-image {
+            width: 1200px;
+            height: 630px;
+            background: linear-gradient(135deg, #0a1628 0%, #1a1040 50%, #0a1628 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .og-image::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 70%, rgba(29, 0, 173, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 30%, rgba(67, 56, 202, 0.1) 0%, transparent 50%);
+        }
+        .top-line {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #c9a962, #e8d5a3, #c9a962, transparent);
+        }
+        .bottom-line {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #c9a962, #e8d5a3, #c9a962, transparent);
+        }
+        .content {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+        .subtitle-en {
+            font-size: 18px;
+            letter-spacing: 8px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+        .main-title {
+            font-size: 72px;
+            font-weight: 900;
+            color: #ffffff;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+        }
+        .tagline {
+            font-size: 26px;
+            color: #c9a962;
+            margin-bottom: 50px;
+            font-weight: 400;
+            letter-spacing: 4px;
+        }
+        .badges {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 50px;
+            justify-content: center;
+            align-items: center;
+        }
+        .badge {
+            width: 280px;
+            padding: 22px 0;
+            border: 1.5px solid rgba(201, 169, 98, 0.5);
+            border-radius: 4px;
+            color: #e8d5a3;
+            font-size: 22px;
+            font-weight: 500;
+            background: rgba(201, 169, 98, 0.05);
+            letter-spacing: 2px;
+            text-align: center;
+        }
+        .badge-divider {
+            display: flex;
+            align-items: center;
+            color: #c9a962;
+            font-size: 24px;
+        }
+        .domain {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 3px;
+            font-weight: 300;
+        }
+        .corner {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-color: rgba(201, 169, 98, 0.3);
+            border-style: solid;
+        }
+        .corner-tl { top: 40px; left: 40px; border-width: 2px 0 0 2px; }
+        .corner-tr { top: 40px; right: 40px; border-width: 2px 2px 0 0; }
+        .corner-bl { bottom: 40px; left: 40px; border-width: 0 0 2px 2px; }
+        .corner-br { bottom: 40px; right: 40px; border-width: 0 2px 2px 0; }
+    </style>
+</head>
+<body>
+    <div class="og-image">
+        <div class="top-line"></div>
+        <div class="bottom-line"></div>
+        <div class="corner corner-tl"></div>
+        <div class="corner corner-tr"></div>
+        <div class="corner corner-bl"></div>
+        <div class="corner corner-br"></div>
+        <div class="content">
+            <div class="subtitle-en">POLICY FUND CENTER</div>
+            <h1 class="main-title">한국정책자금지원센터</h1>
+            <p class="tagline">정책자금 맞춤 컨설팅</p>
+            <div class="badges">
+                <div class="badge">1차 무료심사</div>
+                <div class="badge-divider">✦</div>
+                <div class="badge">2026년 신규정책 상담</div>
+            </div>
+            <div class="domain">KPFC.kr</div>
+        </div>
+    </div>
+</body>
+</html>
