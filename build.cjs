@@ -24,6 +24,16 @@ htmlFiles.forEach(file => {
 
 console.log('\n✅ 빌드 완료!');
 
+// sitemap.xml, robots.txt 복사
+['sitemap.xml', 'robots.txt'].forEach(file => {
+    const src = path.join(ROOT_DIR, file);
+    const dest = path.join(DIST_DIR, file);
+    if (fs.existsSync(src)) {
+        fs.copyFileSync(src, dest);
+        console.log(`✓ 복사됨: ${file}`);
+    }
+});
+
 // 이미지 파일들 (png, jpg, svg 등) 복사
 const rootFiles = fs.readdirSync(ROOT_DIR);
 rootFiles.forEach(file => {
