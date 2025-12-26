@@ -757,12 +757,11 @@ async function handleLeadsAPI(request, env, path) {
     try {
       console.log('📋 Fetching leads...');
 
-      const airtableResponse = await fetch(
-        `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/consulting?sort[0][field]=접수일&sort[0][direction]=desc`,
-        {
-          headers: { 'Authorization': `Bearer ${env.AIRTABLE_TOKEN}` }
-        }
-      );
+      const sortField = encodeURIComponent('접수일');
+      const airtableUrl = `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/consulting?sort[0][field]=${sortField}&sort[0][direction]=desc`;
+      const airtableResponse = await fetch(airtableUrl, {
+        headers: { 'Authorization': `Bearer ${env.AIRTABLE_TOKEN}` }
+      });
 
       if (!airtableResponse.ok) {
         const error = await airtableResponse.json();
@@ -971,6 +970,177 @@ async function handleBoardAPI(request, env, path) {
     }
   }
 
+  // POST /board - 게시글 생성
+  if (method === 'POST' && path === '/board') {
+    try {
+      const data = await request.json();
+      console.log('📝 Creating board post:', data.제목);
+
+      // 한글 필드명 → 영문 필드명 변환
+      const fields = {
+        title: data.제목 || '',
+        content: data.내용 || '',
+        summary: data.요약 || '',
+        category: data.카테고리 || '',
+        thumbnailUrl: data.썸네일URL || '',
+        tags: data.태그 || '',
+        date: data.작성일 || formatDateKST(new Date()),
+        views: 0,
+        isPublic: data.게시여부 !== false
+      };
+
+      const airtableResponse = await fetch(
+        `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/board`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${env.AIRTABLE_TOKEN}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ fields })
+        }
+      );
+
+      if (!airtableResponse.ok) {
+        const error = await airtableResponse.json();
+        return new Response(JSON.stringify({
+          success: false,
+          error: error.error?.message || 'Failed to create post'
+        }), {
+          status: 500,
+          headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const result = await airtableResponse.json();
+      console.log('✅ Board post created:', result.id);
+
+      return new Response(JSON.stringify({
+        success: true,
+        id: result.id
+      }), {
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    } catch (error) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: error.message
+      }), {
+        status: 500,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    }
+  }
+
+  // PATCH /board/:id - 게시글 수정
+  if (method === 'PATCH' && path.startsWith('/board/')) {
+    const recordId = path.replace('/board/', '');
+    try {
+      const data = await request.json();
+      console.log('✏️ Updating board post:', recordId);
+
+      // 한글 필드명 → 영문 필드명 변환 (전달된 필드만)
+      const fields = {};
+      if (data.제목 !== undefined) fields.title = data.제목;
+      if (data.내용 !== undefined) fields.content = data.내용;
+      if (data.요약 !== undefined) fields.summary = data.요약;
+      if (data.카테고리 !== undefined) fields.category = data.카테고리;
+      if (data.썸네일URL !== undefined) fields.thumbnailUrl = data.썸네일URL;
+      if (data.태그 !== undefined) fields.tags = data.태그;
+      if (data.작성일 !== undefined) fields.date = data.작성일;
+      if (data.게시여부 !== undefined) fields.isPublic = data.게시여부;
+
+      const airtableResponse = await fetch(
+        `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/board/${recordId}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${env.AIRTABLE_TOKEN}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ fields })
+        }
+      );
+
+      if (!airtableResponse.ok) {
+        const error = await airtableResponse.json();
+        return new Response(JSON.stringify({
+          success: false,
+          error: error.error?.message || 'Failed to update post'
+        }), {
+          status: 500,
+          headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const result = await airtableResponse.json();
+      console.log('✅ Board post updated:', recordId);
+
+      return new Response(JSON.stringify({
+        success: true,
+        id: result.id
+      }), {
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    } catch (error) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: error.message
+      }), {
+        status: 500,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    }
+  }
+
+  // DELETE /board/:id - 게시글 삭제
+  if (method === 'DELETE' && path.startsWith('/board/')) {
+    const recordId = path.replace('/board/', '');
+    try {
+      console.log('🗑️ Deleting board post:', recordId);
+
+      const airtableResponse = await fetch(
+        `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/board/${recordId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${env.AIRTABLE_TOKEN}`
+          }
+        }
+      );
+
+      if (!airtableResponse.ok) {
+        const error = await airtableResponse.json();
+        return new Response(JSON.stringify({
+          success: false,
+          error: error.error?.message || 'Failed to delete post'
+        }), {
+          status: 500,
+          headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const result = await airtableResponse.json();
+      console.log('✅ Board post deleted:', recordId);
+
+      return new Response(JSON.stringify({
+        success: true,
+        deleted: true,
+        id: result.id
+      }), {
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    } catch (error) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: error.message
+      }), {
+        status: 500,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    }
+  }
+
   // GET /posts/:id - 개별 게시글 조회
   if (method === 'GET' && path.startsWith('/posts/')) {
     try {
@@ -1091,7 +1261,7 @@ export default {
       // ================================================
       // 게시판 API (/board, /posts)
       // ================================================
-      if (path === '/board' || path === '/posts' || path.startsWith('/posts/')) {
+      if (path === '/board' || path.startsWith('/board/') || path === '/posts' || path.startsWith('/posts/')) {
         return await handleBoardAPI(request, env, path);
       }
 
@@ -1346,7 +1516,11 @@ export default {
           'POST /auth - 관리자 로그인',
           'GET /leads - 접수 내역 조회',
           'PATCH /leads/:id - 접수 상태 수정',
+          'DELETE /leads/:id - 접수 삭제',
           'GET /board - 게시글 목록',
+          'POST /board - 게시글 생성',
+          'PATCH /board/:id - 게시글 수정',
+          'DELETE /board/:id - 게시글 삭제',
           'GET /posts - 게시글 목록',
           'GET /posts/:id - 게시글 상세',
           'GET /analytics/all - GA4 전체 데이터',
