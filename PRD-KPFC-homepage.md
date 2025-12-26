@@ -451,7 +451,64 @@ R2 URL 패턴: https://pub-bf39e5c4b6ef41af31941676cc384300.r2.dev/board/{filena
 
 ---
 
-*문서 버전: 1.3*
+---
+
+## 12. 빌드 시스템 수정 (2025-12-26) ⚠️ 중요
+
+### 12.1 문제 상황
+- **기존**: src/ 폴더의 bizen 템플릿 컴포넌트가 빌드되어 배포됨
+- **결과**: 루트의 KPFC 커스텀된 HTML 파일이 무시됨
+
+### 12.2 해결 조치 (완료)
+| 작업 | 상태 | 설명 |
+|------|------|------|
+| **src/ 폴더 삭제** | ✅ | bizen 템플릿 컴포넌트 완전 폐기 |
+| **build.cjs 수정** | ✅ | 루트 HTML → dist 직접 복사 |
+| **vercel.json 추가** | ✅ | outputDirectory: dist |
+
+### 12.3 빌드 소스 (공식)
+```
+⚠️ 빌드 소스는 반드시 루트의 HTML 파일만 사용
+
+F:\pola_homepage\4.20th_ijonghyun_KPFC\
+├── index.html      ← 메인 (빌드 소스)
+├── about.html      ← 회사소개 (빌드 소스)
+├── fund.html       ← 정책자금 (빌드 소스)
+├── process.html    ← 진행절차 (빌드 소스)
+├── service.html    ← 서비스 (빌드 소스)
+├── marketing.html  ← 마케팅 (빌드 소스)
+├── post.html       ← 게시글 상세 (빌드 소스)
+├── policy.html     ← 이용약관 (빌드 소스)
+└── privacy.html    ← 개인정보처리방침 (빌드 소스)
+```
+
+### 12.4 빌드 흐름
+```
+루트 HTML 파일들 (KPFC 커스텀 완료)
+    ↓
+build.cjs (직접 복사, 변환 없음)
+    ↓
+dist/ 폴더
+    ↓
+Vercel 배포
+```
+
+### 12.5 금지 사항
+- ❌ src/ 폴더 재생성 금지
+- ❌ bizen 템플릿 컴포넌트 사용 금지
+- ❌ 루트 HTML 외 다른 소스로 빌드 금지
+
+### 12.6 재빌드 체크리스트
+- [x] src/ 폴더 삭제 (bizen 템플릿 폐기)
+- [x] build.cjs 수정 (루트 HTML 직접 복사)
+- [x] vercel.json 추가 (outputDirectory: dist)
+- [ ] Git commit & push
+- [ ] Vercel 빌드 성공 확인
+
+---
+
+*문서 버전: 1.4*
 *작성일: 2024-12-25*
 *수정: 2024-12-26 - 세션 인수인계 추가, 진행 상황 업데이트*
 *수정: 2025-12-26 - 이미지 생성 파이프라인 TDD 상태 체크 추가*
+*수정: 2025-12-26 - 빌드 시스템 수정 (src 삭제, 루트 HTML 직접 복사)*
