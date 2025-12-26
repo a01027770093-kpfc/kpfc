@@ -1,6 +1,6 @@
 // KPFC 관리자 인증 모듈
 const AUTH_KEY = 'kpfc_admin_auth';
-const WORKER_URL = 'https://kpfc-analytics.chltmdrbs7.workers.dev';
+const WORKER_URL = 'https://kpfc-analytics.a01027770093.workers.dev';
 
 // 인증 상태 확인
 function checkAuth() {

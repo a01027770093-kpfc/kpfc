@@ -1,3 +1,8 @@
 name = "kpfc-analytics"
 main = "worker.js"
 compatibility_date = "2024-01-01"
+account_id = "bf39e5c4b6ef41af31941676cc384300"
+
+# Cron Trigger - 매일 KST 01:00 (UTC 16:00) GA4 데이터 수집
+[triggers]
+crons = ["0 16 * * *"]

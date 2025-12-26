@@ -637,7 +637,7 @@
     // ============================================================
     // GA4 Analytics Worker URL
     // ============================================================
-    const GA4_API_URL = 'https://kpfc-analytics.chltmdrbs7.workers.dev';
+    const GA4_API_URL = 'https://kpfc-analytics.a01027770093.workers.dev';
 
     // 현재 기간
     let currentPeriod = 'daily';
@@ -1149,16 +1149,27 @@
       });
     }
 
-    // 히스토리 데이터 로드
-    async function loadHistoryData() {
+    // 히스토리 데이터 로드 (Airtable 캐시 우선 조회)
+    async function loadHistoryData(forceRefresh = false) {
       if (!GA4_API_URL) return;
 
       try {
-        const response = await fetch(`${GA4_API_URL}/history/stats?days=${historyDays}`);
+        // 기본적으로 Airtable 캐시 조회 (API 제한 방지)
+        const endpoint = forceRefresh
+          ? `${GA4_API_URL}/history/stats?days=${historyDays}`
+          : `${GA4_API_URL}/history/cached?days=${historyDays}`;
+
+        const response = await fetch(endpoint);
         if (!response.ok) {
           throw new Error('히스토리 API 요청 실패');
         }
         historyData = await response.json();
+
+        // 캐시 데이터인 경우 표시
+        if (historyData.cached) {
+          console.log('📦 캐시된 데이터 사용 (Airtable)');
+        }
+
         renderHistoryTable(historyData.data || []);
         renderHistoryChart(historyData.data || []);
         updateLastSyncTime(historyData.data || []);
@@ -1185,29 +1196,119 @@
       el.textContent = `마지막 수집: ${year.slice(2)}.${month}.${day} 01:00 (KST) • 매일 자동 수집`;
     }
 
-    // 기간 비교 데이터 로드
+    // 기간 비교 데이터 로드 (캐시 기반으로 계산)
     async function loadCompareData() {
       if (!GA4_API_URL) return;
 
       try {
-        const [dailyRes, weeklyRes, monthlyRes] = await Promise.all([
-          fetch(`${GA4_API_URL}/analytics/overview?period=daily`),
-          fetch(`${GA4_API_URL}/analytics/overview?period=weekly`),
-          fetch(`${GA4_API_URL}/analytics/overview?period=monthly`)
-        ]);
+        // 캐시된 히스토리 데이터 사용 (API 제한 방지)
+        const response = await fetch(`${GA4_API_URL}/history/cached?days=60`);
+        if (!response.ok) throw new Error('캐시 데이터 조회 실패');
 
-        const [daily, weekly, monthly] = await Promise.all([
-          dailyRes.json(),
-          weeklyRes.json(),
-          monthlyRes.json()
-        ]);
+        const result = await response.json();
+        const data = result.data || [];
 
-        renderCompareCard('compare-daily', daily, '어제');
-        renderCompareCard('compare-weekly', weekly, '지난 주');
-        renderCompareCard('compare-monthly', monthly, '지난 달');
+        if (data.length < 2) {
+          console.log('비교할 데이터 부족');
+          return;
+        }
+
+        // 날짜 기준 정렬 (최신순)
+        data.sort((a, b) => b.date.localeCompare(a.date));
+
+        // 일간 비교 (어제 vs 그저께)
+        const daily = calculateCompare(data, 0, 1);
+        renderCompareCard('compare-daily', daily, '전일');
+
+        // 주간 비교 (최근 7일 vs 이전 7일)
+        const weekly = calculateWeeklyCompare(data);
+        renderCompareCard('compare-weekly', weekly, '전주');
+
+        // 월간 비교 (최근 30일 vs 이전 30일)
+        const monthly = calculateMonthlyCompare(data);
+        renderCompareCard('compare-monthly', monthly, '전월');
+
       } catch (error) {
         console.error('비교 데이터 로드 실패:', error);
       }
+    }
+
+    // 단순 일간 비교 계산
+    function calculateCompare(data, currentIdx, prevIdx) {
+      const current = data[currentIdx] || { visitors: 0, pageviews: 0, avg_duration: 0, bounce_rate: 0 };
+      const prev = data[prevIdx] || current;
+
+      const calcChange = (curr, prv) => {
+        if (prv === 0) return curr > 0 ? 100 : 0;
+        return Math.round(((curr - prv) / prv) * 100);
+      };
+
+      const formatDuration = (seconds) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.round(seconds % 60);
+        return `${mins}분 ${secs}초`;
+      };
+
+      return {
+        visitors: { value: current.visitors, change: calcChange(current.visitors, prev.visitors) },
+        pageviews: { value: current.pageviews, change: calcChange(current.pageviews, prev.pageviews) },
+        duration: { value: formatDuration(current.avg_duration), change: calcChange(current.avg_duration, prev.avg_duration) },
+        bounceRate: { value: Math.round(current.bounce_rate * 100), change: calcChange(current.bounce_rate, prev.bounce_rate) }
+      };
+    }
+
+    // 주간 비교 계산 (최근 7일 vs 이전 7일)
+    function calculateWeeklyCompare(data) {
+      const current = data.slice(0, 7).reduce((acc, d) => ({
+        visitors: acc.visitors + (d.visitors || 0),
+        pageviews: acc.pageviews + (d.pageviews || 0),
+        avg_duration: acc.avg_duration + (d.avg_duration || 0),
+        bounce_rate: acc.bounce_rate + (d.bounce_rate || 0)
+      }), { visitors: 0, pageviews: 0, avg_duration: 0, bounce_rate: 0 });
+
+      const prev = data.slice(7, 14).reduce((acc, d) => ({
+        visitors: acc.visitors + (d.visitors || 0),
+        pageviews: acc.pageviews + (d.pageviews || 0),
+        avg_duration: acc.avg_duration + (d.avg_duration || 0),
+        bounce_rate: acc.bounce_rate + (d.bounce_rate || 0)
+      }), { visitors: 0, pageviews: 0, avg_duration: 0, bounce_rate: 0 });
+
+      // 평균 계산
+      const currentCount = Math.min(data.length, 7);
+      const prevCount = Math.min(Math.max(data.length - 7, 0), 7) || 1;
+      current.avg_duration /= currentCount || 1;
+      current.bounce_rate /= currentCount || 1;
+      prev.avg_duration /= prevCount;
+      prev.bounce_rate /= prevCount;
+
+      return calculateCompare([current, prev], 0, 1);
+    }
+
+    // 월간 비교 계산 (최근 30일 vs 이전 30일)
+    function calculateMonthlyCompare(data) {
+      const current = data.slice(0, 30).reduce((acc, d) => ({
+        visitors: acc.visitors + (d.visitors || 0),
+        pageviews: acc.pageviews + (d.pageviews || 0),
+        avg_duration: acc.avg_duration + (d.avg_duration || 0),
+        bounce_rate: acc.bounce_rate + (d.bounce_rate || 0)
+      }), { visitors: 0, pageviews: 0, avg_duration: 0, bounce_rate: 0 });
+
+      const prev = data.slice(30, 60).reduce((acc, d) => ({
+        visitors: acc.visitors + (d.visitors || 0),
+        pageviews: acc.pageviews + (d.pageviews || 0),
+        avg_duration: acc.avg_duration + (d.avg_duration || 0),
+        bounce_rate: acc.bounce_rate + (d.bounce_rate || 0)
+      }), { visitors: 0, pageviews: 0, avg_duration: 0, bounce_rate: 0 });
+
+      // 평균 계산
+      const currentCount = Math.min(data.length, 30);
+      const prevCount = Math.min(Math.max(data.length - 30, 0), 30) || 1;
+      current.avg_duration /= currentCount || 1;
+      current.bounce_rate /= currentCount || 1;
+      prev.avg_duration /= prevCount;
+      prev.bounce_rate /= prevCount;
+
+      return calculateCompare([current, prev], 0, 1);
     }
 
     // 비교 카드 렌더링

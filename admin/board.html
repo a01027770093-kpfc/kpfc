@@ -748,16 +748,13 @@
       });
     });
 
-    // 게시글 로드 (API 연동 필요)
+    // 게시글 로드 (API 연동)
     async function loadPosts() {
       showLoading(true);
       try {
-        // TODO: 실제 API 연동 후 활성화
-        // const response = await fetch(`${WORKER_URL}/board/all`);
-        // const result = await response.json();
-        // allPosts = result.records || [];
-
-        allPosts = [];
+        const response = await fetch(`${WORKER_URL}/board`);
+        const result = await response.json();
+        allPosts = result.records || [];
         filterAndRenderPosts();
       } catch (error) {
         console.error('Load posts error:', error);

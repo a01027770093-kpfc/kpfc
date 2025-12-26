@@ -71,6 +71,12 @@ function formatTimeKST(date) {
   return kst.toISOString().split('T')[1].substring(0, 5);
 }
 
+// KST ISO 포맷 (YYYY-MM-DDTHH:MM:SS+09:00)
+function formatISOKST(date = new Date()) {
+  const kst = new Date(date.getTime() + 9 * 60 * 60 * 1000);
+  return kst.toISOString().replace('Z', '+09:00');
+}
+
 // ================================================
 // Google Analytics JWT/Token
 // ================================================
@@ -414,6 +420,100 @@ async function getHistoryStats(accessToken, propertyId, days) {
   });
 
   return { data };
+}
+
+// ================================================
+// Airtable 캐시 조회 (GA4 API 호출 없이)
+// ================================================
+
+async function getHistoryStatsFromCache(env, days) {
+  if (!env.AIRTABLE_TOKEN || !env.AIRTABLE_BASE_ID) {
+    throw new Error('Airtable not configured');
+  }
+
+  // 날짜 범위 계산
+  const today = new Date();
+  const startDate = new Date(today.getTime() - days * 24 * 60 * 60 * 1000);
+  const startDateStr = formatDateKST(startDate);
+
+  // Airtable에서 캐시된 데이터 조회
+  const response = await fetch(
+    `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/analytics_daily?` +
+    `filterByFormula=IS_AFTER({date}, '${startDateStr}')&sort[0][field]=date&sort[0][direction]=desc`,
+    {
+      headers: { 'Authorization': `Bearer ${env.AIRTABLE_TOKEN}` }
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch from Airtable');
+  }
+
+  const result = await response.json();
+  const data = (result.records || []).map(record => ({
+    date: record.fields.date,
+    visitors: record.fields.visitors || 0,
+    pageviews: record.fields.pageviews || 0,
+    avg_duration: record.fields.avg_duration || 0,
+    bounce_rate: record.fields.bounce_rate || 0
+  }));
+
+  return { data, source: 'airtable', cached: true };
+}
+
+// 캐시된 개요 데이터 조회 (최근 N일 합산)
+async function getOverviewFromCache(env, days) {
+  const historyData = await getHistoryStatsFromCache(env, days);
+  const data = historyData.data;
+
+  if (!data || data.length === 0) {
+    return {
+      visitors: { value: 0, change: 0 },
+      pageviews: { value: 0, change: 0 },
+      duration: { value: '0분 0초', change: 0 },
+      bounceRate: { value: 0, change: 0 },
+      source: 'airtable'
+    };
+  }
+
+  // 최신 데이터 (오늘 또는 어제)
+  const latest = data[0];
+
+  // 이전 기간 데이터 (비교용)
+  const prev = data[1] || data[0];
+
+  const calcChange = (curr, prv) => {
+    if (prv === 0) return curr > 0 ? 100 : 0;
+    return Math.round(((curr - prv) / prv) * 100);
+  };
+
+  const formatDuration = (seconds) => {
+    const s = parseFloat(seconds) || 0;
+    const mins = Math.floor(s / 60);
+    const secs = Math.round(s % 60);
+    return `${mins}분 ${secs}초`;
+  };
+
+  return {
+    period: { startDate: data[data.length - 1]?.date, endDate: latest.date },
+    visitors: {
+      value: latest.visitors,
+      change: calcChange(latest.visitors, prev.visitors)
+    },
+    pageviews: {
+      value: latest.pageviews,
+      change: calcChange(latest.pageviews, prev.pageviews)
+    },
+    duration: {
+      value: formatDuration(latest.avg_duration),
+      change: calcChange(latest.avg_duration, prev.avg_duration)
+    },
+    bounceRate: {
+      value: Math.round(latest.bounce_rate * 100),
+      change: calcChange(latest.bounce_rate, prev.bounce_rate)
+    },
+    source: 'airtable'
+  };
 }
 
 // ================================================
@@ -796,20 +896,21 @@ async function handleBoardAPI(request, env, path) {
       }
 
       const data = await airtableResponse.json();
-      const posts = (data.records || []).map(record => ({
+      // board.html에서 사용하는 한글 필드명에 맞춰 매핑
+      const records = (data.records || []).map(record => ({
         id: record.id,
-        title: record.fields['title'] || '',
-        content: record.fields['content'] || '',
-        summary: record.fields['content']?.substring(0, 100) || '',
-        category: record.fields['tag'] || '',
-        thumbnail: record.fields['thumbnailUrl'] || '',
-        tags: record.fields['tag'] || '',
-        date: record.fields['date'] || '',
-        views: 0,
-        isPublic: record.fields['isPublic'] || false
+        제목: record.fields['title'] || '',
+        내용: record.fields['content'] || '',
+        요약: record.fields['summary'] || record.fields['content']?.substring(0, 100) || '',
+        카테고리: record.fields['category'] || record.fields['tag'] || '',
+        썸네일URL: record.fields['thumbnailUrl'] || '',
+        태그: record.fields['tags'] || record.fields['tag'] || '',
+        작성일: record.fields['date'] || '',
+        조회수: record.fields['views'] || 0,
+        게시여부: record.fields['isPublic'] !== false
       }));
 
-      return new Response(JSON.stringify({ posts }), {
+      return new Response(JSON.stringify({ records }), {
         headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
       });
     } catch (error) {
@@ -907,8 +1008,17 @@ export default {
         return new Response(JSON.stringify({
           status: 'ok',
           service: 'kpfc-api',
-          version: '2.0.0',
-          features: ['analytics', 'submit', 'leads', 'board']
+          version: '2.0.1',
+          features: ['analytics', 'submit', 'leads', 'board'],
+          env_status: {
+            GA4_PROPERTY_ID: !!env.GA4_PROPERTY_ID,
+            SERVICE_ACCOUNT_EMAIL: !!env.SERVICE_ACCOUNT_EMAIL,
+            SERVICE_ACCOUNT_PRIVATE_KEY: !!env.SERVICE_ACCOUNT_PRIVATE_KEY,
+            AIRTABLE_TOKEN: !!env.AIRTABLE_TOKEN,
+            AIRTABLE_BASE_ID: !!env.AIRTABLE_BASE_ID,
+            TELEGRAM_BOT_TOKEN: !!env.TELEGRAM_BOT_TOKEN,
+            RESEND_API_KEY: !!env.RESEND_API_KEY
+          }
         }), {
           headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
         });
@@ -988,6 +1098,194 @@ export default {
       }
 
       // ================================================
+      // Airtable 캐시 조회 API (GA4 API 호출 없음)
+      // ================================================
+      if (path === '/analytics/cached' || path === '/history/cached') {
+        try {
+          const days = parseInt(url.searchParams.get('days')) || 30;
+          const data = await getHistoryStatsFromCache(env, days);
+          return new Response(JSON.stringify(data), {
+            headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+          });
+        } catch (error) {
+          return new Response(JSON.stringify({
+            error: error.message,
+            data: [],
+            source: 'airtable',
+            cached: true
+          }), {
+            status: 500,
+            headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+          });
+        }
+      }
+
+      if (path === '/analytics/overview/cached') {
+        try {
+          const days = parseInt(url.searchParams.get('days')) || 7;
+          const data = await getOverviewFromCache(env, days);
+          return new Response(JSON.stringify(data), {
+            headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+          });
+        } catch (error) {
+          return new Response(JSON.stringify({
+            error: error.message,
+            source: 'airtable'
+          }), {
+            status: 500,
+            headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+          });
+        }
+      }
+
+      // ================================================
+      // 수동 백필 API (과거 데이터 일괄 수집)
+      // GET /backfill?days=30
+      // ================================================
+      if (path === '/backfill') {
+        try {
+          const days = parseInt(url.searchParams.get('days')) || 7;
+
+          // 환경변수 검증
+          if (!env.GA4_PROPERTY_ID || !env.SERVICE_ACCOUNT_EMAIL || !env.SERVICE_ACCOUNT_PRIVATE_KEY) {
+            return new Response(JSON.stringify({
+              success: false,
+              error: 'Missing GA environment variables'
+            }), {
+              status: 500,
+              headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+            });
+          }
+          if (!env.AIRTABLE_TOKEN || !env.AIRTABLE_BASE_ID) {
+            return new Response(JSON.stringify({
+              success: false,
+              error: 'Missing Airtable environment variables'
+            }), {
+              status: 500,
+              headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+            });
+          }
+
+          console.log(`📊 Backfill started for ${days} days`);
+
+          const accessToken = await getAccessToken(env);
+          const propertyId = env.GA4_PROPERTY_ID;
+          const results = [];
+
+          // 과거 N일간 데이터 수집
+          for (let i = 1; i <= days; i++) {
+            const targetDate = new Date(Date.now() - i * 24 * 60 * 60 * 1000);
+            const dateStr = formatDateKST(targetDate);
+
+            try {
+              // GA4에서 해당 날짜 데이터 수집
+              const report = await runReport(accessToken, propertyId, {
+                dateRanges: [{ startDate: dateStr, endDate: dateStr }],
+                metrics: [
+                  { name: 'activeUsers' },
+                  { name: 'screenPageViews' },
+                  { name: 'averageSessionDuration' },
+                  { name: 'bounceRate' }
+                ]
+              });
+
+              const row = report.rows?.[0]?.metricValues || [];
+              const analyticsData = {
+                date: dateStr,
+                visitors: parseInt(row[0]?.value) || 0,
+                pageviews: parseInt(row[1]?.value) || 0,
+                avg_duration: parseFloat(row[2]?.value) || 0,
+                bounce_rate: parseFloat(row[3]?.value) || 0,
+                collected_at: formatISOKST()
+              };
+
+              // Airtable에서 해당 날짜 레코드 확인 (중복 방지)
+              const checkResponse = await fetch(
+                `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/analytics_daily?filterByFormula={date}='${dateStr}'`,
+                {
+                  headers: { 'Authorization': `Bearer ${env.AIRTABLE_TOKEN}` }
+                }
+              );
+              const existingData = await checkResponse.json();
+
+              if (existingData.records && existingData.records.length > 0) {
+                // 기존 레코드 업데이트
+                const recordId = existingData.records[0].id;
+                await fetch(
+                  `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/analytics_daily/${recordId}`,
+                  {
+                    method: 'PATCH',
+                    headers: {
+                      'Authorization': `Bearer ${env.AIRTABLE_TOKEN}`,
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                      fields: {
+                        visitors: analyticsData.visitors,
+                        pageviews: analyticsData.pageviews,
+                        avg_duration: analyticsData.avg_duration,
+                        bounce_rate: analyticsData.bounce_rate,
+                        collected_at: analyticsData.collected_at
+                      }
+                    })
+                  }
+                );
+                results.push({ date: dateStr, action: 'updated', ...analyticsData });
+              } else {
+                // 새 레코드 생성
+                await fetch(
+                  `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/analytics_daily`,
+                  {
+                    method: 'POST',
+                    headers: {
+                      'Authorization': `Bearer ${env.AIRTABLE_TOKEN}`,
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                      fields: {
+                        date: analyticsData.date,
+                        visitors: analyticsData.visitors,
+                        pageviews: analyticsData.pageviews,
+                        avg_duration: analyticsData.avg_duration,
+                        bounce_rate: analyticsData.bounce_rate,
+                        collected_at: analyticsData.collected_at
+                      }
+                    })
+                  }
+                );
+                results.push({ date: dateStr, action: 'created', ...analyticsData });
+              }
+
+              console.log(`✅ ${dateStr} processed`);
+            } catch (dayError) {
+              console.error(`❌ ${dateStr} failed:`, dayError.message);
+              results.push({ date: dateStr, action: 'error', error: dayError.message });
+            }
+          }
+
+          console.log(`🎉 Backfill completed: ${results.length} days processed`);
+
+          return new Response(JSON.stringify({
+            success: true,
+            processed: results.length,
+            results: results
+          }), {
+            headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+          });
+
+        } catch (error) {
+          console.error('💥 Backfill error:', error.message);
+          return new Response(JSON.stringify({
+            success: false,
+            error: error.message
+          }), {
+            status: 500,
+            headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+          });
+        }
+      }
+
+      // ================================================
       // 기본 응답
       // ================================================
       return new Response(JSON.stringify({
@@ -1003,7 +1301,11 @@ export default {
           'GET /posts/:id - 게시글 상세',
           'GET /analytics/all - GA4 전체 데이터',
           'GET /analytics/overview - GA4 개요',
+          'GET /analytics/cached - 캐시된 히스토리',
+          'GET /analytics/overview/cached - 캐시된 개요',
           'GET /history/stats - GA4 히스토리',
+          'GET /history/cached - 캐시된 히스토리',
+          'GET /backfill?days=N - 과거 데이터 백필',
           'GET /health - 헬스 체크'
         ]
       }), {
@@ -1019,6 +1321,127 @@ export default {
         status: 500,
         headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
       });
+    }
+  },
+
+  // ================================================
+  // Scheduled Event Handler (Cron Trigger)
+  // 매일 KST 01:00 (UTC 16:00) GA4 데이터 수집 → Airtable 저장
+  // ================================================
+  async scheduled(event, env, ctx) {
+    console.log('🕐 Cron triggered (KST):', formatISOKST());
+
+    try {
+      // 환경변수 검증
+      if (!env.GA4_PROPERTY_ID || !env.SERVICE_ACCOUNT_EMAIL || !env.SERVICE_ACCOUNT_PRIVATE_KEY) {
+        console.error('❌ Missing GA environment variables');
+        return;
+      }
+      if (!env.AIRTABLE_TOKEN || !env.AIRTABLE_BASE_ID) {
+        console.error('❌ Missing Airtable environment variables');
+        return;
+      }
+
+      // GA4 Access Token 획득
+      const accessToken = await getAccessToken(env);
+      const propertyId = env.GA4_PROPERTY_ID;
+
+      // 어제 날짜 (KST 기준)
+      const today = new Date();
+      const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+      const dateStr = formatDateKST(yesterday);
+
+      console.log('📊 Collecting GA4 data for:', dateStr);
+
+      // GA4에서 어제 데이터 수집
+      const report = await runReport(accessToken, propertyId, {
+        dateRanges: [{ startDate: dateStr, endDate: dateStr }],
+        metrics: [
+          { name: 'activeUsers' },
+          { name: 'screenPageViews' },
+          { name: 'averageSessionDuration' },
+          { name: 'bounceRate' }
+        ]
+      });
+
+      const row = report.rows?.[0]?.metricValues || [];
+      const analyticsData = {
+        date: dateStr,
+        visitors: parseInt(row[0]?.value) || 0,
+        pageviews: parseInt(row[1]?.value) || 0,
+        avg_duration: parseFloat(row[2]?.value) || 0,
+        bounce_rate: parseFloat(row[3]?.value) || 0,
+        collected_at: formatISOKST()
+      };
+
+      console.log('📈 GA4 Data:', analyticsData);
+
+      // Airtable에서 해당 날짜 레코드 확인 (중복 방지)
+      const checkResponse = await fetch(
+        `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/analytics_daily?filterByFormula={date}='${dateStr}'`,
+        {
+          headers: { 'Authorization': `Bearer ${env.AIRTABLE_TOKEN}` }
+        }
+      );
+
+      const existingData = await checkResponse.json();
+
+      if (existingData.records && existingData.records.length > 0) {
+        // 기존 레코드 업데이트
+        const recordId = existingData.records[0].id;
+        console.log('🔄 Updating existing record:', recordId);
+
+        await fetch(
+          `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/analytics_daily/${recordId}`,
+          {
+            method: 'PATCH',
+            headers: {
+              'Authorization': `Bearer ${env.AIRTABLE_TOKEN}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              fields: {
+                visitors: analyticsData.visitors,
+                pageviews: analyticsData.pageviews,
+                avg_duration: analyticsData.avg_duration,
+                bounce_rate: analyticsData.bounce_rate,
+                collected_at: analyticsData.collected_at
+              }
+            })
+          }
+        );
+        console.log('✅ Record updated');
+      } else {
+        // 새 레코드 생성
+        console.log('➕ Creating new record');
+
+        await fetch(
+          `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/analytics_daily`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${env.AIRTABLE_TOKEN}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              fields: {
+                date: analyticsData.date,
+                visitors: analyticsData.visitors,
+                pageviews: analyticsData.pageviews,
+                avg_duration: analyticsData.avg_duration,
+                bounce_rate: analyticsData.bounce_rate,
+                collected_at: analyticsData.collected_at
+              }
+            })
+          }
+        );
+        console.log('✅ Record created');
+      }
+
+      console.log('🎉 Cron job completed successfully');
+
+    } catch (error) {
+      console.error('💥 Cron error:', error.message);
     }
   }
 };

@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KPFC Worker 환경변수 설정 가이드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .copy-btn { transition: all 0.2s; }
+        .copy-btn:hover { transform: scale(1.05); }
+        .copied { background-color: #10B981 !important; }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="max-w-4xl mx-auto py-8 px-4">
+        <!-- 헤더 -->
+        <div class="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-8 rounded-2xl mb-8 shadow-lg">
+            <h1 class="text-3xl font-bold mb-2">🔧 KPFC Worker 환경변수 설정</h1>
+            <p class="text-orange-100">Worker: kfpc | Account: A01027770093@gmail.com</p>
+        </div>
+
+        <!-- 진행 체크리스트 -->
+        <div class="bg-white p-6 rounded-xl shadow-md mb-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">📋 진행 체크리스트</h2>
+            <div class="space-y-3">
+                <label class="flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" class="w-5 h-5 text-orange-500 rounded" id="check1">
+                    <span class="text-gray-700">Cloudflare Dashboard 로그인</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" class="w-5 h-5 text-orange-500 rounded" id="check2">
+                    <span class="text-gray-700">kfpc Worker 설정 페이지 이동</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" class="w-5 h-5 text-orange-500 rounded" id="check3">
+                    <span class="text-gray-700">환경변수 8개 설정</span>
+                </label>
+                <label class="flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" class="w-5 h-5 text-orange-500 rounded" id="check4">
+                    <span class="text-gray-700">API 테스트</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Step 1 -->
+        <div class="bg-white p-6 rounded-xl shadow-md mb-6">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="bg-orange-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">1</span>
+                <h3 class="text-lg font-bold text-gray-800">Cloudflare Dashboard 접속</h3>
+            </div>
+            <div class="ml-11">
+                <p class="text-gray-600 mb-4">아래 링크를 클릭하여 Cloudflare Workers 설정 페이지로 이동합니다.</p>
+                <a href="https://dash.cloudflare.com/?to=/:account/workers/services/view/kfpc/production/settings"
+                   target="_blank"
+                   class="inline-flex items-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-lg hover:bg-orange-600 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                    </svg>
+                    Cloudflare Dashboard 열기
+                </a>
+                <div class="mt-4 p-4 bg-blue-50 rounded-lg">
+                    <p class="text-blue-800 text-sm">
+                        <strong>경로:</strong> Workers & Pages → kfpc → Settings → Variables and Secrets
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="bg-white p-6 rounded-xl shadow-md mb-6">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="bg-orange-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">2</span>
+                <h3 class="text-lg font-bold text-gray-800">환경변수 추가</h3>
+            </div>
+            <div class="ml-11">
+                <p class="text-gray-600 mb-4">"Variables and Secrets" 섹션에서 <strong>"Add"</strong> 버튼을 클릭하고 아래 값들을 하나씩 추가합니다.</p>
+                <div class="p-4 bg-yellow-50 rounded-lg mb-4">
+                    <p class="text-yellow-800 text-sm">
+                        ⚠️ <strong>중요:</strong> Type을 <strong>"Secret"</strong>으로 선택하세요 (암호화된 저장)
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 환경변수 목록 -->
+        <div class="bg-white p-6 rounded-xl shadow-md mb-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-6">📝 설정할 환경변수 (8개)</h3>
+
+            <!-- 1. AIRTABLE_TOKEN -->
+            <div class="border-b pb-4 mb-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="font-mono text-sm bg-gray-100 px-2 py-1 rounded">AIRTABLE_TOKEN</span>
+                    <button onclick="copyToClipboard('AIRTABLE_TOKEN', this)" class="copy-btn bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded text-sm">
+                        📋 이름 복사
+                    </button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="text" readonly value="[Airtable Personal Access Token]"
+                           class="flex-1 bg-gray-50 border rounded px-3 py-2 text-sm font-mono text-gray-600">
+                    <button onclick="copyToClipboard('[Airtable Personal Access Token]', this)"
+                            class="copy-btn bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded text-sm">
+                        복사
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2. AIRTABLE_BASE_ID -->
+            <div class="border-b pb-4 mb-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="font-mono text-sm bg-gray-100 px-2 py-1 rounded">AIRTABLE_BASE_ID</span>
+                    <button onclick="copyToClipboard('AIRTABLE_BASE_ID', this)" class="copy-btn bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded text-sm">
+                        📋 이름 복사
+                    </button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="text" readonly value="[Airtable Base ID]"
+                           class="flex-1 bg-gray-50 border rounded px-3 py-2 text-sm font-mono text-gray-600">
+                    <button onclick="copyToClipboard('[Airtable Base ID]', this)"
+                            class="copy-btn bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded text-sm">
+                        복사
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3. TELEGRAM_BOT_TOKEN -->
+            <div class="border-b pb-4 mb-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="font-mono text-sm bg-gray-100 px-2 py-1 rounded">TELEGRAM_BOT_TOKEN</span>
+                    <button onclick="copyToClipboard('TELEGRAM_BOT_TOKEN', this)" class="copy-btn bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded text-sm">
+                        📋 이름 복사
+                    </button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="text" readonly value="[Telegram Bot Token]"
+                           class="flex-1 bg-gray-50 border rounded px-3 py-2 text-sm font-mono text-gray-600">
+                    <button onclick="copyToClipboard('[Telegram Bot Token]', this)"
+                            class="copy-btn bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded text-sm">
+                        복사
+                    </button>
+                </div>
+            </div>
+
+            <!-- 4. TELEGRAM_CHAT_ID -->
+            <div class="border-b pb-4 mb-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="font-mono text-sm bg-gray-100 px-2 py-1 rounded">TELEGRAM_CHAT_ID</span>
+                    <button onclick="copyToClipboard('TELEGRAM_CHAT_ID', this)" class="copy-btn bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded text-sm">
+                        📋 이름 복사
+                    </button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="text" readonly value="-1003290973230"
+                           class="flex-1 bg-gray-50 border rounded px-3 py-2 text-sm font-mono text-gray-600">
+                    <button onclick="copyToClipboard('-1003290973230', this)"
+                            class="copy-btn bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded text-sm">
+                        복사
+                    </button>
+                </div>
+            </div>
+
+            <!-- 5. GA4_PROPERTY_ID -->
+            <div class="border-b pb-4 mb-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="font-mono text-sm bg-gray-100 px-2 py-1 rounded">GA4_PROPERTY_ID</span>
+                    <button onclick="copyToClipboard('GA4_PROPERTY_ID', this)" class="copy-btn bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded text-sm">
+                        📋 이름 복사
+                    </button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="text" readonly value="[GA4 Property ID]"
+                           class="flex-1 bg-gray-50 border rounded px-3 py-2 text-sm font-mono text-gray-600">
+                    <button onclick="copyToClipboard('[GA4 Property ID]', this)"
+                            class="copy-btn bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded text-sm">
+                        복사
+                    </button>
+                </div>
+            </div>
+
+            <!-- 6. SERVICE_ACCOUNT_EMAIL -->
+            <div class="border-b pb-4 mb-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="font-mono text-sm bg-gray-100 px-2 py-1 rounded">SERVICE_ACCOUNT_EMAIL</span>
+                    <button onclick="copyToClipboard('SERVICE_ACCOUNT_EMAIL', this)" class="copy-btn bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded text-sm">
+                        📋 이름 복사
+                    </button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="text" readonly value="kpfc-homepage@kpfc-homepage.iam.gserviceaccount.com"
+                           class="flex-1 bg-gray-50 border rounded px-3 py-2 text-sm font-mono text-gray-600">
+                    <button onclick="copyToClipboard('kpfc-homepage@kpfc-homepage.iam.gserviceaccount.com', this)"
+                            class="copy-btn bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded text-sm">
+                        복사
+                    </button>
+                </div>
+            </div>
+
+            <!-- 7. SERVICE_ACCOUNT_PRIVATE_KEY -->
+            <div class="border-b pb-4 mb-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="font-mono text-sm bg-gray-100 px-2 py-1 rounded">SERVICE_ACCOUNT_PRIVATE_KEY</span>
+                    <button onclick="copyToClipboard('SERVICE_ACCOUNT_PRIVATE_KEY', this)" class="copy-btn bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded text-sm">
+                        📋 이름 복사
+                    </button>
+                </div>
+                <div class="p-3 bg-red-50 rounded-lg mb-2">
+                    <p class="text-red-700 text-sm">🔐 <strong>보안 주의:</strong> Private Key는 매우 민감한 정보입니다. 절대 외부에 노출하지 마세요.</p>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <textarea id="privateKey" readonly rows="4"
+                              class="bg-gray-50 border rounded px-3 py-2 text-xs font-mono text-gray-600">[Google Service Account Private Key - .env 파일에서 확인하세요]</textarea>
+                    <button onclick="copyPrivateKey(this)"
+                            class="copy-btn bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded text-sm self-end">
+                        Private Key 복사
+                    </button>
+                </div>
+            </div>
+
+            <!-- 8. ADMIN_PASSWORD -->
+            <div class="pb-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="font-mono text-sm bg-gray-100 px-2 py-1 rounded">ADMIN_PASSWORD</span>
+                    <button onclick="copyToClipboard('ADMIN_PASSWORD', this)" class="copy-btn bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded text-sm">
+                        📋 이름 복사
+                    </button>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="text" readonly value="[Admin Password]"
+                           class="flex-1 bg-gray-50 border rounded px-3 py-2 text-sm font-mono text-gray-600">
+                    <button onclick="copyToClipboard('[Admin Password]', this)"
+                            class="copy-btn bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded text-sm">
+                        복사
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="bg-white p-6 rounded-xl shadow-md mb-6">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="bg-orange-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">3</span>
+                <h3 class="text-lg font-bold text-gray-800">저장 및 배포</h3>
+            </div>
+            <div class="ml-11">
+                <ol class="list-decimal list-inside text-gray-600 space-y-2">
+                    <li>모든 환경변수를 추가한 후 <strong>"Save and deploy"</strong> 버튼 클릭</li>
+                    <li>배포가 완료되면 Worker가 자동으로 재시작됩니다</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Step 4: 테스트 -->
+        <div class="bg-white p-6 rounded-xl shadow-md mb-8">
+            <div class="flex items-center gap-3 mb-4">
+                <span class="bg-orange-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">4</span>
+                <h3 class="text-lg font-bold text-gray-800">API 테스트</h3>
+            </div>
+            <div class="ml-11">
+                <p class="text-gray-600 mb-4">환경변수 설정 후 아래 버튼을 클릭하여 API 연결을 테스트합니다.</p>
+                <button onclick="testApi()"
+                        class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    /leads API 테스트
+                </button>
+                <div id="testResult" class="mt-4 hidden">
+                    <div class="p-4 rounded-lg" id="testResultContent"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 완료 섹션 -->
+        <div class="bg-green-50 p-6 rounded-xl border border-green-200">
+            <h3 class="text-lg font-bold text-green-800 mb-2">✅ 설정 완료 후</h3>
+            <p class="text-green-700">
+                모든 환경변수가 설정되면 kfpc Worker가 Airtable, Telegram, GA4와 연동되어
+                리드 수집 및 알림 기능이 정상 작동합니다.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function copyToClipboard(text, btn) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = btn.innerText;
+                btn.innerText = '✓ 복사됨';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.classList.remove('copied');
+                }, 1500);
+            });
+        }
+
+        function copyPrivateKey(btn) {
+            const privateKey = document.getElementById('privateKey').value;
+            navigator.clipboard.writeText(privateKey).then(() => {
+                btn.innerText = '✓ 복사됨';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.innerText = 'Private Key 복사';
+                    btn.classList.remove('copied');
+                }, 1500);
+            });
+        }
+
+        async function testApi() {
+            const resultDiv = document.getElementById('testResult');
+            const contentDiv = document.getElementById('testResultContent');
+            resultDiv.classList.remove('hidden');
+            contentDiv.className = 'p-4 rounded-lg bg-gray-100';
+            contentDiv.innerHTML = '<p class="text-gray-600">⏳ 테스트 중...</p>';
+
+            try {
+                const response = await fetch('https://kfpc.a01027770093.workers.dev/leads', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    contentDiv.className = 'p-4 rounded-lg bg-green-100';
+                    contentDiv.innerHTML = `
+                        <p class="text-green-800 font-bold mb-2">✅ 연결 성공!</p>
+                        <p class="text-green-700 text-sm">응답: ${JSON.stringify(data).substring(0, 200)}...</p>
+                    `;
+                } else {
+                    const errorText = await response.text();
+                    contentDiv.className = 'p-4 rounded-lg bg-red-100';
+                    contentDiv.innerHTML = `
+                        <p class="text-red-800 font-bold mb-2">❌ 오류 발생</p>
+                        <p class="text-red-700 text-sm">Status: ${response.status}</p>
+                        <p class="text-red-700 text-sm">응답: ${errorText.substring(0, 200)}</p>
+                    `;
+                }
+            } catch (error) {
+                contentDiv.className = 'p-4 rounded-lg bg-red-100';
+                contentDiv.innerHTML = `
+                    <p class="text-red-800 font-bold mb-2">❌ 네트워크 오류</p>
+                    <p class="text-red-700 text-sm">${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
