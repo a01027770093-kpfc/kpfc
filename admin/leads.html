@@ -356,7 +356,7 @@
     });
 
     // API URL
-    const API_URL = 'https://kfpc.a01027770093.workers.dev';
+    const API_URL = 'https://bizen-homepage.weandbiz.workers.dev';
 
     // 접수 목록 로드 (API 호출)
     async function loadLeads() {
@@ -587,15 +587,29 @@
     }
 
     // 삭제
-    function deleteLead(id) {
-      if (!confirm('정말 삭제하시겠습니까?')) return;
+    async function deleteLead(id) {
+      if (!confirm('정말 삭제하시겠습니까?\n삭제된 데이터는 복구할 수 없습니다.')) return;
 
-      allLeads = allLeads.filter(l => l.id !== id);
-      filteredLeads = filteredLeads.filter(l => l.id !== id);
-      renderLeads();
+      try {
+        const response = await fetch(`${API_URL}/leads/${id}`, {
+          method: 'DELETE'
+        });
 
-      // TODO: API 호출
-      console.log(`삭제: ID ${id}`);
+        const result = await response.json();
+
+        if (!result.success) {
+          throw new Error(result.error || '삭제에 실패했습니다.');
+        }
+
+        // UI에서 제거
+        allLeads = allLeads.filter(l => l.id !== id);
+        filteredLeads = filteredLeads.filter(l => l.id !== id);
+        renderLeads();
+
+      } catch (error) {
+        console.error('삭제 오류:', error);
+        alert('삭제 중 오류가 발생했습니다: ' + error.message);
+      }
     }
 
     // 전체 선택

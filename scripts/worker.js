@@ -741,6 +741,7 @@ function buildTelegramMessage(fields, submitDate, submitTime) {
   }
 
   msg += '\n📅 ' + submitDate + ' ' + submitTime;
+  msg += '\n\n📋 <a href="https://airtable.com/appwr3xRqHrc3z0zQ/shrD27tU9ZndZ7d3o">접수내역 확인하기</a> (클릭시 Airtable에서 상세 내용 확인)';
   return msg;
 }
 
@@ -852,6 +853,55 @@ async function handleLeadsAPI(request, env, path) {
       return new Response(JSON.stringify({
         success: true,
         record: result
+      }), {
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    } catch (error) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: error.message
+      }), {
+        status: 500,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    }
+  }
+
+  // DELETE /leads/:id - 접수 내역 삭제
+  if (method === 'DELETE' && path.startsWith('/leads/')) {
+    const recordId = path.replace('/leads/', '');
+
+    try {
+      console.log('🗑️ Deleting lead:', recordId);
+
+      const airtableResponse = await fetch(
+        `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/consulting/${recordId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${env.AIRTABLE_TOKEN}`
+          }
+        }
+      );
+
+      if (!airtableResponse.ok) {
+        const error = await airtableResponse.json();
+        return new Response(JSON.stringify({
+          success: false,
+          error: error.error?.message || 'Failed to delete lead'
+        }), {
+          status: 500,
+          headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const result = await airtableResponse.json();
+      console.log('✅ Lead deleted:', recordId);
+
+      return new Response(JSON.stringify({
+        success: true,
+        deleted: true,
+        id: result.id
       }), {
         headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
       });
