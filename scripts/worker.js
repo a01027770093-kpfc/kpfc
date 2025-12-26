@@ -111,10 +111,16 @@ async function runReport(accessToken, propertyId, request) {
   return await response.json();
 }
 
+// KST 날짜 포맷 (YYYY-MM-DD)
+function formatDateKST(date) {
+  const kst = new Date(date.getTime() + 9 * 60 * 60 * 1000);
+  return kst.toISOString().split('T')[0];
+}
+
 // 날짜 계산 유틸리티
 function getDateRange(period) {
   const today = new Date();
-  const formatDate = (d) => d.toISOString().split('T')[0]; // YYYY-MM-DD 형식
+  const formatDate = formatDateKST;
 
   let startDate, endDate, prevStartDate, prevEndDate;
 
@@ -211,10 +217,9 @@ async function getTrend(accessToken, propertyId, period) {
   const days = period === 'monthly' ? 30 : period === 'weekly' ? 14 : 7;
   const today = new Date();
   const startDate = new Date(today.getTime() - (days - 1) * 24 * 60 * 60 * 1000);
-  const formatDate = (d) => d.toISOString().split('T')[0];
 
   const report = await runReport(accessToken, propertyId, {
-    dateRanges: [{ startDate: formatDate(startDate), endDate: formatDate(today) }],
+    dateRanges: [{ startDate: formatDateKST(startDate), endDate: formatDateKST(today) }],
     dimensions: [{ name: 'date' }],
     metrics: [
       { name: 'activeUsers' },
@@ -354,7 +359,7 @@ async function getHistoryStats(accessToken, propertyId, days) {
   const formatDate = (d) => d.toISOString().split('T')[0];
 
   const report = await runReport(accessToken, propertyId, {
-    dateRanges: [{ startDate: formatDate(startDate), endDate: formatDate(today) }],
+    dateRanges: [{ startDate: formatDateKST(startDate), endDate: formatDateKST(today) }],
     dimensions: [{ name: 'date' }],
     metrics: [
       { name: 'activeUsers' },
