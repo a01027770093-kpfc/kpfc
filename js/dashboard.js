@@ -46,14 +46,15 @@ function initCombinedChart() {
   const pointHoverRadius = mobile ? 4 : 6;
   const borderWidth = mobile ? 1.5 : 2;
 
+  // 빈 데이터로 초기화 (실제 API 연동 필요)
   combinedChart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: ['11/24', '11/25', '11/26', '11/27', '11/28', '11/29', '11/30'],
+      labels: [],
       datasets: [
         {
           label: '방문자',
-          data: [85, 102, 95, 120, 98, 115, 128],
+          data: [],
           borderColor: '#1D00AD',
           backgroundColor: 'rgba(29, 0, 173, 0.1)',
           borderWidth: borderWidth,
@@ -68,7 +69,7 @@ function initCombinedChart() {
         },
         {
           label: '페이지뷰',
-          data: [320, 380, 350, 450, 390, 420, 456],
+          data: [],
           borderColor: '#10B981',
           backgroundColor: 'rgba(16, 185, 129, 0.1)',
           borderWidth: borderWidth,
@@ -83,7 +84,7 @@ function initCombinedChart() {
         },
         {
           label: '체류시간(초)',
-          data: [145, 160, 138, 175, 150, 162, 154],
+          data: [],
           borderColor: '#F59E0B',
           backgroundColor: 'rgba(245, 158, 11, 0.1)',
           borderWidth: borderWidth,
@@ -98,7 +99,7 @@ function initCombinedChart() {
         },
         {
           label: '접수',
-          data: [3, 5, 4, 8, 6, 4, 7],
+          data: [],
           borderColor: '#EF4444',
           backgroundColor: 'rgba(239, 68, 68, 0.1)',
           borderWidth: borderWidth,
