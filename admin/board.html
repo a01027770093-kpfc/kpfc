@@ -401,102 +401,6 @@
     </div>
   </div>
 
-  <!-- 게시글 작성/수정 모달 -->
-  <div class="modal-overlay" id="postModal">
-    <div class="modal modal-lg">
-      <div class="modal-header">
-        <h3 class="modal-title" id="modalTitle">글 작성</h3>
-        <button class="modal-close" onclick="closePostModal()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <line x1="18" y1="6" x2="6" y2="18"/>
-            <line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form id="postForm">
-          <input type="hidden" id="postId">
-          <div class="form-group">
-            <label for="postTitle">제목 *</label>
-            <input type="text" id="postTitle" placeholder="제목을 입력하세요" required>
-          </div>
-          <div class="form-group">
-            <label for="postSummary">요약</label>
-            <input type="text" id="postSummary" placeholder="게시글 요약 (카드에 표시됩니다)">
-          </div>
-          <div class="form-group">
-            <label for="postContent">내용 *</label>
-            <textarea id="postContent" rows="12" placeholder="내용을 입력하세요 (HTML 지원)"></textarea>
-          </div>
-          <div class="form-group">
-            <label>썸네일 이미지</label>
-            <div class="thumbnail-upload">
-              <div class="thumbnail-preview-wrap">
-                <img id="thumbnailPreview" class="thumbnail-upload-preview" src="" alt="썸네일 미리보기" style="display:none; border-style:solid;">
-                <div class="thumbnail-upload-preview" id="thumbnailPlaceholder" style="display:flex; align-items: center; justify-content: center;">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: var(--neutral-400);">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                    <circle cx="8.5" cy="8.5" r="1.5"/>
-                    <polyline points="21 15 16 10 5 21"/>
-                  </svg>
-                </div>
-                <div class="thumbnail-actions" id="thumbnailActions" style="display:none;">
-                  <button type="button" class="btn-img-change" onclick="document.getElementById('postThumbnailFile').click()">교체</button>
-                  <button type="button" class="btn-img-delete" onclick="clearThumbnail()">삭제</button>
-                </div>
-              </div>
-              <div class="thumbnail-upload-btn">
-                <input type="file" id="postThumbnailFile" accept="image/*" style="display:none;">
-                <button type="button" class="btn-secondary" id="uploadBtn" onclick="document.getElementById('postThumbnailFile').click()" style="margin-bottom:8px;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;vertical-align:middle;">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                    <polyline points="17 8 12 3 7 8"/>
-                    <line x1="12" y1="3" x2="12" y2="15"/>
-                  </svg>
-                  이미지 업로드 (webp 변환)
-                </button>
-                <input type="text" id="postThumbnail" placeholder="또는 이미지 URL 직접 입력" style="width: 280px;">
-                <small id="uploadStatus" style="color: var(--neutral-500); display:block; margin-top:4px;"></small>
-              </div>
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="postTags">태그 (최대 5개 선택)</label>
-            <div class="tag-selector" id="tagSelector"></div>
-            <input type="hidden" id="postTags">
-            <small style="color: var(--neutral-500);">클릭해서 선택하세요 (내부 분류용)</small>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="postCategory">카테고리</label>
-              <select id="postCategory" class="filter-select" style="width:100%">
-                <option value="공지">공지</option>
-                <option value="뉴스">뉴스</option>
-                <option value="정보">정보</option>
-                <option value="성공사례">성공사례</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="postDate">작성일</label>
-              <input type="date" id="postDate" style="width:100%; padding:10px; border:1px solid var(--neutral-200); border-radius:8px;">
-            </div>
-            <div class="form-group">
-              <label for="postStatus">공개 상태</label>
-              <select id="postStatus" class="filter-select" style="width:100%">
-                <option value="true">게시중</option>
-                <option value="false">비공개</option>
-              </select>
-            </div>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-secondary" onclick="closePostModal()">취소</button>
-        <button class="btn-primary" onclick="savePost()">저장</button>
-      </div>
-    </div>
-  </div>
-
   <!-- 하단 메뉴바 (모바일) -->
   <nav class="bottom-nav">
     <ul class="bottom-nav-list">
@@ -871,133 +775,47 @@
       return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
     }
 
-    // 모달 열기 (새 글)
+    // 새 글 작성 페이지로 이동
     function openPostModal() {
-      editingPostId = null;
-      document.getElementById('modalTitle').textContent = '글 작성';
-      document.getElementById('postForm').reset();
-      document.getElementById('postId').value = '';
-      document.getElementById('postDate').value = new Date().toISOString().split('T')[0];
-      document.getElementById('thumbnailPreview').style.display = 'none';
-      document.getElementById('thumbnailPlaceholder').style.display = 'flex';
-      document.getElementById('thumbnailActions').style.display = 'none';
-      document.getElementById('uploadStatus').textContent = '';
-      selectedTags = [];
-      renderTags();
-      document.getElementById('postModal').classList.add('open');
+      window.location.href = 'board-edit.html';
     }
 
-    // 썸네일 삭제
-    function clearThumbnail() {
-      document.getElementById('postThumbnail').value = '';
-      document.getElementById('thumbnailPreview').style.display = 'none';
-      document.getElementById('thumbnailPlaceholder').style.display = 'flex';
-      document.getElementById('thumbnailActions').style.display = 'none';
-      document.getElementById('postThumbnailFile').value = '';
-      document.getElementById('uploadStatus').textContent = '';
-    }
-
-    // 모달 닫기
-    function closePostModal() {
-      document.getElementById('postModal').classList.remove('open');
-      editingPostId = null;
-    }
-
-    // 게시글 수정 모달
+    // 게시글 수정 페이지로 이동
     function editPost(id) {
-      const post = allPosts.find(p => p.id === id);
-      if (!post) return;
-
-      editingPostId = id;
-      document.getElementById('modalTitle').textContent = '글 수정';
-      document.getElementById('postId').value = id;
-      document.getElementById('postTitle').value = post.제목 || '';
-      document.getElementById('postSummary').value = post.요약 || '';
-      document.getElementById('postContent').value = post.내용 || '';
-      document.getElementById('postThumbnail').value = post.썸네일URL || '';
-
-      // 태그 로드
-      const tagsStr = post.태그 || '';
-      selectedTags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(t => AVAILABLE_TAGS.includes(t)) : [];
-      renderTags();
-
-      document.getElementById('postCategory').value = post.카테고리 || '공지';
-      document.getElementById('postDate').value = post.작성일 || '';
-      document.getElementById('postStatus').value = post.게시여부 ? 'true' : 'false';
-
-      // 썸네일 미리보기
-      const preview = document.getElementById('thumbnailPreview');
-      const placeholder = document.getElementById('thumbnailPlaceholder');
-      const actions = document.getElementById('thumbnailActions');
-      if (post.썸네일URL) {
-        preview.src = post.썸네일URL;
-        preview.style.display = 'block';
-        placeholder.style.display = 'none';
-        actions.style.display = 'flex';
-      } else {
-        preview.style.display = 'none';
-        placeholder.style.display = 'flex';
-        actions.style.display = 'none';
-      }
-      document.getElementById('uploadStatus').textContent = '';
-
-      document.getElementById('postModal').classList.add('open');
+      window.location.href = `board-edit.html?id=${id}`;
     }
 
-    // 게시글 저장 (생성/수정)
-    async function savePost() {
-      const title = document.getElementById('postTitle').value.trim();
-      const content = document.getElementById('postContent').value.trim();
-
-      if (!title) {
-        alert('제목을 입력해주세요.');
-        return;
-      }
-
-      const postData = {
-        제목: title,
-        내용: content,
-        요약: document.getElementById('postSummary').value.trim(),
-        썸네일URL: document.getElementById('postThumbnail').value.trim() || null,
-        태그: document.getElementById('postTags').value.trim() || null,
-        카테고리: document.getElementById('postCategory').value,
-        작성일: document.getElementById('postDate').value,
-        게시여부: document.getElementById('postStatus').value === 'true'
-      };
-
-      // 샘플 동작 (실제 API 연동 시 수정)
-      if (editingPostId) {
-        // 수정
-        const idx = allPosts.findIndex(p => p.id === editingPostId);
-        if (idx !== -1) {
-          allPosts[idx] = { ...allPosts[idx], ...postData };
-        }
-        alert('게시글이 수정되었습니다.');
-      } else {
-        // 생성
-        const newPost = {
-          id: String(Date.now()),
-          ...postData,
-          조회수: 0
-        };
-        allPosts.unshift(newPost);
-        alert('게시글이 등록되었습니다.');
-      }
-
-      closePostModal();
-      filterAndRenderPosts();
-    }
-
-    // 게시글 삭제
+    // 게시글 삭제 - API 연동
     async function deletePost(id) {
       if (!confirm('정말 삭제하시겠습니까?\n삭제된 게시글은 복구할 수 없습니다.')) {
         return;
       }
 
-      // 샘플 동작 (실제 API 연동 시 수정)
-      allPosts = allPosts.filter(p => p.id !== id);
-      alert('삭제되었습니다.');
-      filterAndRenderPosts();
+      showLoading(true);
+
+      try {
+        if (typeof WORKER_URL === 'undefined') {
+          throw new Error('API 설정이 필요합니다');
+        }
+
+        const response = await fetch(`${WORKER_URL}/board/${id}`, {
+          method: 'DELETE'
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          alert('삭제되었습니다.');
+          await loadPosts(); // 목록 새로고침
+        } else {
+          throw new Error(result.error || '삭제에 실패했습니다');
+        }
+      } catch (error) {
+        console.error('Delete post error:', error);
+        alert('삭제 실패: ' + error.message);
+      } finally {
+        showLoading(false);
+      }
     }
 
     // 로딩 표시
