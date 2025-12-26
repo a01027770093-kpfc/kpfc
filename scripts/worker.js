@@ -114,7 +114,7 @@ async function runReport(accessToken, propertyId, request) {
 // 날짜 계산 유틸리티
 function getDateRange(period) {
   const today = new Date();
-  const formatDate = (d) => d.toISOString().split('T')[0].replace(/-/g, '');
+  const formatDate = (d) => d.toISOString().split('T')[0]; // YYYY-MM-DD 형식
 
   let startDate, endDate, prevStartDate, prevEndDate;
 
@@ -184,8 +184,8 @@ async function getOverview(accessToken, propertyId, period) {
 
   return {
     period: {
-      startDate: `${startDate.slice(0,4)}-${startDate.slice(4,6)}-${startDate.slice(6,8)}`,
-      endDate: `${endDate.slice(0,4)}-${endDate.slice(4,6)}-${endDate.slice(6,8)}`
+      startDate: startDate,
+      endDate: endDate
     },
     visitors: {
       value: parseInt(current[0]?.value) || 0,
@@ -211,7 +211,7 @@ async function getTrend(accessToken, propertyId, period) {
   const days = period === 'monthly' ? 30 : period === 'weekly' ? 14 : 7;
   const today = new Date();
   const startDate = new Date(today.getTime() - (days - 1) * 24 * 60 * 60 * 1000);
-  const formatDate = (d) => d.toISOString().split('T')[0].replace(/-/g, '');
+  const formatDate = (d) => d.toISOString().split('T')[0];
 
   const report = await runReport(accessToken, propertyId, {
     dateRanges: [{ startDate: formatDate(startDate), endDate: formatDate(today) }],
@@ -351,7 +351,7 @@ async function getReferrers(accessToken, propertyId, period) {
 async function getHistoryStats(accessToken, propertyId, days) {
   const today = new Date();
   const startDate = new Date(today.getTime() - (days - 1) * 24 * 60 * 60 * 1000);
-  const formatDate = (d) => d.toISOString().split('T')[0].replace(/-/g, '');
+  const formatDate = (d) => d.toISOString().split('T')[0];
 
   const report = await runReport(accessToken, propertyId, {
     dateRanges: [{ startDate: formatDate(startDate), endDate: formatDate(today) }],
