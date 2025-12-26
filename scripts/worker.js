@@ -450,11 +450,10 @@ async function handleSubmit(request, env) {
       // 필드명 변환 (프론트 → Airtable)
       const fields = { ...rawFields };
 
-      // "지원받고 싶은 자금종류" → "자금종류" (배열을 문자열로 변환)
+      // "지원받고 싶은 자금종류" 배열을 문자열로 변환
       if (rawFields['지원받고 싶은 자금종류']) {
         const fundTypes = rawFields['지원받고 싶은 자금종류'];
-        fields['자금종류'] = Array.isArray(fundTypes) ? fundTypes.join(', ') : fundTypes;
-        delete fields['지원받고 싶은 자금종류'];
+        fields['지원받고 싶은 자금종류'] = Array.isArray(fundTypes) ? fundTypes.join(', ') : fundTypes;
       }
 
       // 체크박스 필드 제거 (Airtable에 없음)
@@ -507,9 +506,9 @@ async function handleSubmit(request, env) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: data.emailFrom || 'KPFC <noreply@mail.kpfc.kr>',
+          from: data.emailFrom || '한국정책자금지원센터 <noreply@mail.policy-fund.online>',
           to: [data.customerEmail],
-          subject: data.customerSubject || '[KPFC] 무료진단 신청이 접수되었습니다',
+          subject: data.customerSubject || '[한국정책자금지원센터] 무료진단 신청이 접수되었습니다',
           html: data.customerHtml
         })
       });
@@ -546,10 +545,10 @@ async function handleSubmit(request, env) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: data.emailFrom || 'KPFC <noreply@mail.kpfc.kr>',
+          from: data.emailFrom || '한국정책자금지원센터 <noreply@mail.policy-fund.online>',
           to: data.staffEmails[0],
           bcc: data.staffEmails.slice(1).join(','),
-          subject: data.staffSubject || '[KPFC] 신규 무료진단 접수',
+          subject: data.staffSubject || '[한국정책자금지원센터] 신규 무료진단 접수',
           html: data.staffHtml
         })
       });
@@ -617,7 +616,7 @@ async function handleSubmit(request, env) {
 
 // Telegram 메시지 생성
 function buildTelegramMessage(fields, submitDate, submitTime) {
-  let msg = '🔔 <b>KPFC 신규 상담</b>\n\n';
+  let msg = '🔔 <b>한국정책자금지원센터 신규 상담</b>\n\n';
   msg += '👤 <b>고객정보</b>\n';
   msg += '├ 기업명: <b>' + escapeHtml(fields['기업명']) + '</b>\n';
   msg += '├ 사업자번호: ' + escapeHtml(fields['사업자번호']) + '\n';
