@@ -37,7 +37,7 @@ rootFiles.forEach(file => {
 });
 
 // css, js, images 폴더 복사
-const filesToCopy = ['css', 'js', 'images'];
+const filesToCopy = ['css', 'js', 'images', 'admin'];
 filesToCopy.forEach(folder => {
     const srcFolder = path.join(ROOT_DIR, folder);
     const destFolder = path.join(DIST_DIR, folder);
