@@ -1,0 +1,395 @@
+<!-- 대표 소개 섹션 -->
+<style>
+    .about-ceo-section {
+        background: #ffffff;
+        padding: 60px 20px;
+    }
+
+    .about-ceo-section .container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .about-ceo-section .section-header {
+        text-align: center;
+        margin-bottom: 50px;
+    }
+
+    .about-ceo-section .section-header h2 {
+        font-size: 36px;
+        font-weight: 700;
+        color: #1B3A5F;
+        margin-bottom: 16px;
+    }
+
+    .about-ceo-section .section-header p {
+        font-size: 18px;
+        color: #718096;
+    }
+
+    /* 공통 인사말 섹션 */
+    .about-ceo-section .greeting-section {
+        background: linear-gradient(135deg, #F8FAFB 0%, #ffffff 100%);
+        padding: 50px 40px;
+        border-radius: 20px;
+        border: 2px solid #E5E7EB;
+        box-shadow: 0 10px 40px rgba(27, 58, 95, 0.08);
+        margin-bottom: 50px;
+    }
+
+    .about-ceo-section .greeting-section h3 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1B3A5F;
+        margin-bottom: 30px;
+        text-align: center;
+        line-height: 1.5;
+    }
+
+    .about-ceo-section .highlight {
+        color: #3B82F6;
+        font-weight: 800;
+    }
+
+    .about-ceo-section .greeting-text {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .about-ceo-section .greeting-text p {
+        font-size: 17px;
+        color: #2D3748;
+        line-height: 1.9;
+        margin-bottom: 24px;
+        text-align: center;
+    }
+
+    .about-ceo-section .greeting-text p:last-of-type {
+        margin-bottom: 0;
+    }
+
+    .about-ceo-section .emphasis {
+        color: #3B82F6;
+        font-weight: 700;
+    }
+
+    .about-ceo-section .desc-mobile {
+        display: none;
+    }
+
+    /* 2명 카드 레이아웃 */
+    .about-ceo-section .team-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 40px;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    /* 개별 카드 */
+    .about-ceo-section .member-card {
+        background: #F8FAFB;
+        padding: 30px 20px;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(27, 58, 95, 0.08);
+        border: 2px solid #E5E7EB;
+        text-align: center;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .about-ceo-section .member-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 50px rgba(59, 130, 246, 0.15);
+        border-color: #60A5FA;
+    }
+
+    /* 사진 */
+    .about-ceo-section .member-image {
+        width: 170px;
+        height: 210px;
+        margin: 0 auto 20px;
+        border-radius: 16px;
+        overflow: hidden;
+        background: #ffffff;
+        border: 3px solid #E5E7EB;
+    }
+
+    .about-ceo-section .member-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center top;
+    }
+
+    /* 이름 */
+    .about-ceo-section .member-name {
+        font-size: 23px;
+        font-weight: 700;
+        color: #1B3A5F;
+        margin-bottom: 8px;
+    }
+
+    /* 직급 */
+    .about-ceo-section .member-position {
+        font-size: 16px;
+        color: #3B82F6;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+
+    /* 자격사항 */
+    .about-ceo-section .member-qualifications {
+        display: inline-block;
+        text-align: left;
+        max-width: 240px;
+    }
+
+    .about-ceo-section .qual-item {
+        font-size: 13px;
+        color: #2D3748;
+        margin-bottom: 8px;
+        padding-left: 20px;
+        position: relative;
+        line-height: 1.6;
+    }
+
+    .about-ceo-section .qual-item::before {
+        content: '✓';
+        position: absolute;
+        left: 0;
+        color: #60A5FA;
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    /* 모바일 전용 띄어쓰기 */
+    .about-ceo-section .mobile-br {
+        display: none;
+    }
+
+    /* 태블릿 반응형 */
+    @media (max-width: 1024px) {
+        .about-ceo-section .team-grid {
+            gap: 30px;
+        }
+
+        .about-ceo-section .member-card {
+            padding: 35px 25px;
+        }
+    }
+
+    /* 모바일 반응형 */
+    @media (max-width: 768px) {
+        .about-ceo-section {
+            padding: 40px 16px;
+        }
+
+        .about-ceo-section .desc-desktop {
+            display: none;
+        }
+
+        .about-ceo-section .desc-mobile {
+            display: block;
+        }
+
+        .about-ceo-section .section-header {
+            margin-bottom: 35px;
+        }
+
+        .about-ceo-section .section-header h2 {
+            font-size: 28px;
+        }
+
+        .about-ceo-section .section-header p {
+            font-size: 16px;
+        }
+
+        .about-ceo-section .team-grid {
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        .about-ceo-section .member-card {
+            padding: 30px 20px;
+        }
+
+        .about-ceo-section .member-image {
+            width: 180px;
+            height: 220px;
+        }
+
+        .about-ceo-section .member-name {
+            font-size: 24px;
+        }
+
+        .about-ceo-section .member-position {
+            font-size: 16px;
+        }
+
+        .about-ceo-section .greeting-section {
+            padding: 35px 25px;
+            margin-bottom: 40px;
+        }
+
+        .about-ceo-section .greeting-section h3 {
+            font-size: 22px;
+            word-break: keep-all;
+        }
+
+        .about-ceo-section .greeting-text p {
+            font-size: 15px;
+            word-break: keep-all;
+        }
+
+        .about-ceo-section .mobile-br {
+            display: inline;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .about-ceo-section .section-header h2 {
+            font-size: 24px;
+        }
+
+        .about-ceo-section .member-image {
+            width: 160px;
+            height: 200px;
+        }
+
+        .about-ceo-section .member-name {
+            font-size: 22px;
+        }
+
+        .about-ceo-section .member-position {
+            font-size: 15px;
+        }
+
+        .about-ceo-section .qual-item {
+            font-size: 13px;
+        }
+
+        .about-ceo-section .greeting-section h3 {
+            font-size: 20px;
+        }
+
+        .about-ceo-section .greeting-text p {
+            font-size: 14px;
+            line-height: 1.8;
+        }
+    }
+</style>
+
+<section class="about-ceo-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>대표 소개</h2>
+            <p>정책자금 전문가가 함께합니다</p>
+        </div>
+
+        <!-- 공통 인사말 -->
+        <div class="greeting-section">
+            <h3>
+                정책전문가가<br class="mobile-br">
+                <span class="highlight">승인률</span>과 <span class="highlight">한도</span>를 높여드립니다
+            </h3>
+            <div class="greeting-text">
+                <p>
+                    안녕하십니까, BIZEN입니다.
+                </p>
+                <p class="desc-desktop">
+                    저희는 <span class="emphasis">정책자금 및 정부지원자금 정책분석 전문가</span>로 구성되어<br>
+                    정책자금 심사 기준과 평가 방법을 정확히 알고 있습니다.<br>
+                    그 경험을 바탕으로 대표님의 승인 가능성을 높여드립니다.
+                </p>
+                <p class="desc-mobile">
+                    저희는 정책자금 및 정부지원자금 정책분석<br>
+                    <span class="emphasis">전문가</span>로 구성되어 정책자금 심사 기준과<br>
+                    평가 방법을 정확히 알고 있습니다.<br>
+                    <br>
+                    그 경험을 바탕으로 대표님의<br>
+                    승인 가능성을 높여드립니다.
+                </p>
+                <p class="desc-desktop">
+                    많은 대표님들이 복잡한 서류와 까다로운 심사로 정책자금을 포기하십니다.<br>
+                    하지만 <span class="emphasis">올바른 준비와 전략</span>이 있다면 충분히 가능합니다.
+                </p>
+                <p class="desc-mobile">
+                    많은 대표님들이 복잡한 서류와 까다로운<br>
+                    심사로 정책자금을 포기하십니다.<br>
+                    하지만 <span class="emphasis">올바른 준비와 전략</span>이 있다면<br>
+                    충분히 가능합니다.
+                </p>
+                <p class="desc-desktop">
+                    <span class="emphasis">대표님의 성공이 저희의 목표입니다.</span> 최선의 방법을 함께 찾아드리겠습니다.
+                </p>
+                <p class="desc-mobile">
+                    <span class="emphasis">대표님의 성공이 저희의 목표입니다.</span><br>
+                    최선의 방법을 함께 찾아드리겠습니다.
+                </p>
+            </div>
+        </div>
+
+        <!-- 2명 카드 그리드 -->
+        <div class="team-grid">
+            <!-- 김우영 센터장 (왼쪽) -->
+            <div class="member-card">
+                <div class="member-image">
+                    <img src="기업심사관_김우영 복사.png" alt="김우영 센터장">
+                </div>
+                <div class="member-name">김 우 영</div>
+                <div class="member-position">센터장 / 기업심사관</div>
+                <div class="member-qualifications">
+                    <div class="qual-item">사업계획서 컨설팅</div>
+                    <div class="qual-item">자금 승인률 최적화</div>
+                </div>
+            </div>
+
+            <!-- 전예진 수석 (오른쪽) -->
+            <div class="member-card">
+                <div class="member-image">
+                    <img src="기업심사관_전예진 복사.png" alt="전예진 수석">
+                </div>
+                <div class="member-name">전 예 진</div>
+                <div class="member-position">수석 / 기업심사관</div>
+                <div class="member-qualifications">
+                    <div class="qual-item">기업 재무 분석 전문</div>
+                    <div class="qual-item">자금 한도 최대화 전략</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+(function() {
+    // 스크롤 애니메이션
+    const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }, index * 150);
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.about-ceo-section .member-card').forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'all 0.6s ease';
+        observer.observe(card);
+    });
+
+    // 인사말 섹션 애니메이션
+    const greetingSection = document.querySelector('.about-ceo-section .greeting-section');
+    if (greetingSection) {
+        greetingSection.style.opacity = '0';
+        greetingSection.style.transform = 'translateY(20px)';
+        greetingSection.style.transition = 'all 0.6s ease';
+        observer.observe(greetingSection);
+    }
+})();
+</script>

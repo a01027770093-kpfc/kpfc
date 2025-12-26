@@ -1,0 +1,558 @@
+<!-- Hero Component -->
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Hero 섹션 배경 영상 */
+    .hero-section {
+        position: relative;
+        width: 100%;
+        min-height: 100vh;
+        padding: 180px 20px 60px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* 유튜브 배경 영상 */
+    .hero-video-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -2;
+        overflow: hidden;
+    }
+
+    .hero-video-bg iframe,
+    .hero-video-bg #youtube-player {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100vw;
+        height: 56.25vw;
+        min-height: 160vh;
+        min-width: 280vh;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+    }
+
+    /* 어두운 오버레이 */
+    .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(30, 30, 110, 0.85) 0%, rgba(20, 20, 74, 0.75) 100%);
+        z-index: -1;
+    }
+
+    /* Hero 컨테이너 */
+    .bizen-hero-container {
+        position: relative;
+        z-index: 1;
+        max-width: 1400px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .bizen-main-message {
+        text-align: center;
+        animation: fadeInUp 1s ease-out;
+        margin-bottom: 20px;
+    }
+
+    .bizen-hero-badge {
+        display: inline-block;
+        background: rgba(59, 130, 246, 0.15);
+        color: #60A5FA;
+        padding: 10px 30px;
+        border-radius: 50px;
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        border: 1px solid rgba(59, 130, 246, 0.4);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+    }
+
+    .bizen-main-title {
+        font-size: clamp(32px, 6vw, 72px);
+        font-weight: 900;
+        color: #ffffff;
+        line-height: 1.2;
+        margin-bottom: 30px;
+        letter-spacing: -1px;
+    }
+
+    .bizen-highlight {
+        color: #93C5FD;
+        text-shadow: 0 0 20px rgba(147, 197, 253, 0.6);
+        display: inline-block;
+    }
+
+    .bizen-sub-desc {
+        font-size: clamp(18px, 3vw, 24px);
+        color: rgba(255, 255, 255, 0.95);
+        line-height: 1.6;
+        max-width: 800px;
+        margin: 0 auto;
+        font-weight: 400;
+    }
+
+    .bizen-brand-name {
+        color: #93C5FD;
+        font-weight: 700;
+        text-shadow: 0 0 12px rgba(147, 197, 253, 0.4);
+    }
+
+    .mobile-br { display: inline; }
+
+    .bizen-main-content {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        align-items: center;
+    }
+
+    .bizen-rate-card {
+        width: 100%;
+        max-width: 350px;
+        background: rgba(30, 30, 60, 0.4);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: 20px;
+        padding: 18px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .bizen-rate-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #3B82F6, transparent);
+        animation: pulse-line 3s ease infinite;
+        opacity: 0.6;
+    }
+
+    @keyframes pulse-line {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 0.8; }
+    }
+
+    .bizen-rate-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #F7F9FB;
+        margin-bottom: 12px;
+        text-align: center;
+    }
+
+    .bizen-rate-comparison {
+        display: flex;
+        gap: 10px;
+        justify-content: space-between;
+    }
+
+    .bizen-rate-item {
+        flex: 1;
+        padding: 12px 8px;
+        border-radius: 12px;
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+
+    .bizen-rate-item.premium {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(96, 165, 250, 0.15));
+        border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .bizen-rate-item.standard {
+        background: rgba(107, 114, 128, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        opacity: 0.7;
+    }
+
+    .bizen-rate-label {
+        font-size: 11px;
+        color: #E8F4F3;
+        margin-bottom: 4px;
+        font-weight: 500;
+        opacity: 0.9;
+    }
+
+    .bizen-rate-value {
+        font-size: 20px;
+        font-weight: 800;
+        margin-bottom: 4px;
+    }
+
+    .count-up { display: inline-block; }
+
+    .bizen-rate-item.premium .bizen-rate-value {
+        color: #93C5FD;
+        text-shadow: 0 0 15px rgba(147, 197, 253, 0.5);
+    }
+
+    .bizen-rate-item.standard .bizen-rate-value { color: #B8C1CC; }
+
+    .bizen-rate-status { font-size: 10px; font-weight: 600; }
+    .bizen-rate-item.premium .bizen-rate-status { color: #60A5FA; }
+    .bizen-rate-item.standard .bizen-rate-status { color: #FF6B6B; }
+
+    .bizen-info-section {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+        max-width: 350px;
+    }
+
+    .bizen-info-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px;
+        background: rgba(30, 30, 60, 0.4);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 16px;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-left: 3px solid #3B82F6;
+        min-height: 65px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .bizen-info-icon {
+        width: 40px; height: 40px; min-width: 40px;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(96, 165, 250, 0.1));
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .bizen-info-icon svg {
+        width: 22px; height: 22px;
+        fill: #60A5FA;
+        filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.5));
+    }
+
+    .bizen-info-text { flex: 1; }
+
+    .bizen-info-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #F7F9FB;
+        margin-bottom: 3px;
+        letter-spacing: -0.3px;
+    }
+
+    .bizen-info-desc {
+        font-size: 12px;
+        color: #E8F4F3;
+        line-height: 1.4;
+        opacity: 0.9;
+    }
+
+    .bizen-info-oneline {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .bizen-cta-section {
+        text-align: center;
+        margin-top: 25px;
+        width: 100%;
+        max-width: 350px;
+    }
+
+    .bizen-cta-btn {
+        display: block;
+        width: 100%;
+        background: linear-gradient(135deg, #3B82F6, #2563EB);
+        color: #FFFFFF;
+        padding: 14px 30px;
+        border-radius: 25px;
+        font-size: 16px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.3), inset 0 0 15px rgba(255, 255, 255, 0.1);
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .bizen-cta-btn::before {
+        content: '';
+        position: absolute;
+        top: 0; left: -100%;
+        width: 100%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        animation: shimmer 2.5s infinite;
+    }
+
+    .bizen-cta-btn:active { transform: scale(0.98); }
+
+    .bizen-cta-btn.bizen-cta-secondary {
+        background: rgba(30, 30, 60, 0.6);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 2px solid rgba(147, 197, 253, 0.5);
+        color: #93C5FD;
+        box-shadow: none;
+        margin-top: 12px;
+    }
+
+    .bizen-cta-btn.bizen-cta-secondary::before { display: none; }
+
+    .bizen-graph-container {
+        display: none;
+        position: relative;
+        height: 160px;
+        margin-bottom: 15px;
+    }
+
+    .bizen-graph-bar {
+        position: absolute;
+        bottom: 0;
+        width: 42%;
+        border-radius: 8px 8px 0 0;
+        transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+        padding-bottom: 10px;
+    }
+
+    .bizen-graph-bar.premium {
+        left: 5%; height: 95%;
+        background: linear-gradient(180deg, #3B82F6, #1D4ED8);
+        animation: growBar 1s ease-out;
+        box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
+    }
+
+    .bizen-graph-bar.standard {
+        right: 5%; height: 47%;
+        background: linear-gradient(180deg, rgba(107, 114, 128, 0.5), rgba(75, 85, 99, 0.5));
+        animation: growBar 1.2s ease-out;
+        opacity: 0.6;
+    }
+
+    .bizen-graph-bar.premium .bizen-graph-value {
+        font-size: 35px; font-weight: 900; color: #FFFFFF;
+        text-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+    }
+
+    .bizen-graph-bar.standard .bizen-graph-value {
+        font-size: 22px; font-weight: 600; color: #E8F4F3;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); opacity: 0.8;
+    }
+
+    .bizen-graph-bar .bizen-graph-label {
+        font-size: 13px; color: #F7F9FB; font-weight: 600; margin-top: 5px;
+    }
+
+    .bizen-graph-legend {
+        display: none;
+        justify-content: space-around;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .bizen-legend-item { text-align: center; }
+    .bizen-legend-label { font-size: 12px; color: #E8F4F3; opacity: 0.8; }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(15px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes growBar {
+        from { height: 0; opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @media (min-width: 768px) {
+        .hero-section { padding: 120px 20px 50px; min-height: auto; }
+        .bizen-hero-container { gap: 30px; }
+        .bizen-main-message { margin-bottom: 35px; }
+        .bizen-hero-badge { font-size: 14px; padding: 10px 30px; }
+        .mobile-br { display: none; }
+        .bizen-main-content {
+            flex-direction: row; gap: 50px;
+            align-items: center; justify-content: center;
+        }
+        .bizen-rate-card { flex: 0 0 420px; max-width: 420px; padding: 25px; }
+        .bizen-info-section { flex: 0 0 500px; max-width: 500px; gap: 20px; }
+        .bizen-rate-title { font-size: 16px; margin-bottom: 15px; }
+        .bizen-rate-comparison { display: none; }
+        .bizen-graph-container { display: block; }
+        .bizen-graph-legend { display: flex; }
+        .bizen-info-item { padding: 22px; min-height: 95px; gap: 20px; border-left-width: 5px; }
+        .bizen-info-icon { width: 60px; height: 60px; min-width: 60px; border-radius: 20px; border-width: 2px; }
+        .bizen-info-icon svg { width: 32px; height: 32px; }
+        .bizen-info-title { font-size: 24px; margin-bottom: 6px; }
+        .bizen-info-desc { font-size: 20px; }
+        .bizen-info-oneline { display: block; }
+        .bizen-cta-section { max-width: none; display: flex; gap: 20px; justify-content: center; }
+        .bizen-cta-btn { display: inline-block; width: auto; padding: 16px 45px; font-size: 20px; }
+        .bizen-cta-btn.bizen-cta-secondary { margin-top: 0; }
+        .bizen-cta-btn.bizen-cta-secondary:hover { background: rgba(147, 197, 253, 0.1); border-color: rgba(147, 197, 253, 0.8); }
+        .bizen-cta-btn:hover { transform: translateY(-2px); box-shadow: 0 0 50px rgba(59, 130, 246, 0.6), inset 0 0 30px rgba(255, 255, 255, 0.2); }
+    }
+
+    @media (min-width: 1024px) {
+        .hero-section { padding: 120px 20px 60px; min-height: auto; }
+        .bizen-hero-badge { font-size: 15px; padding: 12px 35px; }
+        .bizen-rate-card { flex: 0 0 450px; max-width: 450px; }
+        .bizen-info-section { flex: 0 0 550px; max-width: 550px; }
+        .bizen-graph-container { height: 180px; }
+        .bizen-graph-bar.premium .bizen-graph-value { font-size: 40px; }
+        .bizen-graph-bar.standard .bizen-graph-value { font-size: 24px; }
+        .bizen-info-item { padding: 25px; min-height: 100px; }
+        .bizen-info-icon { width: 65px; height: 65px; min-width: 65px; }
+        .bizen-info-icon svg { width: 35px; height: 35px; }
+        .bizen-info-title { font-size: 26px; }
+        .bizen-info-desc { font-size: 21px; }
+        .bizen-cta-btn { padding: 18px 50px; font-size: 22px; }
+    }
+
+    @media (max-width: 968px) {
+        .hero-section { padding-top: 240px; }
+    }
+</style>
+
+<section class="hero-section">
+    <div class="hero-video-bg">
+        <iframe src="https://www.youtube.com/embed/HGrAntOmJtk?autoplay=1&mute=1&loop=1&playlist=HGrAntOmJtk&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="bizen-hero-container">
+        <div class="bizen-main-message">
+            <span class="bizen-hero-badge">정책자금 전문 컨설팅</span>
+            <h1 class="bizen-main-title">
+                자금 조달의 <span class="bizen-highlight">어려움</span>을 겪고 계신가요?<br>
+                이제 전문가와 함께하세요
+            </h1>
+            <p class="bizen-sub-desc">
+                <span class="bizen-brand-name">KPFC</span>의 전문 컨설팅으로<br class="mobile-br">
+                정책자금 승인률 <span class="count-up" data-count="95" data-suffix="%">0%</span> 달성
+            </p>
+        </div>
+        <div class="bizen-main-content">
+            <div class="bizen-rate-card">
+                <h3 class="bizen-rate-title">📊 KPFC와 함께한 승인률</h3>
+                <div class="bizen-rate-comparison">
+                    <div class="bizen-rate-item premium">
+                        <div class="bizen-rate-label">KPFC 컨설팅</div>
+                        <div class="bizen-rate-value"><span class="count-up" data-count="95" data-suffix="%">0%</span></div>
+                        <div class="bizen-rate-status">✅ 높은 승인률</div>
+                    </div>
+                    <div class="bizen-rate-item standard">
+                        <div class="bizen-rate-label">일반 신청</div>
+                        <div class="bizen-rate-value"><span class="count-up" data-count="45" data-suffix="%">0%</span></div>
+                        <div class="bizen-rate-status">❌ 낮은 승인률</div>
+                    </div>
+                </div>
+                <div class="bizen-graph-container">
+                    <div class="bizen-graph-bar premium">
+                        <span class="bizen-graph-value"><span class="count-up" data-count="95" data-suffix="%">0%</span></span>
+                        <span class="bizen-graph-label">KPFC 컨설팅</span>
+                    </div>
+                    <div class="bizen-graph-bar standard">
+                        <span class="bizen-graph-value"><span class="count-up" data-count="45" data-suffix="%">0%</span></span>
+                        <span class="bizen-graph-label">일반 신청</span>
+                    </div>
+                </div>
+                <div class="bizen-graph-legend">
+                    <div class="bizen-legend-item"><span class="bizen-legend-label">✅ 전문가 컨설팅</span></div>
+                    <div class="bizen-legend-item"><span class="bizen-legend-label">❌ 직접 신청</span></div>
+                </div>
+            </div>
+            <div class="bizen-info-section">
+                <div class="bizen-info-item">
+                    <div class="bizen-info-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    </div>
+                    <div class="bizen-info-text">
+                        <h4 class="bizen-info-title">기업심사관 전문가</h4>
+                        <p class="bizen-info-desc"><span class="bizen-info-oneline">정책자금 심사기준 정밀 분석<br>맞춤형 사업계획서 작성 지원</span></p>
+                    </div>
+                </div>
+                <div class="bizen-info-item">
+                    <div class="bizen-info-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    </div>
+                    <div class="bizen-info-text">
+                        <h4 class="bizen-info-title">1:1 맞춤 컨설팅</h4>
+                        <p class="bizen-info-desc">대표자 역량 분석 기반<br>자격요건 정밀 진단</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="bizen-cta-section">
+            <a href="fund.html" class="bizen-cta-btn">정책자금 로드맵</a>
+            <a href="service.html" class="bizen-cta-btn bizen-cta-secondary">전문가 네트워크</a>
+        </div>
+    </div>
+</section>
+
+<script>
+(function() {
+    const counters = document.querySelectorAll('.hero-section .count-up');
+    const speed = 2000;
+
+    const startCounting = (counter) => {
+        const target = parseFloat(counter.getAttribute('data-count'));
+        const suffix = counter.getAttribute('data-suffix') || '';
+        const hasDecimal = counter.getAttribute('data-decimal');
+        const increment = target / (speed / 16);
+        let current = 0;
+
+        const updateCounter = () => {
+            current += increment;
+            if (current < target) {
+                counter.textContent = (hasDecimal ? current.toFixed(1) : Math.floor(current)) + suffix;
+                requestAnimationFrame(updateCounter);
+            } else {
+                counter.textContent = (hasDecimal ? target.toFixed(1) : target) + suffix;
+            }
+        };
+        updateCounter();
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const counter = entry.target;
+                if (counter.textContent === '0%' || counter.textContent === '0') {
+                    startCounting(counter);
+                }
+            }
+        });
+    }, { threshold: 0.5 });
+
+    counters.forEach(counter => observer.observe(counter));
+})();
+</script>

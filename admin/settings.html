@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>설정 - 한국정책자금지원센터</title>
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <script src="/js/admin-auth.js"></script>
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- 사이드바 오버레이 (모바일) -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- 사이드바 -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1 class="logo">KPFC</h1>
+        <span class="logo-sub">관리자</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="/admin/" class="nav-item">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"/>
+              <rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/>
+              <rect x="3" y="14" width="7" height="7"/>
+            </svg>
+          </span>
+          <span class="nav-text">대시보드</span>
+        </a>
+        <a href="/admin/leads.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/>
+              <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
+            </svg>
+          </span>
+          <span class="nav-text">접수내역</span>
+        </a>
+        <a href="/admin/board.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </span>
+          <span class="nav-text">게시판 관리</span>
+        </a>
+        <a href="/admin/analytics.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"/>
+              <line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+          </span>
+          <span class="nav-text">방문통계</span>
+        </a>
+        <a href="/admin/settings.html" class="nav-item active">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </span>
+          <span class="nav-text">설정</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="/" class="nav-item" target="_blank">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+          </span>
+          <span class="nav-text">사이트 보기</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- 메인 콘텐츠 -->
+    <main class="main-content">
+      <!-- 헤더 -->
+      <header class="dashboard-header">
+        <div class="header-left">
+          <button class="mobile-menu-btn" onclick="toggleSidebar()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
+          <div>
+            <h1 class="page-title">설정</h1>
+            <p class="page-subtitle">서비스 스택 및 요금 안내</p>
+          </div>
+        </div>
+        <div class="header-right">
+          <span class="user-name">관리자</span>
+          <button class="btn-logout" onclick="logout()">로그아웃</button>
+        </div>
+      </header>
+
+      <!-- 과금 안내 -->
+      <section class="billing-section">
+        <h3 class="section-title">서비스 요금 안내</h3>
+        <div class="billing-grid">
+          <!-- 무료 구간 -->
+          <div class="billing-card billing-free">
+            <div class="billing-header">
+              <span class="billing-badge free">무료</span>
+              <h4>무료 사용 구간</h4>
+            </div>
+            <ul class="billing-list">
+              <li>
+                <strong>Vercel</strong>
+                <span>월 트래픽 100GB</span>
+              </li>
+              <li>
+                <strong>Airtable</strong>
+                <span>1,200 레코드</span>
+              </li>
+              <li>
+                <strong>Resend</strong>
+                <span>월 3,000통</span>
+              </li>
+              <li>
+                <strong>Google Analytics</strong>
+                <span>무제한</span>
+              </li>
+              <li>
+                <strong>Telegram</strong>
+                <span>무제한</span>
+              </li>
+              <li>
+                <strong>Cloudflare Workers</strong>
+                <span>일 10만 요청</span>
+              </li>
+              <li>
+                <strong>Cloudflare R2</strong>
+                <span>저장 10GB, 전송 무제한</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- 유료 구간 -->
+          <div class="billing-card billing-paid">
+            <div class="billing-header">
+              <span class="billing-badge paid">유료</span>
+              <h4>무료 초과 시 요금</h4>
+            </div>
+            <ul class="billing-list">
+              <li>
+                <strong>Vercel</strong>
+                <span>$20/월 (Pro 플랜)</span>
+              </li>
+              <li>
+                <strong>Airtable</strong>
+                <span>$20/월 (Plus 플랜)</span>
+              </li>
+              <li>
+                <strong>Resend</strong>
+                <span>$20/월</span>
+              </li>
+              <li>
+                <strong>Google Analytics</strong>
+                <span>-</span>
+              </li>
+              <li>
+                <strong>Telegram</strong>
+                <span>-</span>
+              </li>
+              <li>
+                <strong>Cloudflare Workers</strong>
+                <span>$5/월 (Paid 플랜)</span>
+              </li>
+              <li>
+                <strong>Cloudflare R2</strong>
+                <span>$0.015/GB (10GB 초과분)</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <p class="billing-note">현재 모든 서비스가 무료 구간 내에서 운영 중입니다.</p>
+
+        <!-- 트래픽 시뮬레이션 -->
+        <div class="traffic-simulation">
+          <h4>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="16" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+            월 트래픽 100GB, 얼마나 될까요?
+          </h4>
+          <div class="simulation-content">
+            <p>페이지 1회 방문 시 평균 <strong>2~3MB</strong> 사용 (이미지, CSS, JS 포함)</p>
+            <div class="simulation-examples">
+              <div class="simulation-item">
+                <span class="sim-visitors">하루 300명</span>
+                <span class="sim-calc">× 30일 × 3MB = 약 27GB/월</span>
+                <span class="sim-status safe">여유</span>
+              </div>
+              <div class="simulation-item">
+                <span class="sim-visitors">하루 500명</span>
+                <span class="sim-calc">× 30일 × 3MB = 약 45GB/월</span>
+                <span class="sim-status safe">여유</span>
+              </div>
+              <div class="simulation-item">
+                <span class="sim-visitors">하루 1,000명</span>
+                <span class="sim-calc">× 30일 × 3MB = 약 90GB/월</span>
+                <span class="sim-status warning">주의</span>
+              </div>
+              <div class="simulation-item">
+                <span class="sim-visitors">하루 1,500명</span>
+                <span class="sim-calc">× 30일 × 3MB = 약 135GB/월</span>
+                <span class="sim-status danger">초과</span>
+              </div>
+            </div>
+            <p class="simulation-note">일반적인 정책자금 컨설팅 사이트는 하루 100~300명 수준으로, 무료 구간 내 충분히 운영 가능합니다.</p>
+          </div>
+          <div class="traffic-check">
+            <a href="https://vercel.com/dashboard" target="_blank" class="btn-vercel">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L2 19.5h20L12 2z"/>
+              </svg>
+              <span class="btn-vercel-text">Vercel 트래픽 확인</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                <polyline points="15 3 21 3 21 9"/>
+                <line x1="10" y1="14" x2="21" y2="3"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Cloudflare 시뮬레이션 -->
+        <div class="traffic-simulation" style="margin-top: 20px;">
+          <h4>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+            </svg>
+            Cloudflare R2 10GB, 얼마나 될까요?
+          </h4>
+          <div class="simulation-content">
+            <p>게시글 썸네일 1장당 평균 <strong>100~200KB</strong> (webp 변환 후)</p>
+            <div class="simulation-examples">
+              <div class="simulation-item">
+                <span class="sim-visitors">이미지 100장</span>
+                <span class="sim-calc">× 150KB = 약 15MB</span>
+                <span class="sim-status safe">여유</span>
+              </div>
+              <div class="simulation-item">
+                <span class="sim-visitors">이미지 1,000장</span>
+                <span class="sim-calc">× 150KB = 약 150MB</span>
+                <span class="sim-status safe">여유</span>
+              </div>
+              <div class="simulation-item">
+                <span class="sim-visitors">이미지 10,000장</span>
+                <span class="sim-calc">× 150KB = 약 1.5GB</span>
+                <span class="sim-status safe">여유</span>
+              </div>
+              <div class="simulation-item">
+                <span class="sim-visitors">이미지 70,000장</span>
+                <span class="sim-calc">× 150KB = 약 10GB</span>
+                <span class="sim-status warning">한계</span>
+              </div>
+            </div>
+            <p class="simulation-note">이미지 전송(다운로드)은 무제한 무료. 저장 용량만 10GB까지 무료입니다.</p>
+          </div>
+          <div class="traffic-check">
+            <a href="https://dash.cloudflare.com" target="_blank" class="btn-vercel" style="background: #F38020;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M16.5 8.5L19 6l-3-3v2.5L13.5 8l3 .5zM5.5 15.5L3 18l3 3v-2.5L8.5 16l-3-.5z"/>
+                <path d="M12 22c5.5 0 10-4.5 10-10S17.5 2 12 2 2 6.5 2 12s4.5 10 10 10z" opacity="0.3"/>
+              </svg>
+              <span class="btn-vercel-text">Cloudflare 대시보드</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                <polyline points="15 3 21 3 21 9"/>
+                <line x1="10" y1="14" x2="21" y2="3"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- 서비스 스택 정보 -->
+        <div class="traffic-simulation" style="margin-top: 20px;">
+          <h4>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+            서비스 스택 구성
+          </h4>
+          <div class="simulation-content">
+            <div class="simulation-examples">
+              <div class="simulation-item">
+                <span class="sim-visitors">프론트엔드</span>
+                <span class="sim-calc">Vercel + HTML/CSS/JS (정적 호스팅)</span>
+                <span class="sim-status safe">무료</span>
+              </div>
+              <div class="simulation-item">
+                <span class="sim-visitors">백엔드 API</span>
+                <span class="sim-calc">Cloudflare Workers (서버리스)</span>
+                <span class="sim-status safe">무료</span>
+              </div>
+              <div class="simulation-item">
+                <span class="sim-visitors">데이터베이스</span>
+                <span class="sim-calc">Airtable (접수내역, 게시글)</span>
+                <span class="sim-status safe">무료</span>
+              </div>
+              <div class="simulation-item">
+                <span class="sim-visitors">이미지 저장소</span>
+                <span class="sim-calc">Cloudflare R2 (webp 변환)</span>
+                <span class="sim-status safe">무료</span>
+              </div>
+              <div class="simulation-item">
+                <span class="sim-visitors">이메일 발송</span>
+                <span class="sim-calc">Resend (접수 확인 메일)</span>
+                <span class="sim-status safe">무료</span>
+              </div>
+              <div class="simulation-item">
+                <span class="sim-visitors">알림</span>
+                <span class="sim-calc">Telegram Bot (실시간 알림)</span>
+                <span class="sim-status safe">무료</span>
+              </div>
+              <div class="simulation-item">
+                <span class="sim-visitors">분석</span>
+                <span class="sim-calc">Google Analytics 4</span>
+                <span class="sim-status safe">무료</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 관리자 연락처 -->
+      <section class="recent-section" style="margin-top: 24px;">
+        <div class="section-header">
+          <h3 class="section-title">관리자 정보</h3>
+        </div>
+        <div style="padding: 20px 0;">
+          <div style="display: grid; gap: 16px;">
+            <div style="display: flex; align-items: center; gap: 12px; padding: 16px; background: var(--neutral-50); border-radius: 8px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              <div>
+                <p style="font-size: 12px; color: var(--neutral-500); margin: 0;">대표</p>
+                <p style="font-size: 14px; font-weight: 600; color: var(--neutral-800); margin: 0;">이종현</p>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 16px; background: var(--neutral-50); border-radius: 8px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+              </svg>
+              <div>
+                <p style="font-size: 12px; color: var(--neutral-500); margin: 0;">대표번호</p>
+                <p style="font-size: 14px; font-weight: 600; color: var(--neutral-800); margin: 0;">1588-9097</p>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 16px; background: var(--neutral-50); border-radius: 8px;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2">
+                <rect x="2" y="4" width="20" height="16" rx="2"/>
+                <path d="M22 7l-10 5L2 7"/>
+              </svg>
+              <div>
+                <p style="font-size: 12px; color: var(--neutral-500); margin: 0;">브랜드</p>
+                <p style="font-size: 14px; font-weight: 600; color: var(--neutral-800); margin: 0;">한국정책자금지원센터 (KPFC)</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- 하단 메뉴바 (모바일) -->
+  <nav class="bottom-nav">
+    <ul class="bottom-nav-list">
+      <li class="bottom-nav-item">
+        <a href="/admin/" class="bottom-nav-link">
+          <span class="bottom-nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+            </svg>
+          </span>
+          <span class="bottom-nav-text">대시보드</span>
+        </a>
+      </li>
+      <li class="bottom-nav-item">
+        <a href="/admin/leads.html" class="bottom-nav-link">
+          <span class="bottom-nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/>
+              <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
+            </svg>
+          </span>
+          <span class="bottom-nav-text">접수</span>
+        </a>
+      </li>
+      <li class="bottom-nav-item">
+        <a href="/admin/board.html" class="bottom-nav-link">
+          <span class="bottom-nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </span>
+          <span class="bottom-nav-text">게시판</span>
+        </a>
+      </li>
+      <li class="bottom-nav-item">
+        <a href="/admin/analytics.html" class="bottom-nav-link">
+          <span class="bottom-nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+          </span>
+          <span class="bottom-nav-text">통계</span>
+        </a>
+      </li>
+      <li class="bottom-nav-item">
+        <a href="/admin/settings.html" class="bottom-nav-link active">
+          <span class="bottom-nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </span>
+          <span class="bottom-nav-text">설정</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <script src="/js/components.js"></script>
+  <script>
+    // 사이드바 토글
+    function toggleSidebar() {
+      document.querySelector('.sidebar').classList.toggle('open');
+      document.querySelector('.sidebar-overlay').classList.toggle('open');
+    }
+
+    // 로그아웃
+    function logout() {
+      if (confirm('로그아웃 하시겠습니까?')) {
+        window.location.href = '/';
+      }
+    }
+  </script>
+</body>
+</html>

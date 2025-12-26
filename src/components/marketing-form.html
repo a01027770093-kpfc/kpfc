@@ -1,0 +1,1062 @@
+<!-- 마케팅 상담 신청 폼 - BIZEN 스타일 -->
+<style>
+/* 폰트 설정 */
+.mkt-form-section {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+/* 섹션 배경 */
+.mkt-form-section {
+    background: #ffffff !important;
+    padding: 80px 0 !important;
+    position: relative !important;
+}
+
+.mkt-form-section .section-container {
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    padding: 0 20px !important;
+}
+
+/* 폼 래퍼 */
+.mkt-form-section .form-wrapper {
+    display: grid !important;
+    grid-template-columns: 1fr 1.5fr !important;
+    gap: 60px !important;
+    align-items: start !important;
+}
+
+/* 좌측 정보 영역 */
+.mkt-form-section .form-info {
+    position: sticky !important;
+    top: 100px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+}
+
+.mkt-form-section .info-content {
+    width: 100% !important;
+    max-width: 350px !important;
+    text-align: left !important;
+    padding-left: 0 !important;
+}
+
+.mkt-form-section .info-badge {
+    display: inline-block !important;
+    background: #EFF6FF !important;
+    color: #3B82F6 !important;
+    padding: 6px 16px !important;
+    border-radius: 20px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    margin-bottom: 20px !important;
+}
+
+.mkt-form-section .info-title {
+    font-size: 36px !important;
+    font-weight: 700 !important;
+    color: #1f2937 !important;
+    line-height: 1.2 !important;
+    margin-bottom: 16px !important;
+}
+
+/* 그라디언트 스타일 - 비젠 블루 */
+.mkt-form-section .info-title .gradient-text {
+    background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
+}
+
+.mkt-form-section .info-desc {
+    font-size: 18px !important;
+    color: #6b7280 !important;
+    line-height: 1.6 !important;
+    margin-bottom: 40px !important;
+}
+
+/* 혜택 리스트 */
+.mkt-form-section .benefit-list {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 0 40px 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+}
+
+.mkt-form-section .benefit-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 12px 0 !important;
+    justify-content: flex-start !important;
+    width: 100% !important;
+}
+
+.mkt-form-section .benefit-icon {
+    width: 24px !important;
+    height: 24px !important;
+    background: #EFF6FF !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+}
+
+.mkt-form-section .benefit-icon svg {
+    width: 14px !important;
+    height: 14px !important;
+    fill: #3B82F6 !important;
+}
+
+.mkt-form-section .benefit-text {
+    font-size: 16px !important;
+    color: #4b5563 !important;
+}
+
+/* 연락처 정보 */
+.mkt-form-section .contact-info {
+    background: #f8fafc !important;
+    border-radius: 12px !important;
+    padding: 24px !important;
+    text-align: center !important;
+    width: 100% !important;
+}
+
+.mkt-form-section .contact-title {
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    color: #1f2937 !important;
+    margin-bottom: 16px !important;
+}
+
+.mkt-form-section .contact-item {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    margin-bottom: 12px !important;
+    justify-content: center !important;
+}
+
+.mkt-form-section .contact-item:last-child {
+    margin-bottom: 0 !important;
+}
+
+.mkt-form-section .contact-icon {
+    width: 20px !important;
+    height: 20px !important;
+    fill: #6b7280 !important;
+}
+
+.mkt-form-section .contact-text {
+    font-size: 16px !important;
+    color: #4b5563 !important;
+}
+
+.mkt-form-section .contact-text strong {
+    color: #1f2937 !important;
+    font-weight: 700 !important;
+    font-size: 18px !important;
+}
+
+/* 우측 폼 영역 */
+.mkt-form-section .form-area {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 16px !important;
+    padding: 40px !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08) !important;
+}
+
+.mkt-form-section .form-header {
+    text-align: left !important;
+    margin-bottom: 40px !important;
+}
+
+.mkt-form-section .form-title {
+    font-size: 28px !important;
+    font-weight: 700 !important;
+    color: #1f2937 !important;
+    margin-bottom: 10px !important;
+}
+
+.mkt-form-section .form-subtitle {
+    font-size: 16px !important;
+    color: #6b7280 !important;
+}
+
+/* 폼 그리드 */
+.mkt-form-section .form-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 20px !important;
+    margin-bottom: 25px !important;
+}
+
+.mkt-form-section .form-group {
+    margin-bottom: 25px !important;
+}
+
+.mkt-form-section .form-grid .form-group {
+    margin-bottom: 0 !important;
+}
+
+.mkt-form-section .form-group.full-width {
+    grid-column: 1 / -1 !important;
+}
+
+.mkt-form-section .form-label {
+    display: block !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    margin-bottom: 8px !important;
+    color: #333 !important;
+}
+
+.mkt-form-section .required {
+    color: #dc2626 !important;
+    margin-left: 4px !important;
+}
+
+/* 입력 필드 */
+.mkt-form-section .form-input,
+.mkt-form-section .form-select,
+.mkt-form-section .form-textarea {
+    width: 100% !important;
+    padding: 12px 16px !important;
+    border: 1px solid #e1e4e8 !important;
+    border-radius: 8px !important;
+    font-size: 13px !important;
+    transition: all 0.3s ease !important;
+    background-color: #ffffff !important;
+    color: #1f2937 !important;
+}
+
+.mkt-form-section .form-input::placeholder {
+    color: #9ca3af !important;
+    opacity: 1 !important;
+}
+
+.mkt-form-section .form-textarea::placeholder {
+    color: #9ca3af !important;
+    opacity: 1 !important;
+    font-size: 13px !important;
+}
+
+.mkt-form-section .form-select option {
+    color: #1f2937 !important;
+    background-color: #ffffff !important;
+}
+
+.mkt-form-section .form-input:focus,
+.mkt-form-section .form-select:focus,
+.mkt-form-section .form-textarea:focus {
+    outline: none !important;
+    border-color: #3B82F6 !important;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+}
+
+.mkt-form-section .form-select {
+    cursor: pointer !important;
+    appearance: none !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236b7280'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg>") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 12px center !important;
+    background-size: 20px !important;
+    padding-right: 40px !important;
+}
+
+.mkt-form-section .form-textarea {
+    resize: vertical !important;
+    min-height: 44px !important;
+    height: 44px !important;
+    line-height: 1.2 !important;
+}
+
+/* 체크박스 그룹 */
+.mkt-form-section .checkbox-group {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+    margin-top: 8px !important;
+    justify-items: center !important;
+    max-width: 600px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.mkt-form-section .checkbox-label {
+    display: flex !important;
+    align-items: center !important;
+    cursor: pointer !important;
+    font-size: 15px !important;
+    color: #1f2937 !important;
+    width: 100% !important;
+    justify-content: flex-start !important;
+}
+
+.mkt-form-section .checkbox-label input {
+    margin-right: 8px !important;
+    width: 18px !important;
+    height: 18px !important;
+    cursor: pointer !important;
+}
+
+/* 개인정보 동의 */
+.mkt-form-section .privacy-agreement {
+    margin-top: 20px !important;
+    margin-bottom: 0 !important;
+}
+
+.mkt-form-section .privacy-main {
+    display: flex !important;
+    align-items: flex-start !important;
+    position: relative !important;
+    cursor: pointer !important;
+}
+
+.mkt-form-section .privacy-main input[type="checkbox"] {
+    margin-top: 2px !important;
+}
+
+.mkt-form-section .privacy-main span {
+    flex: 1 !important;
+    margin-left: 8px !important;
+    color: #1f2937 !important;
+}
+
+.mkt-form-section .privacy-toggle {
+    background: none !important;
+    border: none !important;
+    color: #3B82F6 !important;
+    font-size: 13px !important;
+    text-decoration: underline !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+    margin-left: 0 !important;
+    margin-bottom: 20px !important;
+    display: block !important;
+    transition: color 0.2s ease !important;
+}
+
+.mkt-form-section .privacy-toggle:hover {
+    color: #1E40AF !important;
+}
+
+.mkt-form-section .privacy-detail {
+    display: none !important;
+    margin-top: 15px !important;
+    padding: 20px !important;
+    background: #f8f9fa !important;
+    border: 1px solid #e1e4e8 !important;
+    border-radius: 8px !important;
+    max-height: 300px !important;
+    overflow-y: auto !important;
+}
+
+.mkt-form-section .privacy-detail.show {
+    display: block !important;
+}
+
+.mkt-form-section .privacy-content h4 {
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    margin-bottom: 15px !important;
+    color: #333 !important;
+}
+
+.mkt-form-section .privacy-section {
+    margin-bottom: 20px !important;
+}
+
+.mkt-form-section .privacy-section:last-child {
+    margin-bottom: 0 !important;
+}
+
+.mkt-form-section .privacy-section strong {
+    display: block !important;
+    font-size: 14px !important;
+    color: #333 !important;
+    margin-bottom: 8px !important;
+}
+
+.mkt-form-section .privacy-section p {
+    font-size: 13px !important;
+    color: #666 !important;
+    line-height: 1.6 !important;
+    margin-bottom: 4px !important;
+}
+
+/* 제출 버튼 */
+.mkt-form-section .submit-btn {
+    width: 100% !important;
+    padding: 16px !important;
+    background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    margin-top: 30px !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.mkt-form-section .submit-btn:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3) !important;
+    background: linear-gradient(135deg, #2563EB 0%, #1E3A8A 100%) !important;
+}
+
+.mkt-form-section .submit-btn::after {
+    content: '' !important;
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    width: 0 !important;
+    height: 0 !important;
+    border-radius: 50% !important;
+    background: rgba(255,255,255,0.3) !important;
+    transform: translate(-50%, -50%) !important;
+    transition: width 0.6s, height 0.6s !important;
+}
+
+.mkt-form-section .submit-btn:active::after {
+    width: 300px !important;
+    height: 300px !important;
+}
+
+.mkt-form-section .privacy-notice {
+    font-size: 13px !important;
+    color: #666 !important;
+    margin-top: 20px !important;
+    line-height: 1.5 !important;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 968px) {
+    .mkt-form-section .form-wrapper {
+        grid-template-columns: 1fr !important;
+        gap: 40px !important;
+    }
+
+    .mkt-form-section .form-info {
+        position: static !important;
+        align-items: center !important;
+    }
+
+    .mkt-form-section .info-content {
+        max-width: 100% !important;
+        text-align: center !important;
+    }
+
+    .mkt-form-section .benefit-item {
+        justify-content: center !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .mkt-form-section {
+        padding: 40px 0 !important;
+    }
+
+    .mkt-form-section .info-content {
+        padding-left: 0 !important;
+    }
+
+    .mkt-form-section .info-title {
+        font-size: 28px !important;
+        margin-bottom: 12px !important;
+        line-height: 1.2 !important;
+    }
+
+    .mkt-form-section .info-desc {
+        font-size: 15px !important;
+        margin-bottom: 24px !important;
+        line-height: 1.4 !important;
+    }
+
+    .mkt-form-section .benefit-list {
+        margin-bottom: 24px !important;
+        width: auto !important;
+        max-width: 280px !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        align-items: center !important;
+    }
+
+    .mkt-form-section .benefit-item {
+        padding: 8px 0 !important;
+        justify-content: flex-start !important;
+        width: auto !important;
+    }
+
+    .mkt-form-section .benefit-text {
+        font-size: 14px !important;
+    }
+
+    .mkt-form-section .contact-info {
+        padding: 16px !important;
+        margin-bottom: 24px !important;
+    }
+
+    .mkt-form-section .contact-title {
+        font-size: 16px !important;
+        margin-bottom: 12px !important;
+    }
+
+    .mkt-form-section .contact-item {
+        margin-bottom: 8px !important;
+    }
+
+    .mkt-form-section .contact-text {
+        font-size: 14px !important;
+    }
+
+    .mkt-form-section .form-area {
+        padding: 20px 16px !important;
+        border-radius: 12px !important;
+    }
+
+    .mkt-form-section .form-header {
+        margin-bottom: 20px !important;
+    }
+
+    .mkt-form-section .form-title {
+        font-size: 22px !important;
+        margin-bottom: 8px !important;
+    }
+
+    .mkt-form-section .form-subtitle {
+        font-size: 13px !important;
+    }
+
+    .mkt-form-section .form-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+        margin-bottom: 15px !important;
+    }
+
+    .mkt-form-section .form-group {
+        margin-bottom: 15px !important;
+    }
+
+    .mkt-form-section .form-label {
+        font-size: 12px !important;
+        margin-bottom: 5px !important;
+    }
+
+    .mkt-form-section .form-input,
+    .mkt-form-section .form-select {
+        font-size: 14px !important;
+        padding: 10px 12px !important;
+    }
+
+    .mkt-form-section .form-textarea {
+        font-size: 14px !important;
+        padding: 10px 12px !important;
+        min-height: 44px !important;
+        height: 44px !important;
+    }
+
+    .mkt-form-section .form-textarea::placeholder {
+        font-size: 13px !important;
+    }
+
+    .mkt-form-section .checkbox-group {
+        grid-template-columns: 1fr !important;
+        gap: 8px !important;
+        max-width: 100% !important;
+        justify-items: flex-start !important;
+    }
+
+    .mkt-form-section .checkbox-label {
+        font-size: 13px !important;
+    }
+
+    .mkt-form-section .checkbox-label input {
+        width: 16px !important;
+        height: 16px !important;
+        margin-right: 6px !important;
+    }
+
+    .mkt-form-section .submit-btn {
+        margin-top: 15px !important;
+        font-size: 16px !important;
+        padding: 14px !important;
+    }
+
+    .mkt-form-section .privacy-notice {
+        font-size: 11px !important;
+        margin-top: 15px !important;
+        line-height: 1.4 !important;
+    }
+
+    .mkt-form-section .privacy-toggle {
+        font-size: 12px !important;
+        margin-bottom: 15px !important;
+    }
+
+    .mkt-form-section .privacy-detail {
+        padding: 15px !important;
+        max-height: 250px !important;
+    }
+
+    .mkt-form-section .privacy-content h4 {
+        font-size: 14px !important;
+        margin-bottom: 12px !important;
+    }
+
+    .mkt-form-section .privacy-section strong {
+        font-size: 13px !important;
+        margin-bottom: 6px !important;
+    }
+
+    .mkt-form-section .privacy-section p {
+        font-size: 12px !important;
+        line-height: 1.5 !important;
+    }
+
+    .mkt-form-section .privacy-section {
+        margin-bottom: 15px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .mkt-form-section .form-grid {
+        gap: 8px !important;
+    }
+
+    .mkt-form-section .info-title {
+        font-size: 24px !important;
+    }
+}
+</style>
+
+<section class="mkt-form-section" id="mkt-contact-form">
+<div class="section-container">
+    <div class="form-wrapper">
+        <!-- 좌측 정보 영역 - 비젠 정보 -->
+        <div class="form-info">
+            <div class="info-content">
+                <span class="info-badge">온라인 마케팅 전문</span>
+                <h2 class="info-title">
+                    성공적인<br>
+                  <span class="gradient-text">비즈니스 성장</span><br>
+                    BIZEN 비젠파트너스
+                </h2>
+                <p class="info-desc">
+                    온라인 마케팅의 모든 것을 한 곳에서<br>
+                    전문가와 함께 만들어가는 성장 전략
+                </p>
+
+                <ul class="benefit-list">
+                    <li class="benefit-item">
+                        <div class="benefit-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+                            </svg>
+                        </div>
+                        <span class="benefit-text">마케팅 컨설팅</span>
+                    </li>
+                    <li class="benefit-item">
+                        <div class="benefit-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+                            </svg>
+                        </div>
+                        <span class="benefit-text">광고DB 자동화</span>
+                    </li>
+                    <li class="benefit-item">
+                        <div class="benefit-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+                            </svg>
+                        </div>
+                        <span class="benefit-text">콘텐츠 마케팅</span>
+                    </li>
+                    <li class="benefit-item">
+                        <div class="benefit-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/>
+                            </svg>
+                        </div>
+                        <span class="benefit-text">홈페이지 제작</span>
+                    </li>
+                </ul>
+
+                <div class="contact-info">
+                    <h3 class="contact-title">빠른 상담 문의</h3>
+                    <div class="contact-item">
+                        <svg class="contact-icon" viewBox="0 0 24 24">
+                            <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                        </svg>
+                        <span class="contact-text">전화: <strong>1668-3166</strong></span>
+                    </div>
+                    <div class="contact-item">
+                        <svg class="contact-icon" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                        </svg>
+                        <span class="contact-text">평일 09:00 ~ 18:00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 우측 폼 영역 -->
+        <div class="form-area">
+            <div class="form-header">
+                <h2 class="form-title">무료 상담 신청</h2>
+                <p class="form-subtitle">전문가가 직접 상담해드립니다</p>
+            </div>
+
+            <form id="mktConsultForm">
+                <!-- 2열 그리드 구성 -->
+                <div class="form-grid">
+                    <!-- 업체명 -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            업체명 <span class="required">*</span>
+                        </label>
+                        <input type="text" class="form-input" name="company" required placeholder="업체명을 입력하세요">
+                    </div>
+
+                    <!-- 이메일 -->
+                    <div class="form-group">
+                        <label class="form-label">이메일</label>
+                        <input type="email" class="form-input" name="email" placeholder="example@email.com">
+                    </div>
+
+                    <!-- 담당자명 -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            담당자명 <span class="required">*</span>
+                        </label>
+                        <input type="text" class="form-input" name="name" required placeholder="담당자명을 입력하세요">
+                    </div>
+
+                    <!-- 연락처 -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            연락처 <span class="required">*</span>
+                        </label>
+                        <input type="tel" class="form-input" name="phone" placeholder="010-0000-0000" required>
+                    </div>
+                </div>
+
+                <!-- 업무분야 (체크박스) -->
+                <!-- 관심서비스 -->
+                <div class="form-group full-width">
+                    <label class="form-label">
+                        관심 서비스 <span class="required">*</span>
+                    </label>
+                    <select class="form-select" name="service" required>
+                        <option value="">선택해주세요</option>
+                        <option value="마케팅 컨설팅">마케팅 컨설팅</option>
+                        <option value="광고DB 자동화">광고DB 자동화</option>
+                        <option value="콘텐츠 마케팅">콘텐츠 마케팅</option>
+                        <option value="홈페이지 제작">홈페이지 제작</option>
+                        <option value="검색광고 운영">검색광고 운영</option>
+                        <option value="SNS 마케팅">SNS 마케팅</option>
+                        <option value="블로그 마케팅">블로그 마케팅</option>
+                        <option value="AI 자동화 구축">AI 자동화 구축</option>
+                        <option value="퍼포먼스 마케팅">퍼포먼스 마케팅</option>
+                    </select>
+                </div>
+
+                <!-- 예산과 문의내용 -->
+                <div class="form-grid">
+                    <!-- 예산 -->
+                    <div class="form-group">
+                        <label class="form-label">예상 예산</label>
+                        <select class="form-select" name="budget">
+                            <option value="">선택해주세요</option>
+                            <option value="100만원 미만">100만원 미만</option>
+                            <option value="100-300만원">100-300만원</option>
+                            <option value="300-500만원">300-500만원</option>
+                            <option value="500-1000만원">500-1000만원</option>
+                            <option value="1000만원 이상">1000만원 이상</option>
+                            <option value="협의">협의</option>
+                        </select>
+                    </div>
+
+                    <!-- 문의내용 -->
+                    <div class="form-group">
+                        <label class="form-label">문의내용</label>
+                        <textarea class="form-textarea" name="message" placeholder="구체적인 문의사항을 작성해주세요"></textarea>
+                    </div>
+                </div>
+
+                <!-- 개인정보 수집 동의 -->
+                <div class="form-group full-width privacy-agreement">
+                    <label class="checkbox-label privacy-main">
+                        <input type="checkbox" name="privacy_agree" id="mktPrivacyAgree" required>
+                        <span>개인정보 수집 및 이용에 동의합니다 <span class="required">*</span></span>
+                    </label>
+
+                    <div class="privacy-detail" id="mktPrivacyDetail">
+                        <div class="privacy-content">
+                            <h4>개인정보 수집 및 이용 동의</h4>
+
+                            <div class="privacy-section">
+                                <strong>1. 수집하는 개인정보 항목</strong>
+                                <p>- 필수항목: 업체명, 담당자명, 연락처</p>
+                                <p>- 선택항목: 이메일, 관심 서비스, 예상 예산, 문의내용</p>
+                            </div>
+
+                            <div class="privacy-section">
+                                <strong>2. 개인정보의 수집 및 이용목적</strong>
+                                <p>- 서비스 상담 및 문의사항 답변</p>
+                                <p>- 맞춤형 서비스 제안 및 마케팅 정보 제공</p>
+                                <p>- 계약 체결 시 연락 및 안내</p>
+                            </div>
+
+                            <div class="privacy-section">
+                                <strong>3. 개인정보의 보유 및 이용기간</strong>
+                                <p>- 상담 완료 후 1년간 보관</p>
+                                <p>- 관계 법령에 따라 보존할 필요가 있는 경우 해당 기간 동안 보관</p>
+                            </div>
+
+                            <div class="privacy-section">
+                                <strong>4. 동의 거부 권리 및 동의 거부 시 불이익</strong>
+                                <p>귀하는 개인정보 수집 및 이용에 대한 동의를 거부할 권리가 있습니다. 다만, 필수항목에 대한 동의를 거부할 경우 상담 서비스 이용이 제한될 수 있습니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="privacy-toggle" onclick="toggleMktPrivacyDetail()">자세히보기</button>
+
+                <button type="submit" class="submit-btn">상담 신청하기</button>
+
+                <p class="privacy-notice">
+                    * 제출하신 정보는 상담 목적으로만 사용되며, 관련 법령에 따라 안전하게 관리됩니다.
+                </p>
+            </form>
+        </div>
+    </div>
+</div>
+</section>
+
+<script>
+// 개인정보 상세보기 토글
+function toggleMktPrivacyDetail() {
+    const detail = document.getElementById('mktPrivacyDetail');
+    const toggle = event.target;
+
+    if (detail.classList.contains('show')) {
+        detail.classList.remove('show');
+        toggle.textContent = '자세히보기';
+    } else {
+        detail.classList.add('show');
+        toggle.textContent = '닫기';
+    }
+}
+
+// 폼 제출 처리 - Worker API (Airtable) 연동
+document.getElementById('mktConsultForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    // 개인정보 동의 체크
+    const privacyAgree = document.getElementById('mktPrivacyAgree');
+    if (!privacyAgree.checked) {
+        alert('개인정보 수집 및 이용에 동의해주세요.');
+        privacyAgree.focus();
+        return;
+    }
+
+    const submitBtn = this.querySelector('.submit-btn');
+    const originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = '전송 중...';
+
+    const formData = new FormData(this);
+
+    // 관심 서비스 체크
+    const service = formData.get('service');
+    if (!service) {
+        alert('관심 서비스를 선택해주세요.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+        return;
+    }
+
+    // Worker API용 데이터 구성 (Airtable 필드명에 맞춤)
+    const airtableFields = {
+        '기업명': formData.get('company') || '',
+        '대표자명': formData.get('name') || '',
+        '연락처': formData.get('phone') || '',
+        '이메일': formData.get('email') || '',
+        '업종': service,
+        '필요자금규모': formData.get('budget') || '',
+        '문의사항': formData.get('message') || '',
+        '상태': '대기중'
+    };
+
+    // 이메일 HTML 템플릿 (고객용) - BIZEN 브랜드 스타일
+    const customerHtml = `
+      <div style="font-family: 'Pretendard', -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0;">
+          <h2 style="margin: 0; font-size: 20px;">✅ 마케팅 상담 신청이 접수되었습니다</h2>
+          <p style="margin: 10px 0 0 0; opacity: 0.95; font-size: 14px;">BIZEN 온라인 마케팅 전문상담</p>
+        </div>
+
+        <div style="background: white; padding: 30px; border: 1px solid #e0e0e0; border-top: none;">
+          <div style="background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); padding: 20px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #3B82F6;">
+            <p style="margin: 0 0 15px 0; font-size: 15px; color: #000000;">안녕하세요, <strong>${airtableFields['대표자명']}</strong>님</p>
+            <p style="margin: 0; color: #4B5563; line-height: 1.6; font-size: 14px;">마케팅 상담 신청이<br>정상 접수되었습니다.</p>
+          </div>
+
+          <div style="background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%); padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+            <h3 style="color: white; margin: 0 0 15px 0; font-size: 15px;">📋 접수 내용</h3>
+            <table style="width: 100%; color: white; font-size: 13px; border-collapse: separate; border-spacing: 0;">
+              <tr><td style="padding: 8px 20px 8px 0; color: #93C5FD; width: 40%; white-space: nowrap;">🏢 업체명</td><td style="padding: 8px 0;">${airtableFields['기업명']}</td></tr>
+              <tr><td style="padding: 8px 20px 8px 0; color: #93C5FD; white-space: nowrap;">📞 연락처</td><td style="padding: 8px 0;">${airtableFields['연락처']}</td></tr>
+              <tr><td style="padding: 8px 20px 8px 0; color: #93C5FD; white-space: nowrap;">🎯 관심 서비스</td><td style="padding: 8px 0;">${service}</td></tr>
+              <tr><td style="padding: 8px 20px 8px 0; color: #93C5FD; white-space: nowrap;">💰 예상 예산</td><td style="padding: 8px 0;">${airtableFields['필요자금규모'] || '미선택'}</td></tr>
+            </table>
+          </div>
+
+          <div style="background: linear-gradient(135deg, #EFF6FF, #DBEAFE); padding: 15px; border-radius: 8px; border-left: 4px solid #3B82F6; margin-bottom: 20px;">
+            <p style="margin: 0; color: #000000; font-weight: 600;">영업일 기준 <strong>24시간 이내</strong>에 BIZEN 전문가가 연락드리겠습니다.</p>
+          </div>
+        </div>
+
+        <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%); border-radius: 0 0 10px 10px; color: white; font-size: 12px;">
+          <p style="margin: 0; font-weight: 600;">BIZEN | 온라인 마케팅 전문</p>
+          <p style="margin: 5px 0 0 0; opacity: 0.9;">문의: 1668-3166 | 이메일: info@bizen.co.kr</p>
+          <p style="margin: 5px 0 0 0; opacity: 0.8; font-size: 10px;">※ 본 메일은 발신 전용입니다. 문의사항은 위 연락처로 부탁드립니다.</p>
+        </div>
+      </div>
+    `;
+
+    // 이메일 HTML 템플릿 (담당자용) - BIZEN 브랜드 스타일
+    const staffHtml = `
+      <div style="font-family: 'Pretendard', -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0;">
+          <h2 style="margin: 0; font-size: 24px;">📣 BIZEN 마케팅 상담 신청</h2>
+          <p style="margin: 10px 0 0 0; opacity: 0.95;">💻 홈페이지 접수</p>
+        </div>
+
+        <div style="background: white; padding: 30px; border: 1px solid #e0e0e0; border-top: none;">
+          <div style="background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); padding: 20px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #3B82F6;">
+            <h3 style="color: #000000; margin: 0 0 15px 0; font-size: 18px; border-bottom: 2px solid #3B82F6; padding-bottom: 8px; display: inline-block;">🏢 업체 정보</h3>
+            <table style="width: 100%;">
+              <tr><td style="padding: 8px 0; color: #4B5563; width: 40%; white-space: nowrap;">🏢 업체명</td><td style="font-weight: 600; color: #000000;">${airtableFields['기업명']}</td></tr>
+              <tr><td style="padding: 8px 0; color: #4B5563; white-space: nowrap;">🎯 관심 서비스</td><td style="color: #3B82F6; font-weight: 600;">${service}</td></tr>
+            </table>
+          </div>
+
+          <div style="background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); padding: 20px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #3B82F6;">
+            <h3 style="color: #000000; margin: 0 0 15px 0; font-size: 18px; border-bottom: 2px solid #3B82F6; padding-bottom: 8px; display: inline-block;">👤 담당자 정보</h3>
+            <table style="width: 100%;">
+              <tr><td style="padding: 8px 0; color: #4B5563; width: 40%; white-space: nowrap;">👤 담당자명</td><td>${airtableFields['대표자명']}</td></tr>
+              <tr><td style="padding: 8px 0; color: #4B5563; white-space: nowrap;">📞 연락처</td><td style="color: #000000; font-weight: 600;">${airtableFields['연락처']}</td></tr>
+              <tr><td style="padding: 8px 0; color: #4B5563; white-space: nowrap;">✉️ 이메일</td><td>${airtableFields['이메일'] || '-'}</td></tr>
+            </table>
+          </div>
+
+          <div style="background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%); padding: 20px; border-radius: 8px; margin-bottom: 25px;">
+            <h3 style="color: white; margin: 0 0 15px 0; font-size: 18px;">💰 예산 정보</h3>
+            <table style="width: 100%; color: white;">
+              <tr><td style="padding: 8px 0; color: #93C5FD; width: 40%; white-space: nowrap;">💵 예상 예산</td><td style="color: #DBEAFE; font-weight: 700; font-size: 16px;">${airtableFields['필요자금규모'] || '미선택'}</td></tr>
+            </table>
+          </div>
+
+          ${airtableFields['문의사항'] ? \`
+          <div style="background: linear-gradient(135deg, #EFF6FF, #DBEAFE); padding: 20px; border-radius: 8px; border-left: 4px solid #3B82F6; margin-bottom: 20px;">
+            <h3 style="color: #000000; margin: 0 0 10px 0; font-size: 16px;">📝 문의내용</h3>
+            <p style="margin: 0; color: #4B5563; white-space: pre-wrap;">\${airtableFields['문의사항']}</p>
+          </div>
+          \` : ''}
+        </div>
+
+        <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%); border-radius: 0 0 10px 10px; color: white; font-size: 12px;">
+          <p style="margin: 0; font-weight: 600;">BIZEN | 1668-3166</p>
+          <p style="margin: 5px 0 0 0; opacity: 0.9; font-size: 11px;">※ 홈페이지에서 자동 발송되었습니다.</p>
+        </div>
+      </div>
+    `;
+
+    try {
+        // Worker API 호출 (Airtable + 이메일 + Telegram)
+        const response = await fetch('https://bizen-homepage.weandbiz.workers.dev/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                airtableFields: airtableFields,
+                customerEmail: airtableFields['이메일'] || null,
+                customerSubject: '[BIZEN] 마케팅 상담 신청이 접수되었습니다',
+                customerHtml: customerHtml,
+                staffEmail: 'weandbiz@gmail.com',
+                staffBcc: 'mkt@polarad.co.kr',
+                staffSubject: `[마케팅 상담] ${airtableFields['기업명']} - ${airtableFields['대표자명']}`,
+                staffHtml: staffHtml
+            })
+        });
+
+        const result = await response.json();
+        console.log('Worker API 응답:', result);
+
+        if (result.success && result.airtable.success) {
+            const now = new Date();
+            const hour = now.getHours();
+            const day = now.getDay();
+            const isWorkingTime = day >= 1 && day <= 5 && hour >= 9 && hour < 18;
+
+            let message = '상담 신청이 접수되었습니다.\n';
+            if (isWorkingTime) {
+                message += '영업일 기준 24시간 내에 연락드리겠습니다.';
+            } else {
+                message += '현재 업무시간이 아닙니다.\n다음 영업일에 연락드리겠습니다.\n\n';
+                message += '업무시간: 평일 09:00-18:00';
+            }
+
+            if (airtableFields['이메일'] && result.email?.customer?.success) {
+                message += '\n\n확인 메일을 발송했습니다.';
+            }
+
+            alert(message);
+            this.reset();
+        } else {
+            throw new Error(result.airtable?.error || '저장 실패');
+        }
+
+    } catch (error) {
+        console.error('전송 실패:', error);
+        alert('전송 중 오류가 발생했습니다. 다시 시도해주세요.\n\n오류: ' + error.message);
+    }
+
+    submitBtn.disabled = false;
+    submitBtn.textContent = originalText;
+});
+
+// 전화번호 자동 포맷팅
+document.querySelector('#mktConsultForm input[name="phone"]').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/[^0-9]/g, '');
+    if (value.length > 3 && value.length <= 7) {
+        value = value.slice(0, 3) + '-' + value.slice(3);
+    } else if (value.length > 7) {
+        value = value.slice(0, 3) + '-' + value.slice(3, 7) + '-' + value.slice(7, 11);
+    }
+    e.target.value = value;
+});
+
+// 모바일 최적화
+if (window.innerWidth <= 768) {
+    const inputs = document.querySelectorAll('.mkt-form-section .form-input, .mkt-form-section .form-select, .mkt-form-section .form-textarea');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            setTimeout(() => {
+                this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 300);
+        });
+    });
+}
+</script>

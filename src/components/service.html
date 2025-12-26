@@ -1,0 +1,166 @@
+    <style>
+        .bizen-service-section { position: relative; width: 100%; padding: 40px 20px 30px; overflow: hidden; background: linear-gradient(180deg, #14144A 0%, #1E1E6E 50%, #14144A 100%); }
+        .bizen-service-section::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(ellipse 80% 50% at 20% 20%, rgba(59, 130, 246, 0.15) 0%, transparent 50%), radial-gradient(ellipse 60% 40% at 80% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%); pointer-events: none; }
+        .bizen-service-container { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; }
+        .bizen-service-header { text-align: center; margin-bottom: 25px; }
+        .bizen-service-title { font-size: 22px; font-weight: 900; color: #ffffff; margin-bottom: 8px; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); }
+        .bizen-service-highlight { color: #93C5FD; text-shadow: 0 0 15px rgba(147, 197, 253, 0.5); }
+        .bizen-service-subtitle { font-size: 13px; color: rgba(255, 255, 255, 0.9); font-weight: 500; line-height: 1.5; }
+        .bizen-tab-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+        .bizen-tab-btn { padding: 10px 8px; background: rgba(255, 255, 255, 0.08); border: 1.5px solid rgba(255, 255, 255, 0.15); border-radius: 10px; font-size: 13px; font-weight: 600; color: rgba(255, 255, 255, 0.7); cursor: pointer; transition: all 0.3s ease; text-align: center; backdrop-filter: blur(10px); }
+        .bizen-tab-btn:active { transform: scale(0.98); }
+        .bizen-tab-btn.active { background: linear-gradient(135deg, #3B82F6, #60A5FA); border-color: rgba(147, 197, 253, 0.3); color: #ffffff; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
+        .bizen-tab-wrapper { margin-bottom: 25px; }
+        .bizen-tab-content { display: none; animation: svcTabFade 0.4s ease; }
+        .bizen-tab-content.active { display: block; }
+        @keyframes svcTabFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .bizen-tab-card { background: rgba(30, 30, 60, 0.9); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 16px; padding: 25px 20px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3); backdrop-filter: blur(15px); }
+        .bizen-tab-icon { width: 56px; height: 56px; margin: 0 auto 18px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(147, 197, 253, 0.15)); border: 2px solid rgba(59, 130, 246, 0.5); border-radius: 16px; display: flex; align-items: center; justify-content: center; }
+        .bizen-tab-icon svg { width: 28px; height: 28px; fill: #93C5FD; filter: drop-shadow(0 0 5px rgba(147, 197, 253, 0.3)); }
+        .bizen-tab-title { font-size: 20px; font-weight: 800; color: #ffffff; margin-bottom: 12px; text-align: center; }
+        .bizen-tab-desc { font-size: 14px; color: rgba(255, 255, 255, 0.85); line-height: 1.7; text-align: left; }
+        .bizen-text-highlight { color: #93C5FD; font-weight: 700; }
+        .bizen-point-box { background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(147, 197, 253, 0.1)); border-left: 3px solid #3B82F6; border-radius: 8px; padding: 12px 14px; margin: 15px 0; }
+        .bizen-point-box p { font-size: 13px; color: #ffffff; font-weight: 600; margin: 0; }
+        .bizen-trust-banner { max-width: 1400px; margin: 25px auto 0; background: linear-gradient(135deg, rgba(30, 30, 60, 0.7), rgba(20, 20, 50, 0.8)); border: 1px solid rgba(147, 197, 253, 0.25); border-radius: 16px; padding: 20px 16px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); position: relative; overflow: hidden; box-shadow: 0 0 30px rgba(59, 130, 246, 0.2), 0 0 60px rgba(147, 197, 253, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1); }
+        .bizen-trust-banner::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(147, 197, 253, 0.6), transparent); }
+        .bizen-trust-banner::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.4), transparent); }
+        .bizen-trust-content { position: relative; z-index: 1; }
+        .bizen-trust-title { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 15px; font-weight: 700; color: #ffffff; margin-bottom: 16px; text-shadow: 0 0 15px rgba(147, 197, 253, 0.5); }
+        .bizen-banner-icon { width: 22px; height: 22px; fill: #93C5FD; filter: drop-shadow(0 0 8px rgba(147, 197, 253, 0.6)); }
+        .bizen-trust-items { display: flex; flex-direction: column; gap: 10px; }
+        .bizen-trust-item { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 10px; padding: 14px 16px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; min-height: 52px; backdrop-filter: blur(10px); transition: all 0.3s ease; }
+        .bizen-trust-item:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(147, 197, 253, 0.2); box-shadow: 0 0 20px rgba(239, 68, 68, 0.15); }
+        .bizen-trust-icon-wrap { position: relative; width: 36px; height: 36px; flex-shrink: 0; }
+        .bizen-trust-icon-wrap .icon-base { width: 28px; height: 28px; fill: rgba(255, 255, 255, 0.2); position: absolute; top: 4px; left: 4px; }
+        .bizen-trust-icon-wrap .icon-x { width: 36px; height: 36px; fill: #EF4444; position: absolute; top: 0; left: 0; filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.6)); }
+        .bizen-trust-text { font-size: 13px; color: #ffffff; font-weight: 600; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); }
+        @media (min-width: 768px) {
+            .bizen-service-section { padding: 60px 30px 50px; }
+            .bizen-service-header { margin-bottom: 50px; }
+            .bizen-service-title { font-size: 42px; }
+            .bizen-service-subtitle { font-size: 20px; }
+            .bizen-tab-nav { display: flex; gap: 12px; justify-content: center; margin-bottom: 35px; }
+            .bizen-tab-btn { padding: 12px 24px; font-size: 16px; border-radius: 12px; flex: none; }
+            .bizen-tab-btn:hover { background: rgba(255, 255, 255, 0.12); border-color: rgba(147, 197, 253, 0.3); }
+            .bizen-tab-card { padding: 40px; border-radius: 20px; text-align: center; max-width: 1400px; margin: 0 auto; }
+            .bizen-tab-icon { width: 80px; height: 80px; margin-bottom: 25px; border-radius: 20px; }
+            .bizen-tab-icon svg { width: 40px; height: 40px; }
+            .bizen-tab-title { font-size: 28px; margin-bottom: 15px; }
+            .bizen-tab-desc { font-size: 18px; text-align: center; }
+            .bizen-point-box { display: none; }
+            .bizen-trust-banner { padding: 28px 35px; border-radius: 20px; margin-top: 40px; box-shadow: 0 0 40px rgba(59, 130, 246, 0.25), 0 0 80px rgba(147, 197, 253, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15); }
+            .bizen-trust-content { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 30px; }
+            .bizen-trust-title { margin-bottom: 0; font-size: 20px; justify-content: flex-start; }
+            .bizen-banner-icon { width: 28px; height: 28px; }
+            .bizen-trust-items { flex-direction: row; gap: 40px; }
+            .bizen-trust-item { flex-direction: row; padding: 10px 15px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; gap: 10px; min-height: auto; text-align: left; }
+            .bizen-trust-item:hover { background: rgba(255, 255, 255, 0.08); transform: translateY(-2px); }
+            .bizen-trust-icon-wrap { width: 35px; height: 35px; }
+            .bizen-trust-icon-wrap .icon-base { width: 28px; height: 28px; }
+            .bizen-trust-icon-wrap .icon-x { width: 35px; height: 35px; }
+            .bizen-trust-text { font-size: 15px; }
+        }
+        @media (min-width: 1024px) {
+            .bizen-service-section { padding: 80px 40px 60px; }
+            .bizen-service-header { margin-bottom: 60px; }
+            .bizen-service-title { font-size: 48px; }
+            .bizen-service-subtitle { font-size: 22px; }
+            .bizen-tab-btn { padding: 14px 30px; font-size: 17px; }
+            .bizen-tab-card { padding: 50px; border-radius: 24px; }
+            .bizen-tab-icon { width: 90px; height: 90px; margin-bottom: 30px; border-radius: 24px; transition: all 0.3s ease; }
+            .bizen-tab-icon svg { width: 45px; height: 45px; }
+            .bizen-tab-card:hover .bizen-tab-icon { transform: rotate(5deg) scale(1.05); box-shadow: 0 0 30px rgba(147, 197, 253, 0.3); }
+            .bizen-tab-title { font-size: 32px; margin-bottom: 20px; }
+            .bizen-tab-desc { font-size: 20px; line-height: 1.8; }
+            .bizen-trust-banner { padding: 32px 45px; border-radius: 24px; box-shadow: 0 0 50px rgba(59, 130, 246, 0.3), 0 0 100px rgba(147, 197, 253, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15); }
+            .bizen-trust-title { font-size: 22px; }
+            .bizen-trust-items { gap: 50px; }
+            .bizen-trust-item { padding: 12px 18px; }
+            .bizen-trust-text { font-size: 16px; }
+        }
+    </style>
+
+    <section class="bizen-service-section">
+        <div class="bizen-service-container">
+            <div class="bizen-service-header">
+                <h2 class="bizen-service-title">BIZEN의 <span class="bizen-service-highlight">전문 컨설팅 시스템</span></h2>
+                <p class="bizen-service-subtitle">체계적인 프로세스로 기업의 성공을 이끕니다</p>
+            </div>
+            <div class="bizen-tab-nav">
+                <button class="bizen-tab-btn active" data-tab="svc-tab1">심층 기업 분석</button>
+                <button class="bizen-tab-btn" data-tab="svc-tab2">맞춤 자금 설계</button>
+                <button class="bizen-tab-btn" data-tab="svc-tab3">성장 전략 구축</button>
+                <button class="bizen-tab-btn" data-tab="svc-tab4">전담 컨설팅</button>
+            </div>
+            <div class="bizen-tab-wrapper">
+                <div id="svc-tab1" class="bizen-tab-content active">
+                    <div class="bizen-tab-card">
+                        <div class="bizen-tab-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+                        <h3 class="bizen-tab-title">심층 기업 분석</h3>
+                        <p class="bizen-tab-desc">다양한 산업군의 데이터를 기반으로 기업의 현재 위치를 정확히 파악합니다.</p>
+                        <div class="bizen-point-box"><p><span class="bizen-text-highlight">체계적 분석</span>으로 성공 가능성 진단</p></div>
+                        <p class="bizen-tab-desc">재무 현황, 사업 모델, 시장 경쟁력 등 다각도 분석을 통해 기업에 가장 적합한 자금 지원 방안을 도출합니다.<br><br>정책 동향과 심사 기준을 면밀히 분석하여 귀사에 최적화된 접근 전략을 수립합니다.</p>
+                    </div>
+                </div>
+                <div id="svc-tab2" class="bizen-tab-content">
+                    <div class="bizen-tab-card">
+                        <div class="bizen-tab-icon"><svg viewBox="0 0 24 24"><path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/></svg></div>
+                        <h3 class="bizen-tab-title">맞춤 자금 설계</h3>
+                        <p class="bizen-tab-desc">기업 특성과 성장 단계를 고려하여 최적의 정책자금 포트폴리오를 설계해드립니다.</p>
+                        <div class="bizen-point-box"><p>평균 지원 규모 <span class="bizen-text-highlight">3.2억원</span></p></div>
+                        <p class="bizen-tab-desc">사업 확장과 안정적 운영을 위한 단계별 자금 조달 계획 수립.<br><br>단기 운영자금부터 장기 성장자금까지 기업의 미래 비전에 맞춘 통합적 자금 전략을 제시합니다.</p>
+                    </div>
+                </div>
+                <div id="svc-tab3" class="bizen-tab-content">
+                    <div class="bizen-tab-card">
+                        <div class="bizen-tab-icon"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg></div>
+                        <h3 class="bizen-tab-title">성장 전략 구축</h3>
+                        <p class="bizen-tab-desc">자금 지원을 넘어 기업의 장기적 성장 기반을 함께 만듭니다.</p>
+                        <div class="bizen-point-box"><p><span class="bizen-text-highlight">지속가능한 발전</span> 로드맵 제시</p></div>
+                        <p class="bizen-tab-desc">경영 효율성 개선, 사업 모델 고도화, 시장 경쟁력 강화 방안을 통해 기업 체질을 개선합니다.<br><br>자금 확보 이후에도 안정적인 성장이 가능하도록 경영 전반에 대한 전략적 조언을 제공합니다.</p>
+                    </div>
+                </div>
+                <div id="svc-tab4" class="bizen-tab-content">
+                    <div class="bizen-tab-card">
+                        <div class="bizen-tab-icon"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg></div>
+                        <h3 class="bizen-tab-title">전담 컨설팅</h3>
+                        <p class="bizen-tab-desc">산업별 전문 컨설턴트가 귀사만을 위한 맞춤형 솔루션을 제공합니다.</p>
+                        <div class="bizen-point-box"><p><span class="bizen-text-highlight">전 과정 밀착 지원</span> 서비스</p></div>
+                        <p class="bizen-tab-desc">서류 준비부터 심사 준비, 사후 관리까지 모든 단계를 체계적으로 관리합니다.<br><br>경영진이 핵심 사업에 집중할 수 있도록 복잡한 행정 절차를 전문가가 대행합니다.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bizen-trust-banner">
+                <div class="bizen-trust-content">
+                    <div class="bizen-trust-title">
+                        <svg viewBox="0 0 24 24" class="bizen-banner-icon"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+                        <span>BIZEN은 절대 하지 않습니다</span>
+                    </div>
+                    <div class="bizen-trust-items">
+                        <div class="bizen-trust-item">
+                            <div class="bizen-trust-icon-wrap">
+                                <svg viewBox="0 0 24 24" class="icon-base"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1.81.45 1.61 1.67 1.61 1.16 0 1.6-.64 1.6-1.36 0-.84-.68-1.3-2.07-1.73-1.54-.46-3.2-1.04-3.2-3.12 0-1.23.77-2.48 2.61-2.96V6h2.67v1.15c1.29.32 2.51 1.07 2.64 2.81h-1.94c-.05-.5-.38-1.26-1.36-1.26-1.08 0-1.54.67-1.54 1.25 0 .85.75 1.18 2.07 1.61 1.54.48 3.2 1.06 3.2 3.19.01 1.6-1.15 2.58-2.97 3.04z"/></svg>
+                                <svg viewBox="0 0 24 24" class="icon-x"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                            </div>
+                            <p class="bizen-trust-text">불법 대출알선</p>
+                        </div>
+                        <div class="bizen-trust-item">
+                            <div class="bizen-trust-icon-wrap">
+                                <svg viewBox="0 0 24 24" class="icon-base"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                                <svg viewBox="0 0 24 24" class="icon-x"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                            </div>
+                            <p class="bizen-trust-text">개인정보 유출</p>
+                        </div>
+                        <div class="bizen-trust-item">
+                            <div class="bizen-trust-icon-wrap">
+                                <svg viewBox="0 0 24 24" class="icon-base"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+                                <svg viewBox="0 0 24 24" class="icon-x"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                            </div>
+                            <p class="bizen-trust-text">보험상품 권유</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>

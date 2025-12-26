@@ -1,0 +1,310 @@
+<!-- 진행절차 히어로 섹션 -->
+<style>
+    .process-hero-section {
+        position: relative;
+        width: 100%;
+        min-height: 100vh;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 120px 20px 80px;
+        background: #14144A;
+    }
+
+    /* 유튜브 배경 영상 */
+    .process-hero-section .video-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        overflow: hidden;
+    }
+
+    .process-hero-section .video-bg iframe {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100vw;
+        height: 56.25vw;
+        min-height: 100vh;
+        min-width: 177.78vh;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+    }
+
+    /* 어두운 오버레이 */
+    .process-hero-section .video-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, rgba(30, 30, 110, 0.85) 0%, rgba(20, 20, 74, 0.80) 100%);
+        z-index: 1;
+    }
+
+    .process-hero-section .hero-container {
+        position: relative;
+        z-index: 2;
+        max-width: 1200px;
+        margin: 0 auto;
+        text-align: center;
+        animation: processFadeInUp 1s ease;
+    }
+
+    @keyframes processFadeInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .process-hero-section .hero-badge {
+        display: inline-block;
+        padding: 10px 30px;
+        background: rgba(59, 130, 246, 0.15);
+        border: 1px solid rgba(59, 130, 246, 0.4);
+        border-radius: 50px;
+        color: #60A5FA;
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 30px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        backdrop-filter: blur(10px);
+        animation: processFadeIn 1s ease 0.2s backwards;
+    }
+
+    @keyframes processFadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .process-hero-section .hero-title {
+        font-size: clamp(36px, 5vw, 56px);
+        font-weight: 900;
+        color: #ffffff;
+        margin-bottom: 30px;
+        line-height: 1.2;
+        letter-spacing: -1px;
+        text-shadow: 0 0 20px rgba(96, 165, 250, 0.5), 2px 2px 8px rgba(0, 0, 0, 0.8);
+        animation: processFadeInUp 1s ease 0.4s backwards;
+    }
+
+    .process-hero-section .hero-subtitle {
+        font-size: clamp(18px, 2.5vw, 24px);
+        color: rgba(255, 255, 255, 0.95);
+        line-height: 1.6;
+        max-width: 800px;
+        margin: 0 auto;
+        font-weight: 400;
+        text-shadow: 0 0 10px rgba(96, 165, 250, 0.3), 2px 2px 6px rgba(0, 0, 0, 0.7);
+        animation: processFadeInUp 1s ease 0.6s backwards;
+    }
+
+    .process-hero-section .highlight {
+        color: #60A5FA;
+        font-weight: 600;
+        text-shadow: 0 0 15px rgba(96, 165, 250, 0.8), 2px 2px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    .process-hero-section .mobile-br {
+        display: none;
+    }
+
+    .process-hero-section .features-container {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        margin-top: 50px;
+        flex-wrap: wrap;
+        animation: processFadeInUp 1s ease 0.8s backwards;
+    }
+
+    .process-hero-section .feature-item {
+        text-align: center;
+        padding: 25px 20px;
+        min-width: 160px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(96, 165, 250, 0.2);
+        border-radius: 16px;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+
+    .process-hero-section .feature-item:hover {
+        background: rgba(96, 165, 250, 0.1);
+        border-color: rgba(96, 165, 250, 0.4);
+        transform: translateY(-5px);
+    }
+
+    .process-hero-section .feature-icon {
+        width: 48px;
+        height: 48px;
+        margin: 0 auto 15px;
+        background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .process-hero-section .feature-icon svg {
+        width: 24px;
+        height: 24px;
+        fill: #ffffff;
+    }
+
+    .process-hero-section .feature-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #ffffff;
+        margin-bottom: 8px;
+    }
+
+    .process-hero-section .feature-desc {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.7);
+        line-height: 1.5;
+    }
+
+    .process-hero-section .scroll-indicator {
+        position: absolute;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        animation: processBounce 2s infinite;
+    }
+
+    @keyframes processBounce {
+        0%, 100% { transform: translateX(-50%) translateY(0); }
+        50% { transform: translateX(-50%) translateY(-10px); }
+    }
+
+    .process-hero-section .scroll-indicator svg {
+        width: 30px;
+        height: 30px;
+        fill: rgba(255, 255, 255, 0.5);
+    }
+
+    @media (min-width: 768px) {
+        .process-hero-section { min-height: 100vh; padding: 140px 40px 100px; }
+        .process-hero-section .features-container { gap: 50px; }
+        .process-hero-section .feature-item { min-width: 180px; padding: 30px 25px; }
+    }
+
+    @media (max-width: 767px) {
+        .process-hero-section { min-height: 100vh; padding: 220px 16px 60px; align-items: flex-start; }
+        .process-hero-section .hero-title { font-size: 32px; margin-bottom: 20px; }
+        .process-hero-section .hero-subtitle { font-size: 17px; word-break: keep-all; line-height: 1.7; padding: 0 10px; }
+        .process-hero-section .hero-badge { font-size: 12px; padding: 8px 20px; }
+        .process-hero-section .mobile-br { display: inline; }
+        .process-hero-section .features-container { gap: 15px; margin-top: 35px; }
+        .process-hero-section .feature-item { min-width: 100px; padding: 20px 15px; flex: 1; }
+        .process-hero-section .feature-icon { width: 40px; height: 40px; margin-bottom: 12px; }
+        .process-hero-section .feature-icon svg { width: 20px; height: 20px; }
+        .process-hero-section .feature-title { font-size: 15px; margin-bottom: 5px; }
+        .process-hero-section .feature-desc { font-size: 12px; }
+    }
+
+    @media (max-width: 480px) {
+        .process-hero-section .hero-title { font-size: 28px; }
+        .process-hero-section .hero-subtitle { font-size: 15px; }
+    }
+</style>
+
+<section class="process-hero-section">
+    <!-- 유튜브 배경 영상 -->
+    <div class="video-bg">
+        <iframe src="https://www.youtube.com/embed/saT5iG12H1w?autoplay=1&mute=1&loop=1&playlist=saT5iG12H1w&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1"
+                frameborder="0"
+                allow="autoplay; encrypted-media"
+                allowfullscreen>
+        </iframe>
+    </div>
+    <div class="video-overlay"></div>
+
+    <div class="hero-container">
+        <span class="hero-badge">Process</span>
+        <h1 class="hero-title">BIZEN이 만드는 확실한 차이</h1>
+        <p class="hero-subtitle">
+            <span class="highlight"><span class="process-counter" data-target="95" data-suffix="% 승인률">0% 승인률</span></span>의 노하우,<br class="mobile-br"> 전문 심사관 시스템으로 실현하는 정책자금 성공
+        </p>
+
+        <div class="features-container">
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                </div>
+                <div class="feature-title">무료 사전심사</div>
+                <div class="feature-desc">부담 없이 가능성 확인</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </div>
+                <div class="feature-title">1:1 전담 매니저</div>
+                <div class="feature-desc">끝까지 책임지는 관리</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                </div>
+                <div class="feature-title">맞춤형 서류 준비</div>
+                <div class="feature-desc">승인률 높이는 전략</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="scroll-indicator">
+        <svg viewBox="0 0 24 24">
+            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+        </svg>
+    </div>
+</section>
+
+<script>
+(function() {
+    'use strict';
+
+    function initProcessCounters() {
+        const counters = document.querySelectorAll('.process-hero-section .process-counter');
+        const duration = 1500;
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const counter = entry.target;
+                    if (counter.dataset.counted) return;
+                    counter.dataset.counted = true;
+
+                    const target = parseFloat(counter.getAttribute('data-target'));
+                    const suffix = counter.getAttribute('data-suffix') || '';
+                    const increment = target / (duration / 16);
+                    let current = 0;
+
+                    const updateCounter = () => {
+                        current += increment;
+                        if (current < target) {
+                            counter.textContent = Math.floor(current) + suffix;
+                            requestAnimationFrame(updateCounter);
+                        } else {
+                            counter.textContent = target + suffix;
+                        }
+                    };
+                    updateCounter();
+                }
+            });
+        }, { threshold: 0.3 });
+
+        counters.forEach(counter => observer.observe(counter));
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initProcessCounters);
+    } else {
+        initProcessCounters();
+    }
+})();
+</script>

@@ -1,0 +1,184 @@
+<!-- KPFC Process Component -->
+<style>
+    .kpfc-process-section { position: relative; width: 100%; padding: 60px 20px 50px; overflow: hidden; background: linear-gradient(180deg, #F9FAFB 0%, #FFFFFF 100%); }
+    .kpfc-process-container { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; }
+    .kpfc-process-header { text-align: center; margin-bottom: 40px; animation: fadeInDown 0.8s ease; }
+    .kpfc-process-title { font-size: 26px; font-weight: 900; color: #1E1E6E; margin-bottom: 12px; line-height: 1.3; }
+    .kpfc-process-highlight { color: #3B82F6; font-weight: 900; }
+    .kpfc-process-subtitle { font-size: 15px; color: #4B5563; font-weight: 600; margin-bottom: 8px; }
+    .kpfc-process-desc { font-size: 13px; color: #6B7280; font-weight: 500; }
+
+    /* 상단 3단계 스텝 */
+    .kpfc-steps-wrapper { display: flex; flex-direction: column; gap: 12px; margin-bottom: 40px; }
+    .kpfc-step-item { display: flex; align-items: center; gap: 14px; background: #FFFFFF; border: 1px solid rgba(30, 30, 110, 0.1); border-radius: 14px; padding: 16px 18px; box-shadow: 0 4px 15px rgba(30, 30, 110, 0.06); animation: fadeInUp 0.5s ease backwards; }
+    .kpfc-step-item:nth-child(1) { animation-delay: 0.1s; }
+    .kpfc-step-item:nth-child(2) { animation-delay: 0.2s; }
+    .kpfc-step-item:nth-child(3) { animation-delay: 0.3s; }
+    .kpfc-step-badge { min-width: 28px; height: 28px; background: linear-gradient(135deg, #1E1E6E, #2D2D8A); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; }
+    .kpfc-step-content { flex: 1; }
+    .kpfc-step-title { font-size: 15px; font-weight: 800; color: #1E1E6E; margin-bottom: 2px; }
+    .kpfc-step-desc { font-size: 12px; color: #6B7280; font-weight: 500; }
+
+    /* 하단 상세 카드 */
+    .kpfc-detail-grid { display: flex; flex-direction: column; gap: 20px; }
+    .kpfc-detail-card { background: #FFFFFF; border: 1px solid rgba(30, 30, 110, 0.08); border-radius: 20px; padding: 24px 20px; box-shadow: 0 6px 24px rgba(30, 30, 110, 0.08); animation: fadeInUp 0.6s ease backwards; position: relative; overflow: hidden; }
+    .kpfc-detail-card:nth-child(1) { animation-delay: 0.2s; }
+    .kpfc-detail-card:nth-child(2) { animation-delay: 0.3s; }
+    .kpfc-detail-card:nth-child(3) { animation-delay: 0.4s; }
+    .kpfc-detail-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: linear-gradient(180deg, #3B82F6, #1E1E6E); }
+    .kpfc-detail-number { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: linear-gradient(135deg, #3B82F6, #2563EB); border-radius: 50%; font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 14px; }
+    .kpfc-detail-header { margin-bottom: 14px; }
+    .kpfc-detail-title { font-size: 18px; font-weight: 800; color: #1E1E6E; margin-bottom: 4px; }
+    .kpfc-detail-subtitle { font-size: 13px; color: #6B7280; font-weight: 500; }
+    .kpfc-detail-condition { display: inline-block; background: rgba(59, 130, 246, 0.1); color: #3B82F6; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; margin-bottom: 10px; }
+    .kpfc-detail-list { margin-bottom: 16px; }
+    .kpfc-detail-list-item { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: #374151; font-weight: 500; margin-bottom: 8px; line-height: 1.4; }
+    .kpfc-detail-list-item:last-child { margin-bottom: 0; }
+    .kpfc-detail-list-item::before { content: ''; min-width: 6px; height: 6px; background: #3B82F6; border-radius: 50%; margin-top: 6px; }
+    .kpfc-detail-message { display: flex; align-items: center; gap: 8px; background: rgba(30, 30, 110, 0.04); border-radius: 10px; padding: 12px 14px; margin-top: 14px; }
+    .kpfc-detail-message-icon { width: 18px; height: 18px; fill: #1E1E6E; flex-shrink: 0; }
+    .kpfc-detail-message-text { font-size: 13px; font-weight: 600; color: #1E1E6E; }
+
+    /* 계약 카드 특수 스타일 */
+    .kpfc-detail-card.contract-card { background: linear-gradient(135deg, #1E1E6E 0%, #14144A 100%); border: none; }
+    .kpfc-detail-card.contract-card::before { background: linear-gradient(180deg, #60A5FA, #3B82F6); }
+    .kpfc-detail-card.contract-card .kpfc-detail-number { background: linear-gradient(135deg, #60A5FA, #93C5FD); color: #1E1E6E; }
+    .kpfc-detail-card.contract-card .kpfc-detail-title { color: #FFFFFF; }
+    .kpfc-detail-card.contract-card .kpfc-detail-subtitle { color: rgba(255, 255, 255, 0.85); font-size: 14px; line-height: 1.6; }
+
+    @media (min-width: 768px) {
+        .kpfc-process-section { padding: 80px 30px 70px; }
+        .kpfc-process-header { margin-bottom: 50px; }
+        .kpfc-process-title { font-size: 38px; }
+        .kpfc-process-subtitle { font-size: 18px; }
+        .kpfc-process-desc { font-size: 15px; }
+
+        .kpfc-steps-wrapper { flex-direction: row; gap: 20px; margin-bottom: 50px; }
+        .kpfc-step-item { flex: 1; flex-direction: column; text-align: center; padding: 24px 20px; border-radius: 18px; }
+        .kpfc-step-item:hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(30, 30, 110, 0.12); }
+        .kpfc-step-badge { width: 36px; height: 36px; font-size: 14px; border-radius: 10px; }
+        .kpfc-step-title { font-size: 17px; margin-bottom: 4px; }
+        .kpfc-step-desc { font-size: 13px; }
+
+        .kpfc-detail-grid { flex-direction: row; gap: 24px; }
+        .kpfc-detail-card { flex: 1; padding: 30px 26px; }
+        .kpfc-detail-card:hover { transform: translateY(-6px); box-shadow: 0 12px 35px rgba(30, 30, 110, 0.12); }
+        .kpfc-detail-number { width: 38px; height: 38px; font-size: 16px; }
+        .kpfc-detail-title { font-size: 20px; }
+        .kpfc-detail-subtitle { font-size: 14px; }
+        .kpfc-detail-list-item { font-size: 14px; }
+        .kpfc-detail-message-text { font-size: 14px; }
+    }
+
+    @media (min-width: 1024px) {
+        .kpfc-process-section { padding: 100px 40px 90px; }
+        .kpfc-process-header { margin-bottom: 60px; }
+        .kpfc-process-title { font-size: 44px; }
+        .kpfc-process-subtitle { font-size: 20px; }
+        .kpfc-process-desc { font-size: 16px; }
+
+        .kpfc-steps-wrapper { gap: 28px; margin-bottom: 60px; }
+        .kpfc-step-item { padding: 28px 24px; }
+        .kpfc-step-badge { width: 42px; height: 42px; font-size: 16px; }
+        .kpfc-step-title { font-size: 19px; }
+        .kpfc-step-desc { font-size: 14px; }
+
+        .kpfc-detail-grid { gap: 30px; }
+        .kpfc-detail-card { padding: 36px 32px; border-radius: 24px; }
+        .kpfc-detail-number { width: 44px; height: 44px; font-size: 18px; margin-bottom: 18px; }
+        .kpfc-detail-title { font-size: 22px; margin-bottom: 6px; }
+        .kpfc-detail-subtitle { font-size: 15px; }
+        .kpfc-detail-condition { font-size: 12px; padding: 5px 12px; }
+        .kpfc-detail-list-item { font-size: 15px; margin-bottom: 10px; }
+        .kpfc-detail-message { padding: 14px 18px; margin-top: 18px; }
+        .kpfc-detail-message-text { font-size: 15px; }
+    }
+
+    @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+
+<section class="kpfc-process-section">
+    <div class="kpfc-process-container">
+        <!-- 헤더 -->
+        <div class="kpfc-process-header">
+            <h2 class="kpfc-process-title"><span class="kpfc-process-highlight">KPFC</span>의 진행 절차</h2>
+            <p class="kpfc-process-subtitle">기관 심사 기준 그대로 진행합니다</p>
+            <p class="kpfc-process-desc">96% 승인 노하우, 실제 기관 심사 기준으로 점검합니다</p>
+        </div>
+
+        <!-- 상단 3단계 스텝 -->
+        <div class="kpfc-steps-wrapper">
+            <div class="kpfc-step-item">
+                <div class="kpfc-step-badge">1차</div>
+                <div class="kpfc-step-content">
+                    <h3 class="kpfc-step-title">유선 심사</h3>
+                    <p class="kpfc-step-desc">사업장 현황 · 기본 요건 서류 심사</p>
+                </div>
+            </div>
+            <div class="kpfc-step-item">
+                <div class="kpfc-step-badge">2차</div>
+                <div class="kpfc-step-content">
+                    <h3 class="kpfc-step-title">방문 심사</h3>
+                    <p class="kpfc-step-desc">1차 통과 사업자 대상 현장 심사 진행</p>
+                </div>
+            </div>
+            <div class="kpfc-step-item">
+                <div class="kpfc-step-badge">3차</div>
+                <div class="kpfc-step-content">
+                    <h3 class="kpfc-step-title">계약서 작성</h3>
+                    <p class="kpfc-step-desc">심사 통과 사업자에 한해 계약 진행</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 하단 상세 카드 -->
+        <div class="kpfc-detail-grid">
+            <!-- 1차 심사 -->
+            <div class="kpfc-detail-card">
+                <div class="kpfc-detail-number">1</div>
+                <div class="kpfc-detail-header">
+                    <h4 class="kpfc-detail-title">서류 기반 사전 심사</h4>
+                    <p class="kpfc-detail-subtitle">정책자금 기관의 심사 기준으로 점검</p>
+                </div>
+                <div class="kpfc-detail-list">
+                    <div class="kpfc-detail-list-item">업종 적합 여부</div>
+                    <div class="kpfc-detail-list-item">매출 · 부채 · 신용 상태</div>
+                    <div class="kpfc-detail-list-item">국세 · 지방세 체납 여부</div>
+                </div>
+                <div class="kpfc-detail-message">
+                    <svg class="kpfc-detail-message-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    <span class="kpfc-detail-message-text">가능성 없는 진행은 여기서 중단됩니다</span>
+                </div>
+            </div>
+
+            <!-- 2차 심사 -->
+            <div class="kpfc-detail-card">
+                <div class="kpfc-detail-number">2</div>
+                <div class="kpfc-detail-header">
+                    <h4 class="kpfc-detail-title">현장 방문 심사 진행</h4>
+                    <span class="kpfc-detail-condition">1차 심사 통과 사업자에 한해</span>
+                    <p class="kpfc-detail-subtitle">사업장을 직접 방문해 심사를 진행합니다.</p>
+                </div>
+                <div class="kpfc-detail-list">
+                    <div class="kpfc-detail-list-item">실제 사업 운영 여부</div>
+                    <div class="kpfc-detail-list-item">사업 구조 · 운영 안정성</div>
+                    <div class="kpfc-detail-list-item">향후 성장 가능성</div>
+                </div>
+                <div class="kpfc-detail-message">
+                    <svg class="kpfc-detail-message-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    <span class="kpfc-detail-message-text">전화·서류만으로 판단하지 않습니다</span>
+                </div>
+            </div>
+
+            <!-- 계약 진행 -->
+            <div class="kpfc-detail-card contract-card">
+                <div class="kpfc-detail-number">3</div>
+                <div class="kpfc-detail-header">
+                    <h4 class="kpfc-detail-title">심사 통과 사업자만 계약 가능</h4>
+                    <p class="kpfc-detail-subtitle">저희는 상담 후 계약이 아니라<br>심사 통과 후 계약을 원칙으로 합니다.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

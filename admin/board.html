@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>게시판 관리 - 한국정책자금지원센터</title>
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <script src="/js/admin-auth.js"></script>
+  <style>
+    .thumbnail-preview {
+      width: 80px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 6px;
+      background: var(--neutral-100);
+    }
+    .thumbnail-placeholder {
+      width: 80px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--neutral-100);
+      border-radius: 6px;
+      color: var(--neutral-400);
+    }
+    .post-title-cell {
+      max-width: 350px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .board-table {
+      table-layout: fixed;
+      width: 100%;
+    }
+    .board-table td {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .loading-overlay.hidden { display: none; }
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--neutral-200);
+      border-radius: 8px;
+      font-size: 14px;
+      resize: vertical;
+      font-family: inherit;
+    }
+    .thumbnail-upload {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .thumbnail-preview-wrap {
+      position: relative;
+      width: 160px;
+      height: 100px;
+    }
+    .thumbnail-upload-preview {
+      width: 160px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: var(--neutral-100);
+      border: 2px dashed var(--neutral-300);
+    }
+    .thumbnail-actions {
+      position: absolute;
+      bottom: 6px;
+      right: 6px;
+      display: flex;
+      gap: 4px;
+    }
+    .thumbnail-actions button {
+      padding: 4px 8px;
+      font-size: 11px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      opacity: 0.9;
+    }
+    .thumbnail-actions button:hover {
+      opacity: 1;
+    }
+    .btn-img-change {
+      background: var(--primary);
+      color: white;
+    }
+    .btn-img-delete {
+      background: var(--error);
+      color: white;
+    }
+    .thumbnail-upload-btn {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .tag-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px;
+      background: var(--neutral-50);
+      border: 1px solid var(--neutral-200);
+      border-radius: 8px;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+    .tag-chip {
+      padding: 6px 12px;
+      border-radius: 16px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid var(--neutral-300);
+      background: white;
+      color: var(--neutral-600);
+    }
+    .tag-chip:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .tag-chip.selected {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+    .tag-chip.disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    /* 이미지 미리보기 모달 */
+    .image-preview-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+    }
+    .image-preview-modal.open {
+      opacity: 1;
+      visibility: visible;
+    }
+    .image-preview-container {
+      position: relative;
+      max-width: 90vw;
+      max-height: 90vh;
+    }
+    .image-preview-modal img {
+      max-width: 90vw;
+      max-height: 85vh;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+    .image-preview-close {
+      position: absolute;
+      top: -40px;
+      right: 0;
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 8px;
+      opacity: 0.8;
+      transition: opacity 0.2s;
+    }
+    .image-preview-close:hover {
+      opacity: 1;
+    }
+    .image-preview-title {
+      color: white;
+      text-align: center;
+      margin-top: 12px;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+    .thumbnail-clickable {
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .thumbnail-clickable:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- 사이드바 오버레이 (모바일) -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- 사이드바 -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1 class="logo">KPFC</h1>
+        <span class="logo-sub">관리자</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="/admin/" class="nav-item">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"/>
+              <rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/>
+              <rect x="3" y="14" width="7" height="7"/>
+            </svg>
+          </span>
+          <span class="nav-text">대시보드</span>
+        </a>
+        <a href="/admin/leads.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/>
+              <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
+            </svg>
+          </span>
+          <span class="nav-text">접수내역</span>
+        </a>
+        <a href="/admin/board.html" class="nav-item active">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </span>
+          <span class="nav-text">게시판 관리</span>
+        </a>
+        <a href="/admin/analytics.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"/>
+              <line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+          </span>
+          <span class="nav-text">방문통계</span>
+        </a>
+        <a href="/admin/settings.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </span>
+          <span class="nav-text">설정</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="/" class="nav-item" target="_blank">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+          </span>
+          <span class="nav-text">사이트 보기</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- 메인 콘텐츠 -->
+    <main class="main-content">
+      <!-- 헤더 -->
+      <header class="dashboard-header">
+        <div class="header-left">
+          <button class="mobile-menu-btn" onclick="toggleSidebar()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
+          <div>
+            <h1 class="page-title">게시판 관리</h1>
+            <p class="page-subtitle">게시글 CRUD 관리</p>
+          </div>
+        </div>
+        <div class="header-right">
+          <span class="user-name">관리자</span>
+          <button class="btn-logout" onclick="logout()">로그아웃</button>
+        </div>
+      </header>
+
+      <!-- 게시판 관리 -->
+      <section class="board-section">
+        <!-- 탭 메뉴 -->
+        <div class="board-tabs">
+          <button class="board-tab active" data-category="전체">전체</button>
+          <button class="board-tab" data-category="공지">공지</button>
+          <button class="board-tab" data-category="뉴스">뉴스</button>
+          <button class="board-tab" data-category="정보">정보</button>
+          <button class="board-tab" data-category="성공사례">성공사례</button>
+        </div>
+
+        <!-- 헤더 -->
+        <div class="section-header">
+          <h3 class="section-title">게시글 관리</h3>
+          <button class="btn-primary" onclick="openPostModal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            글 작성
+          </button>
+        </div>
+
+        <!-- 게시글 목록 -->
+        <div class="table-container">
+          <table class="data-table board-table">
+            <thead>
+              <tr>
+                <th style="width:90px">썸네일</th>
+                <th style="min-width:200px; max-width:350px;">제목</th>
+                <th style="width:90px">카테고리</th>
+                <th style="width:110px">작성일</th>
+                <th style="width:90px">조회수</th>
+                <th style="width:90px">상태</th>
+                <th style="width:110px">관리</th>
+              </tr>
+            </thead>
+            <tbody id="boardTableBody">
+              <tr>
+                <td colspan="7" style="text-align: center; padding: 40px; color: var(--neutral-400);">
+                  게시글을 불러오는 중...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div class="pagination" id="pagination" style="display: none;">
+          <button class="pagination-btn" id="prevPage" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15 18 9 12 15 6"/>
+            </svg>
+          </button>
+          <span class="pagination-info" id="pageInfo">1 / 1 페이지</span>
+          <button class="pagination-btn" id="nextPage" disabled>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- 로딩 오버레이 -->
+  <div class="loading-overlay hidden" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <!-- 이미지 미리보기 모달 -->
+  <div class="image-preview-modal" id="imagePreviewModal" onclick="closeImagePreview(event)">
+    <div class="image-preview-container" onclick="event.stopPropagation()">
+      <button class="image-preview-close" onclick="closeImagePreview()" title="닫기 (ESC)">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+      <img id="previewImage" src="" alt="이미지 미리보기">
+      <div class="image-preview-title" id="previewTitle"></div>
+    </div>
+  </div>
+
+  <!-- 게시글 작성/수정 모달 -->
+  <div class="modal-overlay" id="postModal">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitle">글 작성</h3>
+        <button class="modal-close" onclick="closePostModal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="postForm">
+          <input type="hidden" id="postId">
+          <div class="form-group">
+            <label for="postTitle">제목 *</label>
+            <input type="text" id="postTitle" placeholder="제목을 입력하세요" required>
+          </div>
+          <div class="form-group">
+            <label for="postSummary">요약</label>
+            <input type="text" id="postSummary" placeholder="게시글 요약 (카드에 표시됩니다)">
+          </div>
+          <div class="form-group">
+            <label for="postContent">내용 *</label>
+            <textarea id="postContent" rows="12" placeholder="내용을 입력하세요 (HTML 지원)"></textarea>
+          </div>
+          <div class="form-group">
+            <label>썸네일 이미지</label>
+            <div class="thumbnail-upload">
+              <div class="thumbnail-preview-wrap">
+                <img id="thumbnailPreview" class="thumbnail-upload-preview" src="" alt="썸네일 미리보기" style="display:none; border-style:solid;">
+                <div class="thumbnail-upload-preview" id="thumbnailPlaceholder" style="display:flex; align-items: center; justify-content: center;">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: var(--neutral-400);">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
+                  </svg>
+                </div>
+                <div class="thumbnail-actions" id="thumbnailActions" style="display:none;">
+                  <button type="button" class="btn-img-change" onclick="document.getElementById('postThumbnailFile').click()">교체</button>
+                  <button type="button" class="btn-img-delete" onclick="clearThumbnail()">삭제</button>
+                </div>
+              </div>
+              <div class="thumbnail-upload-btn">
+                <input type="file" id="postThumbnailFile" accept="image/*" style="display:none;">
+                <button type="button" class="btn-secondary" id="uploadBtn" onclick="document.getElementById('postThumbnailFile').click()" style="margin-bottom:8px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;vertical-align:middle;">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                  </svg>
+                  이미지 업로드 (webp 변환)
+                </button>
+                <input type="text" id="postThumbnail" placeholder="또는 이미지 URL 직접 입력" style="width: 280px;">
+                <small id="uploadStatus" style="color: var(--neutral-500); display:block; margin-top:4px;"></small>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="postTags">태그 (최대 5개 선택)</label>
+            <div class="tag-selector" id="tagSelector"></div>
+            <input type="hidden" id="postTags">
+            <small style="color: var(--neutral-500);">클릭해서 선택하세요 (내부 분류용)</small>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="postCategory">카테고리</label>
+              <select id="postCategory" class="filter-select" style="width:100%">
+                <option value="공지">공지</option>
+                <option value="뉴스">뉴스</option>
+                <option value="정보">정보</option>
+                <option value="성공사례">성공사례</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="postDate">작성일</label>
+              <input type="date" id="postDate" style="width:100%; padding:10px; border:1px solid var(--neutral-200); border-radius:8px;">
+            </div>
+            <div class="form-group">
+              <label for="postStatus">공개 상태</label>
+              <select id="postStatus" class="filter-select" style="width:100%">
+                <option value="true">게시중</option>
+                <option value="false">비공개</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closePostModal()">취소</button>
+        <button class="btn-primary" onclick="savePost()">저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 하단 메뉴바 (모바일) -->
+  <nav class="bottom-nav">
+    <ul class="bottom-nav-list">
+      <li class="bottom-nav-item">
+        <a href="/admin/" class="bottom-nav-link">
+          <span class="bottom-nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+            </svg>
+          </span>
+          <span class="bottom-nav-text">대시보드</span>
+        </a>
+      </li>
+      <li class="bottom-nav-item">
+        <a href="/admin/leads.html" class="bottom-nav-link">
+          <span class="bottom-nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/>
+              <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
+            </svg>
+          </span>
+          <span class="bottom-nav-text">접수</span>
+        </a>
+      </li>
+      <li class="bottom-nav-item">
+        <a href="/admin/board.html" class="bottom-nav-link active">
+          <span class="bottom-nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </span>
+          <span class="bottom-nav-text">게시판</span>
+        </a>
+      </li>
+      <li class="bottom-nav-item">
+        <a href="/admin/analytics.html" class="bottom-nav-link">
+          <span class="bottom-nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+          </span>
+          <span class="bottom-nav-text">통계</span>
+        </a>
+      </li>
+      <li class="bottom-nav-item">
+        <a href="/admin/settings.html" class="bottom-nav-link">
+          <span class="bottom-nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </span>
+          <span class="bottom-nav-text">설정</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <script src="/js/components.js"></script>
+  <script>
+    // API 설정 (admin-auth.js에서 WORKER_URL 정의됨)
+    // const WORKER_URL = 'https://your-worker.workers.dev';
+
+    // 상태 관리
+    let allPosts = [];
+    let filteredPosts = [];
+    let currentCategory = '전체';
+    let currentPage = 1;
+    const postsPerPage = 10;
+    let editingPostId = null;
+
+    // 정부정책자금 관련 태그 20개
+    const AVAILABLE_TAGS = [
+      '정책자금', '중소기업', '소상공인', '창업지원', '기술보증',
+      '신용보증', '저금리대출', '정부보증', '시설자금', '운전자금',
+      '수출지원', '기술개발', '스타트업', 'R&D자금', '고용지원',
+      '지역특화', '소공인', '재창업', '성장지원', '긴급자금'
+    ];
+    const MAX_TAGS = 5;
+    let selectedTags = [];
+
+    // 사이드바 토글
+    function toggleSidebar() {
+      document.querySelector('.sidebar').classList.toggle('open');
+      document.querySelector('.sidebar-overlay').classList.toggle('open');
+    }
+
+    // 로그아웃
+    function logout() {
+      if (confirm('로그아웃 하시겠습니까?')) {
+        window.location.href = '/';
+      }
+    }
+
+    // 태그 렌더링
+    function renderTags() {
+      const container = document.getElementById('tagSelector');
+      container.innerHTML = AVAILABLE_TAGS.map(tag => {
+        const isSelected = selectedTags.includes(tag);
+        const isDisabled = !isSelected && selectedTags.length >= MAX_TAGS;
+        return `<span class="tag-chip ${isSelected ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}"
+                      data-tag="${tag}" onclick="toggleTag('${tag}')">${tag}</span>`;
+      }).join('');
+      document.getElementById('postTags').value = selectedTags.join(', ');
+    }
+
+    // 태그 토글
+    function toggleTag(tag) {
+      if (selectedTags.includes(tag)) {
+        selectedTags = selectedTags.filter(t => t !== tag);
+      } else if (selectedTags.length < MAX_TAGS) {
+        selectedTags.push(tag);
+      }
+      renderTags();
+    }
+
+    // 페이지 로드 시 초기화
+    document.addEventListener('DOMContentLoaded', function() {
+      loadPosts();
+      renderTags();
+
+      // 탭 클릭 이벤트
+      document.querySelectorAll('.board-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+          document.querySelectorAll('.board-tab').forEach(t => t.classList.remove('active'));
+          this.classList.add('active');
+          currentCategory = this.dataset.category;
+          currentPage = 1;
+          filterAndRenderPosts();
+        });
+      });
+
+      // 썸네일 URL 입력 시 미리보기
+      document.getElementById('postThumbnail').addEventListener('input', function(e) {
+        const url = e.target.value;
+        const preview = document.getElementById('thumbnailPreview');
+        const placeholder = document.getElementById('thumbnailPlaceholder');
+        const actions = document.getElementById('thumbnailActions');
+
+        if (url) {
+          preview.src = url;
+          preview.style.display = 'block';
+          placeholder.style.display = 'none';
+          actions.style.display = 'flex';
+          preview.onerror = () => {
+            preview.style.display = 'none';
+            placeholder.style.display = 'flex';
+            actions.style.display = 'none';
+          };
+        } else {
+          preview.style.display = 'none';
+          placeholder.style.display = 'flex';
+          actions.style.display = 'none';
+        }
+      });
+
+      // 이미지 파일 업로드 (webp 변환) - WORKER_URL이 정의되어 있어야 동작
+      document.getElementById('postThumbnailFile').addEventListener('change', async function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const statusEl = document.getElementById('uploadStatus');
+        const preview = document.getElementById('thumbnailPreview');
+        const placeholder = document.getElementById('thumbnailPlaceholder');
+
+        statusEl.textContent = 'webp 변환 중...';
+        statusEl.style.color = 'var(--primary)';
+
+        try {
+          // webp로 변환
+          const webpBlob = await convertToWebp(file);
+
+          statusEl.textContent = '업로드 중...';
+
+          // WORKER_URL이 정의되어 있는지 확인
+          if (typeof WORKER_URL === 'undefined') {
+            throw new Error('API 설정이 필요합니다');
+          }
+
+          // FormData로 업로드
+          const formData = new FormData();
+          formData.append('file', webpBlob, file.name.replace(/\.[^/.]+$/, '.webp'));
+
+          const response = await fetch(`${WORKER_URL}/upload`, {
+            method: 'POST',
+            body: formData
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            document.getElementById('postThumbnail').value = result.url;
+            preview.src = result.url;
+            preview.style.display = 'block';
+            placeholder.style.display = 'none';
+            document.getElementById('thumbnailActions').style.display = 'flex';
+            statusEl.textContent = '업로드 완료';
+            statusEl.style.color = 'var(--success)';
+          } else {
+            throw new Error(result.error || '업로드 실패');
+          }
+        } catch (error) {
+          statusEl.textContent = error.message;
+          statusEl.style.color = 'var(--error)';
+        }
+      });
+
+      // webp 변환 함수
+      async function convertToWebp(file) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+
+            canvas.toBlob((blob) => {
+              if (blob) {
+                resolve(blob);
+              } else {
+                reject(new Error('webp 변환 실패'));
+              }
+            }, 'image/webp', 0.85);
+          };
+          img.onerror = () => reject(new Error('이미지 로드 실패'));
+          img.src = URL.createObjectURL(file);
+        });
+      }
+
+      // 페이지네이션
+      document.getElementById('prevPage').addEventListener('click', () => {
+        if (currentPage > 1) {
+          currentPage--;
+          renderPosts();
+        }
+      });
+      document.getElementById('nextPage').addEventListener('click', () => {
+        const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+        if (currentPage < totalPages) {
+          currentPage++;
+          renderPosts();
+        }
+      });
+    });
+
+    // 게시글 로드 (샘플 데이터 - 실제 API 연동 시 수정)
+    async function loadPosts() {
+      showLoading(true);
+      try {
+        // TODO: 실제 API 연동 시 수정
+        // const response = await fetch(`${WORKER_URL}/board/all`);
+        // const result = await response.json();
+
+        // 샘플 데이터
+        allPosts = [
+          { id: '1', 제목: '2025년 정책자금 신청 가이드', 카테고리: '정보', 작성일: '2024-12-26', 조회수: 256, 게시여부: true, 요약: '정책자금 신청 방법 안내', 썸네일URL: '' },
+          { id: '2', 제목: '중소기업 대출 성공사례 - (주)테크솔루션', 카테고리: '성공사례', 작성일: '2024-12-25', 조회수: 189, 게시여부: true, 요약: '3억원 대출 승인 사례', 썸네일URL: '' },
+          { id: '3', 제목: '신규 정책자금 안내', 카테고리: '공지', 작성일: '2024-12-24', 조회수: 342, 게시여부: true, 요약: '2025년 신규 정책자금 안내', 썸네일URL: '' },
+          { id: '4', 제목: '기업 신용평가 향상 방법', 카테고리: '정보', 작성일: '2024-12-23', 조회수: 127, 게시여부: true, 요약: '신용평가 점수 올리는 방법', 썸네일URL: '' },
+          { id: '5', 제목: '창업자금 지원 프로그램', 카테고리: '뉴스', 작성일: '2024-12-22', 조회수: 98, 게시여부: false, 요약: '정부 창업자금 지원 프로그램', 썸네일URL: '' },
+        ];
+
+        filterAndRenderPosts();
+      } catch (error) {
+        console.error('Load posts error:', error);
+        showError('게시글을 불러올 수 없습니다.');
+      } finally {
+        showLoading(false);
+      }
+    }
+
+    // 필터링 및 렌더링
+    function filterAndRenderPosts() {
+      if (currentCategory === '전체') {
+        filteredPosts = [...allPosts];
+      } else {
+        filteredPosts = allPosts.filter(post => post.카테고리 === currentCategory);
+      }
+      renderPosts();
+    }
+
+    // 게시글 렌더링
+    function renderPosts() {
+      const tbody = document.getElementById('boardTableBody');
+      const startIdx = (currentPage - 1) * postsPerPage;
+      const endIdx = startIdx + postsPerPage;
+      const pageData = filteredPosts.slice(startIdx, endIdx);
+
+      if (pageData.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 40px; color: var(--neutral-400);">
+              등록된 게시글이 없습니다.
+            </td>
+          </tr>
+        `;
+        document.getElementById('pagination').style.display = 'none';
+        return;
+      }
+
+      tbody.innerHTML = pageData.map((post, idx) => `
+        <tr>
+          <td>
+            ${post.썸네일URL
+              ? `<img src="${post.썸네일URL}" alt="" class="thumbnail-preview thumbnail-clickable"
+                     onclick="openImagePreview('${post.썸네일URL}', '${(post.제목 || '').replace(/'/g, "\\'")}');"
+                     title="클릭하여 크게 보기">`
+              : `<div class="thumbnail-placeholder">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
+                  </svg>
+                </div>`
+            }
+          </td>
+          <td class="post-title-cell">
+            <a href="#" onclick="editPost('${post.id}'); return false;">${post.제목 || '(제목 없음)'}</a>
+          </td>
+          <td><span class="status-badge ${getCategoryClass(post.카테고리)}">${post.카테고리 || '-'}</span></td>
+          <td>${formatDate(post.작성일)}</td>
+          <td>${(post.조회수 || 0).toLocaleString()}</td>
+          <td>
+            <span class="status-badge ${post.게시여부 ? 'complete' : 'pending'}">
+              ${post.게시여부 ? '게시중' : '비공개'}
+            </span>
+          </td>
+          <td>
+            <button class="btn-icon" onclick="editPost('${post.id}')" title="수정">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </button>
+            <button class="btn-icon btn-icon-danger" onclick="deletePost('${post.id}')" title="삭제">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+              </svg>
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      // 페이지네이션 업데이트
+      const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+      document.getElementById('pagination').style.display = totalPages > 1 ? 'flex' : 'none';
+      document.getElementById('pageInfo').textContent = `${currentPage} / ${totalPages} 페이지`;
+      document.getElementById('prevPage').disabled = currentPage <= 1;
+      document.getElementById('nextPage').disabled = currentPage >= totalPages;
+    }
+
+    // 카테고리 스타일
+    function getCategoryClass(category) {
+      const classes = {
+        '공지': 'complete',
+        '뉴스': 'pending',
+        '정보': 'progress',
+        '성공사례': 'complete'
+      };
+      return classes[category] || '';
+    }
+
+    // 날짜 포맷
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      const date = new Date(dateStr);
+      return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+    }
+
+    // 모달 열기 (새 글)
+    function openPostModal() {
+      editingPostId = null;
+      document.getElementById('modalTitle').textContent = '글 작성';
+      document.getElementById('postForm').reset();
+      document.getElementById('postId').value = '';
+      document.getElementById('postDate').value = new Date().toISOString().split('T')[0];
+      document.getElementById('thumbnailPreview').style.display = 'none';
+      document.getElementById('thumbnailPlaceholder').style.display = 'flex';
+      document.getElementById('thumbnailActions').style.display = 'none';
+      document.getElementById('uploadStatus').textContent = '';
+      selectedTags = [];
+      renderTags();
+      document.getElementById('postModal').classList.add('open');
+    }
+
+    // 썸네일 삭제
+    function clearThumbnail() {
+      document.getElementById('postThumbnail').value = '';
+      document.getElementById('thumbnailPreview').style.display = 'none';
+      document.getElementById('thumbnailPlaceholder').style.display = 'flex';
+      document.getElementById('thumbnailActions').style.display = 'none';
+      document.getElementById('postThumbnailFile').value = '';
+      document.getElementById('uploadStatus').textContent = '';
+    }
+
+    // 모달 닫기
+    function closePostModal() {
+      document.getElementById('postModal').classList.remove('open');
+      editingPostId = null;
+    }
+
+    // 게시글 수정 모달
+    function editPost(id) {
+      const post = allPosts.find(p => p.id === id);
+      if (!post) return;
+
+      editingPostId = id;
+      document.getElementById('modalTitle').textContent = '글 수정';
+      document.getElementById('postId').value = id;
+      document.getElementById('postTitle').value = post.제목 || '';
+      document.getElementById('postSummary').value = post.요약 || '';
+      document.getElementById('postContent').value = post.내용 || '';
+      document.getElementById('postThumbnail').value = post.썸네일URL || '';
+
+      // 태그 로드
+      const tagsStr = post.태그 || '';
+      selectedTags = tagsStr ? tagsStr.split(',').map(t => t.trim()).filter(t => AVAILABLE_TAGS.includes(t)) : [];
+      renderTags();
+
+      document.getElementById('postCategory').value = post.카테고리 || '공지';
+      document.getElementById('postDate').value = post.작성일 || '';
+      document.getElementById('postStatus').value = post.게시여부 ? 'true' : 'false';
+
+      // 썸네일 미리보기
+      const preview = document.getElementById('thumbnailPreview');
+      const placeholder = document.getElementById('thumbnailPlaceholder');
+      const actions = document.getElementById('thumbnailActions');
+      if (post.썸네일URL) {
+        preview.src = post.썸네일URL;
+        preview.style.display = 'block';
+        placeholder.style.display = 'none';
+        actions.style.display = 'flex';
+      } else {
+        preview.style.display = 'none';
+        placeholder.style.display = 'flex';
+        actions.style.display = 'none';
+      }
+      document.getElementById('uploadStatus').textContent = '';
+
+      document.getElementById('postModal').classList.add('open');
+    }
+
+    // 게시글 저장 (생성/수정)
+    async function savePost() {
+      const title = document.getElementById('postTitle').value.trim();
+      const content = document.getElementById('postContent').value.trim();
+
+      if (!title) {
+        alert('제목을 입력해주세요.');
+        return;
+      }
+
+      const postData = {
+        제목: title,
+        내용: content,
+        요약: document.getElementById('postSummary').value.trim(),
+        썸네일URL: document.getElementById('postThumbnail').value.trim() || null,
+        태그: document.getElementById('postTags').value.trim() || null,
+        카테고리: document.getElementById('postCategory').value,
+        작성일: document.getElementById('postDate').value,
+        게시여부: document.getElementById('postStatus').value === 'true'
+      };
+
+      // 샘플 동작 (실제 API 연동 시 수정)
+      if (editingPostId) {
+        // 수정
+        const idx = allPosts.findIndex(p => p.id === editingPostId);
+        if (idx !== -1) {
+          allPosts[idx] = { ...allPosts[idx], ...postData };
+        }
+        alert('게시글이 수정되었습니다.');
+      } else {
+        // 생성
+        const newPost = {
+          id: String(Date.now()),
+          ...postData,
+          조회수: 0
+        };
+        allPosts.unshift(newPost);
+        alert('게시글이 등록되었습니다.');
+      }
+
+      closePostModal();
+      filterAndRenderPosts();
+    }
+
+    // 게시글 삭제
+    async function deletePost(id) {
+      if (!confirm('정말 삭제하시겠습니까?\n삭제된 게시글은 복구할 수 없습니다.')) {
+        return;
+      }
+
+      // 샘플 동작 (실제 API 연동 시 수정)
+      allPosts = allPosts.filter(p => p.id !== id);
+      alert('삭제되었습니다.');
+      filterAndRenderPosts();
+    }
+
+    // 로딩 표시
+    function showLoading(show) {
+      document.getElementById('loadingOverlay').classList.toggle('hidden', !show);
+    }
+
+    // 에러 표시
+    function showError(message) {
+      document.getElementById('boardTableBody').innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 40px; color: var(--error);">
+            ${message}
+          </td>
+        </tr>
+      `;
+    }
+
+    // 이미지 미리보기 열기
+    function openImagePreview(imageUrl, title) {
+      const modal = document.getElementById('imagePreviewModal');
+      const img = document.getElementById('previewImage');
+      const titleEl = document.getElementById('previewTitle');
+
+      img.src = imageUrl;
+      titleEl.textContent = title || '';
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // 이미지 미리보기 닫기
+    function closeImagePreview(event) {
+      if (event && event.target !== event.currentTarget) return;
+      const modal = document.getElementById('imagePreviewModal');
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // ESC 키로 미리보기/모달 닫기
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        const imageModal = document.getElementById('imagePreviewModal');
+        const postModal = document.getElementById('postModal');
+
+        if (imageModal.classList.contains('open')) {
+          closeImagePreview();
+        } else if (postModal.classList.contains('open')) {
+          closePostModal();
+        }
+      }
+    });
+  </script>
+</body>
+</html>

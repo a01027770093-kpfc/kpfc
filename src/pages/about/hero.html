@@ -1,0 +1,298 @@
+<!-- 회사소개 히어로 섹션 -->
+<style>
+    /* 히어로 타이틀 섹션 */
+    .about-hero {
+        position: relative;
+        width: 100%;
+        min-height: 60vh;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 120px 20px 80px;
+        background: transparent;
+    }
+
+    /* 타이틀 컨테이너 */
+    .about-hero .hero-container {
+        position: relative;
+        z-index: 2;
+        max-width: 1200px;
+        margin: 0 auto;
+        text-align: center;
+        animation: aboutFadeInUp 1s ease;
+    }
+
+    @keyframes aboutFadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* 배지 */
+    .about-hero .hero-badge {
+        display: inline-block;
+        padding: 10px 30px;
+        background: rgba(59, 130, 246, 0.15);
+        border: 1px solid rgba(59, 130, 246, 0.4);
+        border-radius: 50px;
+        color: #60A5FA;
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 30px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        backdrop-filter: blur(10px);
+        animation: aboutFadeIn 1s ease 0.2s backwards;
+    }
+
+    @keyframes aboutFadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    /* 메인 타이틀 */
+    .about-hero .hero-title {
+        font-size: clamp(42px, 6vw, 72px);
+        font-weight: 900;
+        color: #ffffff;
+        margin-bottom: 30px;
+        line-height: 1.2;
+        letter-spacing: -1px;
+        animation: aboutFadeInUp 1s ease 0.4s backwards;
+    }
+
+    .about-hero .hero-title .highlight {
+        color: #60A5FA;
+        text-shadow:
+            0 0 30px rgba(96, 165, 250, 0.8),
+            0 0 60px rgba(96, 165, 250, 0.4);
+        display: inline-block;
+        animation: aboutPulse 2s ease infinite;
+    }
+
+    @keyframes aboutPulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.8; }
+    }
+
+    /* 서브타이틀 */
+    .about-hero .hero-subtitle {
+        font-size: clamp(20px, 3vw, 28px);
+        color: rgba(255, 255, 255, 0.95);
+        line-height: 1.6;
+        max-width: 800px;
+        margin: 0 auto 40px;
+        font-weight: 400;
+        animation: aboutFadeInUp 1s ease 0.6s backwards;
+    }
+
+    /* 통계 카운터 섹션 */
+    .about-hero .stats-container {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        margin-top: 50px;
+        flex-wrap: wrap;
+        animation: aboutFadeInUp 1s ease 0.8s backwards;
+    }
+
+    .about-hero .stat-item {
+        text-align: center;
+        padding: 20px;
+        min-width: 150px;
+    }
+
+    .about-hero .stat-number {
+        font-size: 42px;
+        font-weight: 900;
+        color: #60A5FA;
+        text-shadow: 0 0 20px rgba(96, 165, 250, 0.6);
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .about-hero .counter {
+        display: inline-block;
+        min-width: 1.2em;
+    }
+
+    .about-hero .stat-label {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* 스크롤 인디케이터 */
+    .about-hero .scroll-indicator {
+        position: absolute;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        animation: aboutBounce 2s infinite;
+    }
+
+    @keyframes aboutBounce {
+        0%, 100% { transform: translateX(-50%) translateY(0); }
+        50% { transform: translateX(-50%) translateY(-10px); }
+    }
+
+    .about-hero .scroll-indicator svg {
+        width: 30px;
+        height: 30px;
+        fill: rgba(255, 255, 255, 0.5);
+    }
+
+    /* 반응형 - 태블릿 */
+    @media (min-width: 768px) {
+        .about-hero {
+            min-height: 70vh;
+            padding: 140px 40px 100px;
+        }
+
+        .about-hero .stats-container {
+            gap: 60px;
+        }
+
+        .about-hero .stat-item {
+            min-width: 180px;
+        }
+
+        .about-hero .stat-number {
+            font-size: 48px;
+        }
+
+        .about-hero .stat-label {
+            font-size: 16px;
+        }
+    }
+
+    /* 반응형 - 모바일 */
+    @media (max-width: 767px) {
+        .about-hero {
+            min-height: 50vh;
+            padding: 100px 16px 60px;
+        }
+
+        .about-hero .hero-title {
+            font-size: 36px;
+        }
+
+        .about-hero .hero-subtitle {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        .about-hero .hero-badge {
+            font-size: 12px;
+            padding: 8px 20px;
+        }
+
+        .about-hero .stats-container {
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .about-hero .stat-item {
+            min-width: 120px;
+            padding: 15px;
+        }
+
+        .about-hero .stat-number {
+            font-size: 36px;
+        }
+
+        .about-hero .stat-label {
+            font-size: 12px;
+        }
+    }
+</style>
+
+<section class="about-hero">
+    <div class="hero-container">
+        <span class="hero-badge">About BIZEN</span>
+        <h1 class="hero-title">
+            정책자금 승인의<br>
+            <span class="highlight">전문 파트너</span>
+        </h1>
+        <p class="hero-subtitle">
+            BIZEN은 체계적인 분석과 맞춤형 전략으로<br>
+            귀사의 성공적인 자금 확보를 지원합니다
+        </p>
+
+        <!-- 통계 카운터 -->
+        <div class="stats-container">
+            <div class="stat-item">
+                <span class="stat-number">
+                    <span class="counter" data-target="95">0</span>%
+                </span>
+                <span class="stat-label">승인률</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">
+                    <span class="counter" data-target="3.2" data-decimal="1">0.0</span>억
+                </span>
+                <span class="stat-label">평균 지원금</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">
+                    <span class="counter" data-target="150">0</span>+
+                </span>
+                <span class="stat-label">성공 사례</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 스크롤 인디케이터 -->
+    <div class="scroll-indicator">
+        <svg viewBox="0 0 24 24">
+            <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+        </svg>
+    </div>
+</section>
+
+<script>
+// 회사소개 카운팅 애니메이션
+(function() {
+    const counters = document.querySelectorAll('.about-hero .counter');
+    const speed = 2000;
+
+    const startCounting = (counter) => {
+        const target = parseFloat(counter.getAttribute('data-target'));
+        const hasDecimal = counter.getAttribute('data-decimal');
+        const increment = target / (speed / 16);
+        let current = 0;
+
+        const updateCounter = () => {
+            current += increment;
+            if (current < target) {
+                counter.textContent = hasDecimal ? current.toFixed(1) : Math.floor(current);
+                requestAnimationFrame(updateCounter);
+            } else {
+                counter.textContent = hasDecimal ? target.toFixed(1) : target;
+            }
+        };
+        updateCounter();
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const counter = entry.target;
+                if (counter.textContent === '0' || counter.textContent === '0.0') {
+                    startCounting(counter);
+                }
+            }
+        });
+    }, { threshold: 0.5 });
+
+    counters.forEach(counter => observer.observe(counter));
+})();
+</script>

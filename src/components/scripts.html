@@ -1,0 +1,107 @@
+<!-- Scripts Component -->
+<script>
+    // 서비스 탭 기능
+    (function() {
+        const tabBtns = document.querySelectorAll('.bizen-tab-btn');
+        const tabContents = document.querySelectorAll('.bizen-tab-content');
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const targetTab = this.getAttribute('data-tab');
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById(targetTab).classList.add('active');
+            });
+        });
+    })();
+</script>
+
+<script>
+    // 카운트업 애니메이션
+    function animateValue(element, start, end, duration, suffix = '') {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            const value = Math.floor(progress * (end - start) + start);
+            element.textContent = value + suffix;
+            if (progress < 1) window.requestAnimationFrame(step);
+        };
+        window.requestAnimationFrame(step);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const countElements = document.querySelectorAll('.count-up');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !entry.target.classList.contains('counted')) {
+                    entry.target.classList.add('counted');
+                    const endValue = parseInt(entry.target.getAttribute('data-count'));
+                    const suffix = entry.target.getAttribute('data-suffix') || '';
+                    animateValue(entry.target, 0, endValue, 2000, suffix);
+                }
+            });
+        }, { threshold: 0.5 });
+        countElements.forEach(element => observer.observe(element));
+    });
+
+    // 모바일 헤더 스크롤 숨김
+    let lastScrollY = 0;
+    let ticking = false;
+    const header = document.querySelector('.header');
+    const mobileNav = document.getElementById('mobileNav');
+
+    function updateHeader() {
+        const currentScrollY = window.scrollY;
+        if (window.innerWidth <= 968) {
+            if (currentScrollY > lastScrollY && currentScrollY > 50) {
+                header.classList.add('header-hidden');
+                mobileNav.classList.add('nav-hidden');
+            } else if (currentScrollY < lastScrollY) {
+                header.classList.remove('header-hidden');
+                mobileNav.classList.remove('nav-hidden');
+            }
+        }
+        lastScrollY = currentScrollY;
+        ticking = false;
+    }
+
+    window.addEventListener('scroll', function() {
+        if (!ticking) {
+            requestAnimationFrame(updateHeader);
+            ticking = true;
+        }
+    }, { passive: true });
+</script>
+
+<script>
+    // Trust 섹션 카운팅 애니메이션
+    (function() {
+        const trustCounters = document.querySelectorAll('.trust-counter');
+        const speed = 2000;
+        const startCounting = (counter) => {
+            const target = parseFloat(counter.getAttribute('data-target'));
+            const hasDecimal = counter.getAttribute('data-decimal');
+            const increment = target / (speed / 16);
+            let current = 0;
+            const updateCounter = () => {
+                current += increment;
+                if (current < target) {
+                    counter.textContent = hasDecimal ? current.toFixed(1) : Math.floor(current);
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    counter.textContent = hasDecimal ? target.toFixed(1) : target;
+                }
+            };
+            updateCounter();
+        };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && (entry.target.textContent === '0' || entry.target.textContent === '0.0')) {
+                    startCounting(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+        trustCounters.forEach(counter => observer.observe(counter));
+    })();
+</script>

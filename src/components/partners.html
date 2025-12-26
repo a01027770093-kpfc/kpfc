@@ -1,0 +1,215 @@
+<!-- 업무협약 섹션 - 푸터 아래 -->
+<style>
+    .partners-section {
+        background: linear-gradient(180deg, #0a1628 0%, #060d18 100%);
+        padding: 40px 0 32px;
+        overflow: hidden;
+    }
+
+    .partners-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 24px;
+    }
+
+    .partners-header {
+        text-align: center;
+        margin-bottom: 28px;
+    }
+
+    .partners-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.5);
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+    }
+
+    .partners-subtitle {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.35);
+    }
+
+    /* 마퀴(무한 스크롤) 컨테이너 */
+    .partners-marquee {
+        display: flex;
+        overflow: hidden;
+        position: relative;
+        width: 100%;
+    }
+
+    .partners-marquee::before,
+    .partners-marquee::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100px;
+        z-index: 2;
+        pointer-events: none;
+    }
+
+    .partners-marquee::before {
+        left: 0;
+        background: linear-gradient(to right, #060d18, transparent);
+    }
+
+    .partners-marquee::after {
+        right: 0;
+        background: linear-gradient(to left, #060d18, transparent);
+    }
+
+    .partners-track {
+        display: flex;
+        align-items: center;
+        gap: 80px;
+        animation: marquee 20s linear infinite;
+        will-change: transform;
+    }
+
+    .partners-track:hover {
+        animation-play-state: paused;
+    }
+
+    @keyframes marquee {
+        0% {
+            transform: translateX(0);
+        }
+        100% {
+            transform: translateX(-50%);
+        }
+    }
+
+    .partner-item {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px 40px;
+        transition: all 0.3s ease;
+    }
+
+    .partner-item a {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+    }
+
+    .partner-logo {
+        height: 40px;
+        width: auto;
+        max-width: 160px;
+        object-fit: contain;
+        opacity: 0.5;
+        transition: all 0.3s ease;
+    }
+
+    .partner-item:hover .partner-logo {
+        opacity: 1;
+        transform: scale(1.08);
+    }
+
+    /* 반응형 */
+    @media (max-width: 768px) {
+        .partners-section {
+            padding: 32px 0 24px;
+        }
+
+        .partners-header {
+            margin-bottom: 20px;
+        }
+
+        .partners-title {
+            font-size: 12px;
+        }
+
+        .partners-track {
+            gap: 50px;
+            animation-duration: 15s;
+        }
+
+        .partner-item {
+            padding: 12px 30px;
+        }
+
+        .partner-logo {
+            height: 32px;
+            max-width: 120px;
+        }
+
+        .partners-marquee::before,
+        .partners-marquee::after {
+            width: 60px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .partners-track {
+            gap: 40px;
+            animation-duration: 12s;
+        }
+
+        .partner-logo {
+            height: 28px;
+            max-width: 100px;
+        }
+    }
+</style>
+
+<section class="partners-section">
+    <div class="partners-container">
+        <div class="partners-header">
+            <p class="partners-title">Business Partners</p>
+            <p class="partners-subtitle">BIZEN과 함께하는 업무협약사</p>
+        </div>
+
+        <div class="partners-marquee">
+            <div class="partners-track">
+                <!-- 로고 세트 1 -->
+                <div class="partner-item">
+                    <a href="https://www.jjk-biz.com/" target="_blank" rel="noopener noreferrer">
+                        <img src="https://www.jjk-biz.com/wp-content/uploads/2023/05/n_ci_white_001.svg" alt="JJK" class="partner-logo">
+                    </a>
+                </div>
+                <div class="partner-item">
+                    <a href="https://www.jjk-biz.com/" target="_blank" rel="noopener noreferrer">
+                        <img src="https://www.jjk-biz.com/wp-content/uploads/2023/05/n_ci_white_001.svg" alt="JJK" class="partner-logo">
+                    </a>
+                </div>
+                <div class="partner-item">
+                    <a href="https://www.jjk-biz.com/" target="_blank" rel="noopener noreferrer">
+                        <img src="https://www.jjk-biz.com/wp-content/uploads/2023/05/n_ci_white_001.svg" alt="JJK" class="partner-logo">
+                    </a>
+                </div>
+                <div class="partner-item">
+                    <a href="https://www.jjk-biz.com/" target="_blank" rel="noopener noreferrer">
+                        <img src="https://www.jjk-biz.com/wp-content/uploads/2023/05/n_ci_white_001.svg" alt="JJK" class="partner-logo">
+                    </a>
+                </div>
+                <!-- 로고 세트 2 (무한 스크롤을 위한 복제) -->
+                <div class="partner-item">
+                    <a href="https://www.jjk-biz.com/" target="_blank" rel="noopener noreferrer">
+                        <img src="https://www.jjk-biz.com/wp-content/uploads/2023/05/n_ci_white_001.svg" alt="JJK" class="partner-logo">
+                    </a>
+                </div>
+                <div class="partner-item">
+                    <a href="https://www.jjk-biz.com/" target="_blank" rel="noopener noreferrer">
+                        <img src="https://www.jjk-biz.com/wp-content/uploads/2023/05/n_ci_white_001.svg" alt="JJK" class="partner-logo">
+                    </a>
+                </div>
+                <div class="partner-item">
+                    <a href="https://www.jjk-biz.com/" target="_blank" rel="noopener noreferrer">
+                        <img src="https://www.jjk-biz.com/wp-content/uploads/2023/05/n_ci_white_001.svg" alt="JJK" class="partner-logo">
+                    </a>
+                </div>
+                <div class="partner-item">
+                    <a href="https://www.jjk-biz.com/" target="_blank" rel="noopener noreferrer">
+                        <img src="https://www.jjk-biz.com/wp-content/uploads/2023/05/n_ci_white_001.svg" alt="JJK" class="partner-logo">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

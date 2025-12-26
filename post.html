@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시글 - 한국정책자금지원센터</title>
+    <meta name="description" content="한국정책자금지원센터 공지사항 및 정책자금 소식">
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZE8ZX35DQW"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-ZE8ZX35DQW');
+    </script>
+
+    <!-- Pretendard 폰트 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+
+    <style>
+        /* ========================================
+           기본 스타일 초기화
+           ======================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            color: #93C5FD;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #0F172A 0%, #1E3A5F 50%, #0F172A 100%);
+        }
+
+        /* ========================================
+           헤더 섹션
+           ======================================== */
+        .kpfc-header-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 9999;
+            background: rgba(15, 23, 42, 0.95);
+            border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .kpfc-header-wrapper.scrolled {
+            background: rgba(15, 23, 42, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.2);
+        }
+
+        .kpfc-header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+
+        .kpfc-logo {
+            z-index: 10001;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-decoration: none;
+        }
+
+        .kpfc-logo-img {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+            transition: all 0.3s ease;
+        }
+
+        .kpfc-logo:hover .kpfc-logo-img {
+            filter: brightness(1.1);
+            transform: scale(1.02);
+        }
+
+        .kpfc-logo-text {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            white-space: nowrap;
+            background: linear-gradient(to bottom, #DBEAFE 0%, #93C5FD 35%, #3B82F6 65%, #1E3A5F 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .kpfc-nav-desktop {
+            display: none;
+        }
+
+        .kpfc-nav-list {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            list-style: none;
+        }
+
+        .kpfc-nav-link {
+            display: inline-block;
+            font-size: 15px;
+            font-weight: 600;
+            color: #93C5FD;
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .kpfc-nav-link:hover {
+            color: #FFFFFF;
+            background: rgba(59, 130, 246, 0.15);
+        }
+
+        .kpfc-nav-cta {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 28px;
+            background: linear-gradient(135deg, #3B82F6, #1E3A5F);
+            color: #FFFFFF;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 50px;
+            margin-left: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .kpfc-nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
+        }
+
+        .kpfc-hamburger {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 44px;
+            height: 44px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            z-index: 10001;
+            padding: 10px;
+        }
+
+        .kpfc-hamburger span {
+            display: block;
+            width: 24px;
+            height: 2px;
+            background: #93C5FD;
+            margin: 3px 0;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+
+        .kpfc-hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 6px);
+        }
+
+        .kpfc-hamburger.active span:nth-child(2) {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        .kpfc-hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -6px);
+        }
+
+        .kpfc-mobile-menu {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            width: 100%;
+            height: calc(100vh - 80px);
+            background: rgba(15, 23, 42, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 9998;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 40px 20px;
+            transform: translateY(-120%);
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+
+        .kpfc-mobile-menu.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .kpfc-mobile-nav-list {
+            list-style: none;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .kpfc-mobile-nav-item {
+            border-bottom: 1px solid rgba(59, 130, 246, 0.15);
+        }
+
+        .kpfc-mobile-nav-link {
+            display: block;
+            padding: 20px 10px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #93C5FD;
+            text-decoration: none;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .kpfc-mobile-nav-link:hover {
+            color: #FFFFFF;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .kpfc-mobile-nav-cta {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 50px;
+            background: linear-gradient(135deg, #3B82F6, #1E3A5F);
+            color: #FFFFFF;
+            font-size: 17px;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 50px;
+            margin-top: 30px;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        @media (min-width: 1024px) {
+            .kpfc-nav-desktop {
+                display: flex;
+                align-items: center;
+            }
+            .kpfc-hamburger {
+                display: none;
+            }
+            .kpfc-mobile-menu {
+                display: none;
+            }
+        }
+
+        /* ========================================
+           게시글 상세 섹션
+           ======================================== */
+        .post-section {
+            padding: 120px 20px 80px;
+            min-height: 100vh;
+        }
+
+        .post-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .post-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #60A5FA;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .post-back:hover {
+            color: #93C5FD;
+        }
+
+        .post-back svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        .post-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.15);
+        }
+
+        .post-thumbnail-wrapper {
+            position: relative;
+            display: block;
+        }
+
+        .post-thumbnail {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .ai-generated-badge {
+            position: absolute;
+            bottom: 12px;
+            right: 12px;
+            background: rgba(0, 0, 0, 0.7);
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 11px;
+            font-weight: 500;
+            padding: 4px 8px;
+            border-radius: 4px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        .post-content {
+            padding: 40px;
+        }
+
+        .post-category {
+            display: inline-block;
+            padding: 6px 14px;
+            background: rgba(59, 130, 246, 0.3);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #60A5FA;
+            margin-bottom: 16px;
+        }
+
+        .post-title {
+            font-size: 28px;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.4;
+            margin-bottom: 20px;
+        }
+
+        .post-meta {
+            display: flex;
+            gap: 20px;
+            padding-bottom: 25px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .post-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .post-meta-item svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        .post-body {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.9;
+            white-space: pre-wrap;
+        }
+
+        .post-body p {
+            margin-bottom: 16px;
+        }
+
+        .post-loading, .post-error {
+            text-align: center;
+            padding: 80px 20px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .post-loading .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(59, 130, 246, 0.3);
+            border-top-color: #60A5FA;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .post-nav {
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .post-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 30px;
+            background: transparent;
+            border: 2px solid rgba(59, 130, 246, 0.5);
+            border-radius: 30px;
+            color: #60A5FA;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .post-nav-btn:hover {
+            background: rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.8);
+        }
+
+        /* CTA 섹션 */
+        .post-cta {
+            margin-top: 50px;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(30, 58, 95, 0.3));
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .post-cta-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 12px;
+        }
+
+        .post-cta-desc {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 24px;
+        }
+
+        .post-cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 16px 40px;
+            background: linear-gradient(135deg, #3B82F6, #1E3A5F);
+            color: #FFFFFF;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .post-cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(59, 130, 246, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .post-content {
+                padding: 24px;
+            }
+            .post-title {
+                font-size: 22px;
+            }
+            .post-meta {
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+            .post-cta {
+                padding: 30px 20px;
+            }
+        }
+
+        /* ========================================
+           푸터 섹션
+           ======================================== */
+        #kpfcFooter { font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif; }
+        #kpfcFooter .footer-wrapper { background: #050a14; color: white; padding: 60px 0 0; margin: 0; width: 100vw; position: relative; left: 50%; margin-left: -50vw; }
+        #kpfcFooter .footer-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        #kpfcFooter .footer-top { padding-bottom: 30px; border-bottom: 1px solid rgba(59, 130, 246, 0.2); }
+        #kpfcFooter .footer-logo { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+        #kpfcFooter .footer-logo-text { font-size: 20px; font-weight: 700; background: linear-gradient(to bottom, #DBEAFE 0%, #93C5FD 35%, #3B82F6 65%, #1E3A5F 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        #kpfcFooter .footer-logo-img { height: 40px; width: auto; object-fit: contain; }
+        #kpfcFooter .footer-desc { color: rgba(255, 255, 255, 0.9); line-height: 1.8; font-size: 15px; }
+        #kpfcFooter .footer-middle { display: grid; grid-template-columns: 2.5fr 1fr; gap: 80px; padding: 40px 0 30px; border-bottom: 1px solid rgba(59, 130, 246, 0.2); }
+        #kpfcFooter .footer-title { font-size: 18px; font-weight: 600; margin-bottom: 20px; color: #3B82F6; }
+        #kpfcFooter .footer-list { list-style: none; padding: 0; margin: 0; }
+        #kpfcFooter .footer-list li { margin-bottom: 12px; }
+        #kpfcFooter .footer-list a { color: rgba(255, 255, 255, 0.8); text-decoration: none; transition: all 0.3s ease; font-size: 15px; }
+        #kpfcFooter .footer-list a:hover { color: #3B82F6; padding-left: 5px; }
+        #kpfcFooter .footer-contact-item { display: flex; align-items: flex-start; gap: 10px; color: rgba(255, 255, 255, 0.9); margin-bottom: 14px; font-size: 15px; }
+        #kpfcFooter .footer-contact-item svg { width: 16px; height: 16px; flex-shrink: 0; stroke: #3B82F6; }
+        #kpfcFooter .disclaimer-section { padding: 20px 0; border-bottom: 1px solid rgba(59, 130, 246, 0.2); }
+        #kpfcFooter .disclaimer-text { font-size: 11px; color: rgba(255, 255, 255, 0.6); line-height: 1.6; }
+        #kpfcFooter .footer-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; padding: 25px 0; gap: 15px; }
+        #kpfcFooter .copyright { font-size: 14px; color: rgba(255, 255, 255, 0.6); }
+        #kpfcFooter .footer-links { display: flex; gap: 15px; }
+        #kpfcFooter .footer-links a { font-size: 13px; color: rgba(255, 255, 255, 0.6); text-decoration: none; transition: color 0.3s; }
+        #kpfcFooter .footer-links a:hover { color: #3B82F6; }
+        #kpfcFooter .footer-links .divider { color: rgba(255, 255, 255, 0.3); }
+        @media (max-width: 768px) {
+            #kpfcFooter .footer-middle { grid-template-columns: 1fr; gap: 40px; }
+            #kpfcFooter .footer-bottom { flex-direction: column; text-align: center; }
+        }
+
+        /* Top 버튼 스타일 */
+        .top-button { position: fixed; bottom: 30px; right: 30px; width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #1E3A5F 0%, #2563EB 100%); border: 2px solid rgba(59, 130, 246, 0.5); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; visibility: hidden; transform: translateY(20px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 9998; box-shadow: 0 4px 20px rgba(30, 58, 95, 0.4), 0 0 30px rgba(59, 130, 246, 0.2); }
+        .top-button svg { width: 24px; height: 24px; stroke: #fff; transition: transform 0.3s ease; }
+        .top-button:hover { background: linear-gradient(135deg, #2563EB 0%, #3B82F6 100%); border-color: rgba(59, 130, 246, 0.8); transform: translateY(-3px); box-shadow: 0 8px 30px rgba(30, 58, 95, 0.5), 0 0 40px rgba(59, 130, 246, 0.4); }
+        .top-button.visible { opacity: 1; visibility: visible; transform: translateY(0); }
+        @media (max-width: 768px) { .top-button { width: 46px; height: 46px; bottom: 20px; right: 20px; } .top-button svg { width: 20px; height: 20px; } }
+    </style>
+</head>
+<body>
+    <!-- 헤더 -->
+    <div class="kpfc-header-wrapper" id="kpfcHeader">
+        <header class="kpfc-header-container">
+            <a href="index.html" class="kpfc-logo">
+                <img src="로고화이트.png" alt="한국정책자금지원센터 로고" class="kpfc-logo-img">
+                <span class="kpfc-logo-text">한국정책자금지원센터</span>
+            </a>
+            <nav class="kpfc-nav-desktop">
+                <ul class="kpfc-nav-list">
+                    <li><a href="index.html" class="kpfc-nav-link">홈</a></li>
+                    <li><a href="about.html" class="kpfc-nav-link">회사소개</a></li>
+                    <li><a href="process.html" class="kpfc-nav-link">진행절차</a></li>
+                    <li><a href="fund.html" class="kpfc-nav-link">정책자금</a></li>
+                    <li><a href="service.html" class="kpfc-nav-link">전문가서비스</a></li>
+                    <li><a href="marketing.html" class="kpfc-nav-link">온라인마케팅</a></li>
+                </ul>
+                <a href="index.html#contact-form" class="kpfc-nav-cta">무료상담</a>
+            </nav>
+            <button class="kpfc-hamburger" id="kpfcHamburger" aria-label="메뉴 열기">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </header>
+    </div>
+
+    <!-- 모바일 메뉴 -->
+    <div class="kpfc-mobile-menu" id="kpfcMobileMenu">
+        <ul class="kpfc-mobile-nav-list">
+            <li class="kpfc-mobile-nav-item"><a href="index.html" class="kpfc-mobile-nav-link">홈</a></li>
+            <li class="kpfc-mobile-nav-item"><a href="about.html" class="kpfc-mobile-nav-link">회사소개</a></li>
+            <li class="kpfc-mobile-nav-item"><a href="process.html" class="kpfc-mobile-nav-link">진행절차</a></li>
+            <li class="kpfc-mobile-nav-item"><a href="fund.html" class="kpfc-mobile-nav-link">정책자금</a></li>
+            <li class="kpfc-mobile-nav-item"><a href="service.html" class="kpfc-mobile-nav-link">전문가서비스</a></li>
+            <li class="kpfc-mobile-nav-item"><a href="marketing.html" class="kpfc-mobile-nav-link">온라인마케팅</a></li>
+        </ul>
+        <a href="index.html#contact-form" class="kpfc-mobile-nav-cta">무료상담</a>
+    </div>
+
+    <!-- 게시글 상세 -->
+    <section class="post-section">
+        <div class="post-container">
+            <a href="index.html#board" class="post-back">
+                <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                목록으로 돌아가기
+            </a>
+
+            <!-- 로딩 상태 -->
+            <div class="post-loading" id="post-loading">
+                <div class="spinner"></div>
+                <p>게시글을 불러오는 중...</p>
+            </div>
+
+            <!-- 에러 상태 -->
+            <div class="post-error" id="post-error" style="display: none;">
+                <p>게시글을 찾을 수 없습니다.</p>
+                <a href="index.html" class="post-nav-btn" style="margin-top: 20px;">홈으로 이동</a>
+            </div>
+
+            <!-- 게시글 내용 -->
+            <article class="post-card" id="post-card" style="display: none;">
+                <div class="post-thumbnail-wrapper" id="post-thumbnail-wrapper" style="display: none;">
+                    <img class="post-thumbnail" id="post-thumbnail" src="" alt="">
+                    <span class="ai-generated-badge">AI 생성 이미지</span>
+                </div>
+                <div class="post-content">
+                    <span class="post-category" id="post-category"></span>
+                    <h1 class="post-title" id="post-title"></h1>
+                    <div class="post-meta">
+                        <span class="post-meta-item" id="post-date">
+                            <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+                            <span></span>
+                        </span>
+                        <span class="post-meta-item" id="post-views">
+                            <svg viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+                            <span></span>
+                        </span>
+                    </div>
+                    <div class="post-body" id="post-body"></div>
+                </div>
+            </article>
+
+            <!-- CTA 섹션 -->
+            <div class="post-cta" id="post-cta" style="display: none;">
+                <h3 class="post-cta-title">정책자금 상담이 필요하신가요?</h3>
+                <p class="post-cta-desc">한국정책자금지원센터의 전문 컨설턴트가 무료로 상담해드립니다.</p>
+                <a href="index.html#contact-form" class="post-cta-btn">
+                    무료 상담 신청
+                    <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                </a>
+            </div>
+
+            <div class="post-nav" id="post-nav" style="display: none;">
+                <a href="index.html#board" class="post-nav-btn">
+                    <svg viewBox="0 0 24 24" style="width:18px;height:18px;fill:currentColor"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+                    목록으로
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Top 버튼 -->
+    <button id="topButton" class="top-button" aria-label="맨 위로 이동" title="맨 위로">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+    </button>
+
+    <!-- 푸터 -->
+    <footer id="kpfcFooter">
+        <div class="footer-wrapper">
+            <div class="footer-container">
+                <div class="footer-top">
+                    <div class="footer-logo">
+                        <img src="로고화이트.png" alt="한국정책자금지원센터 로고" class="footer-logo-img">
+                        <span class="footer-logo-text">한국정책자금지원센터</span>
+                    </div>
+                    <p class="footer-desc">중소기업과 소상공인의 성장을 위한 맞춤형 정책자금 컨설팅 서비스를 제공합니다.</p>
+                </div>
+                <div class="footer-middle">
+                    <div class="footer-contact">
+                        <h4 class="footer-title">Contact</h4>
+                        <div class="footer-contact-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>대표전화: 1555-1333</span></div>
+                        <div class="footer-contact-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M12 12l8-5H4l8 5z"/></svg><span>이메일: kpfc@kpfc.co.kr</span></div>
+                        <div class="footer-contact-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span>주소: 서울특별시 강남구 테헤란로 123</span></div>
+                        <div class="footer-contact-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>상담시간: 평일 09:00-18:00</span></div>
+                    </div>
+                    <div class="footer-menu">
+                        <h4 class="footer-title">Menu</h4>
+                        <ul class="footer-list">
+                            <li><a href="index.html">홈</a></li>
+                            <li><a href="about.html">회사소개</a></li>
+                            <li><a href="process.html">진행절차</a></li>
+                            <li><a href="fund.html">정책자금</a></li>
+                            <li><a href="service.html">전문가서비스</a></li>
+                            <li><a href="marketing.html">온라인마케팅</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="disclaimer-section">
+                    <p class="disclaimer-text">※ 한국정책자금지원센터는 정책자금 서류작성을 대행하지 않습니다. ※ 기업평가를 하지 않습니다.</p>
+                </div>
+                <div class="footer-bottom">
+                    <p class="copyright">© 2025 한국정책자금지원센터. All rights reserved.</p>
+                    <div class="footer-links"><a href="privacy.html">개인정보처리방침</a><span class="divider">|</span><a href="policy.html">이용약관</a></div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    (function() {
+        'use strict';
+
+        // 데모 데이터 (실제 API 연동 시 제거)
+        const DEMO_POSTS = [
+            {
+                id: '1',
+                title: '2026년 중소기업 정책자금 4.4조원 총정리',
+                content: '중소벤처기업부가 2026년 중소기업 정책자금 운용계획을 발표했습니다.\n\n■ 총 공급규모: 4조 4,313억원\n- 융자: 4조 643억원\n- 이차보전: 3,670억원\n\n■ 주요 추진방향\n1. 비수도권 집중 지원 (60% 이상, 2.4조원)\n2. AI·반도체 등 혁신성장분야 중점 공급\n3. K-뷰티론 공급규모 2배 확대\n4. 긴급경영안정자금 2,500억원 편성\n\n■ 신청일정\n- 2026년 1월 5일부터 중진공 누리집에서 신청\n- 서울·지방: 1월 5~6일 / 경기·인천: 1월 7~8일\n\n정책자금 상담은 한국정책자금지원센터로 문의해 주세요.',
+                category: '공지',
+                thumbnail: 'https://pub-bf39e5c4b6ef41af31941676cc384300.r2.dev/board/policy-fund-4trillion-2026.webp',
+                date: '2025-12-26',
+                views: 3421
+            },
+            {
+                id: '2',
+                title: '소상공인 경영안정 바우처 2026년 신설 안내',
+                content: '2026년부터 소상공인 부담경감 크레딧이 "소상공인 경영안정 바우처"로 개편됩니다.\n\n■ 지원 대상\n소상공인 사업자\n\n■ 지원 내용\n- 전기·가스·수도요금\n- 4대 보험료\n- 통신비\n- 차량 연료비 등 고정비\n\n■ 지급 방식\n카드 포인트 형태로 지급\n\n■ 신청 방법\n소상공인시장진흥공단 홈페이지에서 신청\n\n고정비 부담을 줄여주는 이번 바우처 사업을 놓치지 마세요!\n자세한 상담은 한국정책자금지원센터로 문의해 주세요.',
+                category: '정보',
+                thumbnail: 'https://pub-bf39e5c4b6ef41af31941676cc384300.r2.dev/board/regional-support-60percent.webp',
+                date: '2025-12-24',
+                views: 2854
+            },
+            {
+                id: '3',
+                title: 'AX(AI 전환) 스프린트 우대트랙 1,400억원 신설',
+                content: '2026년 정책자금의 핵심! AI 전환을 추진하는 기업을 위한 특별 지원 트랙이 신설됩니다.\n\n■ AX 스프린트 우대트랙\n- 규모: 1,400억원\n- 대상: AX 전환 추진 기업, AI 관련 분야 영위·활용·도입 기업\n\n■ 지원 혜택\n- 우대 금리 적용\n- 심사 우선순위 부여\n- 전담 컨설팅 지원\n\n■ AI 관련 분야 예시\n- AI 솔루션 개발\n- 스마트팩토리 AI 도입\n- AI 기반 서비스 플랫폼\n- 생성형 AI 활용 사업\n\nAI 시대, 정책자금으로 선제적 투자하세요!\n상담은 한국정책자금지원센터로 문의해 주세요.',
+                category: '공지',
+                thumbnail: 'https://pub-bf39e5c4b6ef41af31941676cc384300.r2.dev/board/ai-transformation-track.webp',
+                date: '2025-12-22',
+                views: 4127
+            },
+            {
+                id: '4',
+                title: 'K-뷰티 산업 지원 대폭 확대 (200억→400억원)',
+                content: '글로벌 K-뷰티 열풍에 맞춰 정책자금 지원이 2배로 확대됩니다!\n\n■ K-뷰티론 변경 내용\n- 공급규모: 200억원 → 400억원 (2배 확대)\n- 연간 지원한도: 2억원 → 3억원 (상향)\n\n■ 지원 대상\n- 화장품 제조업\n- 뷰티 관련 유통업\n- K-뷰티 수출기업\n- 뷰티테크 스타트업\n\n■ 지원 내용\n- 시설자금 및 운전자금\n- 해외진출 지원\n- R&D 투자 지원\n\nK-뷰티 기업이라면 이번 기회를 놓치지 마세요!\n상담은 한국정책자금지원센터로 문의해 주세요.',
+                category: '뉴스',
+                thumbnail: 'https://pub-bf39e5c4b6ef41af31941676cc384300.r2.dev/board/kbeauty-fund-expansion.webp',
+                date: '2025-12-20',
+                views: 1893
+            },
+            {
+                id: '5',
+                title: '희망리턴패키지 - 폐업부터 재창업까지 원스톱 지원',
+                content: '사업이 어려우신가요? 희망리턴패키지로 새로운 시작을 준비하세요!\n\n■ 희망리턴패키지란?\n폐업부터 재기, 취업, 창업까지 한 번에 지원하는 제도\n\n■ 2026년 변경사항\n- 예산 605억원 증액\n- 재창업 지원금 최대 2,000만원\n\n■ 지원 내용\n1. 폐업 컨설팅 및 정리 지원\n2. 재취업 교육 및 알선\n3. 재창업 자금 지원 (최대 2,000만원)\n4. 심리상담 및 멘토링\n\n■ 신청 방법\n소상공인시장진흥공단 희망리턴패키지 신청\n\n실패는 끝이 아닙니다. 다시 시작할 수 있습니다!\n상담은 한국정책자금지원센터로 문의해 주세요.',
+                category: '정보',
+                thumbnail: 'https://pub-bf39e5c4b6ef41af31941676cc384300.r2.dev/board/policy-fund-navigator-ai.webp',
+                date: '2025-12-18',
+                views: 2456
+            },
+            {
+                id: '6',
+                title: '비수도권 중소기업 2.4조원 집중 지원',
+                content: '2026년 정책자금, 비수도권 기업에 더 많은 기회가 열립니다!\n\n■ 비수도권 우선 배정\n- 전체 정책자금의 60% 이상\n- 규모: 2조 4,400억원\n\n■ 지원 목적\n- 지역 소멸 대응\n- 지역 산업 기반 확충\n- 수도권 집중 해소\n\n■ 우대 지역\n- 강원, 충청, 전라, 경상, 제주 등\n- 산업위기지역 추가 우대\n\n■ 혜택\n- 우선 심사\n- 우대 금리 적용\n- 지역 맞춤 컨설팅\n\n비수도권 기업이라면 2026년 정책자금에 꼭 도전하세요!\n상담은 한국정책자금지원센터로 문의해 주세요.',
+                category: '뉴스',
+                thumbnail: 'https://pub-bf39e5c4b6ef41af31941676cc384300.r2.dev/board/application-schedule-2026.webp',
+                date: '2025-12-15',
+                views: 1672
+            }
+        ];
+
+        // URL에서 게시글 ID 가져오기
+        const urlParams = new URLSearchParams(window.location.search);
+        const postId = urlParams.get('id');
+
+        const loadingEl = document.getElementById('post-loading');
+        const errorEl = document.getElementById('post-error');
+        const cardEl = document.getElementById('post-card');
+        const navEl = document.getElementById('post-nav');
+        const ctaEl = document.getElementById('post-cta');
+
+        if (!postId) {
+            showError();
+            return;
+        }
+
+        // 게시글 로드 (데모 데이터 사용)
+        function loadPost() {
+            const post = DEMO_POSTS.find(p => p.id === postId);
+
+            if (!post) {
+                showError();
+                return;
+            }
+
+            showPost(post);
+        }
+
+        function showPost(post) {
+            loadingEl.style.display = 'none';
+            errorEl.style.display = 'none';
+            cardEl.style.display = 'block';
+            navEl.style.display = 'flex';
+            ctaEl.style.display = 'block';
+
+            // 제목 업데이트
+            document.title = `${post.title} - 한국정책자금지원센터`;
+
+            // 썸네일
+            const thumbnailEl = document.getElementById('post-thumbnail');
+            const thumbnailWrapper = document.getElementById('post-thumbnail-wrapper');
+            if (post.thumbnail) {
+                thumbnailEl.src = post.thumbnail;
+                thumbnailEl.alt = post.title;
+                thumbnailWrapper.style.display = 'block';
+            } else {
+                thumbnailWrapper.style.display = 'none';
+            }
+
+            // 내용 채우기
+            document.getElementById('post-category').textContent = post.category;
+            document.getElementById('post-title').textContent = post.title;
+            document.getElementById('post-date').querySelector('span').textContent = formatDate(post.date);
+            document.getElementById('post-views').querySelector('span').textContent = `조회 ${post.views.toLocaleString()}`;
+
+            // 내용 파싱
+            const contentHtml = parseContent(post.content);
+            document.getElementById('post-body').innerHTML = contentHtml;
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}.${month}.${day}`;
+        }
+
+        // 내용 파싱 함수
+        function parseContent(content) {
+            if (!content) return '';
+
+            let html = content
+                // 헤딩
+                .replace(/^### (.+)$/gm, '<h3 style="margin: 20px 0 10px; color: #60A5FA;">$1</h3>')
+                .replace(/^## (.+)$/gm, '<h2 style="margin: 24px 0 12px; color: #93C5FD;">$1</h2>')
+                // 굵은 글씨
+                .replace(/\*\*(.+?)\*\*/g, '<strong style="color: #FFFFFF;">$1</strong>')
+                // 링크
+                .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank" style="color: #60A5FA;">$1</a>')
+                // 인용
+                .replace(/^> (.+)$/gm, '<blockquote style="border-left: 3px solid #3B82F6; padding-left: 15px; margin: 16px 0; color: rgba(255,255,255,0.7);">$1</blockquote>')
+                // 리스트
+                .replace(/^[-•] (.+)$/gm, '<li style="margin-left: 20px;">$1</li>')
+                .replace(/^\d+\. (.+)$/gm, '<li style="margin-left: 20px;">$1</li>')
+                // 줄바꿈
+                .replace(/\n\n/g, '</p><p style="margin-bottom: 16px;">')
+                .replace(/\n/g, '<br>');
+
+            return '<p style="margin-bottom: 16px;">' + html + '</p>';
+        }
+
+        function showError() {
+            loadingEl.style.display = 'none';
+            errorEl.style.display = 'block';
+            cardEl.style.display = 'none';
+            navEl.style.display = 'none';
+            ctaEl.style.display = 'none';
+        }
+
+        // 헤더 스크롤 효과
+        const header = document.getElementById('kpfcHeader');
+        const hamburger = document.getElementById('kpfcHamburger');
+        const mobileMenu = document.getElementById('kpfcMobileMenu');
+        let isMenuOpen = false;
+
+        function toggleMenu(forceClose = false) {
+            if (forceClose || isMenuOpen) {
+                hamburger.classList.remove('active');
+                mobileMenu.classList.remove('active');
+                document.body.style.overflow = '';
+                isMenuOpen = false;
+            } else {
+                hamburger.classList.add('active');
+                mobileMenu.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                isMenuOpen = true;
+            }
+        }
+
+        hamburger.addEventListener('click', (e) => {
+            e.preventDefault();
+            toggleMenu();
+        });
+
+        document.querySelectorAll('.kpfc-mobile-nav-link, .kpfc-mobile-nav-cta').forEach(link => {
+            link.addEventListener('click', () => setTimeout(() => toggleMenu(true), 100));
+        });
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // 초기 로드
+        loadPost();
+    })();
+
+    // Top 버튼 기능
+    (function() {
+        const topButton = document.getElementById('topButton');
+        if (!topButton) return;
+        let ticking = false;
+        function updateTopButton() { if (window.scrollY > 400) { topButton.classList.add('visible'); } else { topButton.classList.remove('visible'); } ticking = false; }
+        window.addEventListener('scroll', function() { if (!ticking) { requestAnimationFrame(updateTopButton); ticking = true; } }, { passive: true });
+        topButton.addEventListener('click', function() { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    })();
+    </script>
+</body>
+</html>

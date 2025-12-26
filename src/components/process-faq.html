@@ -1,0 +1,341 @@
+<!-- 자주 묻는 질문 섹션 -->
+<style>
+    .process-faq-section {
+        background: #ffffff;
+        padding: 60px 20px;
+        width: 100%;
+    }
+
+    .process-faq-section .container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .process-faq-section .section-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .process-faq-section .section-header h2 {
+        font-size: 38px;
+        font-weight: 700;
+        color: #0a1628;
+        margin-bottom: 15px;
+        position: relative;
+        display: inline-block;
+    }
+
+    .process-faq-section .section-header h2::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 3px;
+        background: linear-gradient(90deg, transparent, #60A5FA, transparent);
+        box-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+    }
+
+    .process-faq-section .section-header p {
+        font-size: 18px;
+        color: #718096;
+        line-height: 1.5;
+    }
+
+    .process-faq-section .faq-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .process-faq-section .faq-item {
+        background: #F8FAFB;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .process-faq-section .faq-item:hover {
+        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.1);
+        border-color: rgba(59, 130, 246, 0.3);
+    }
+
+    .process-faq-section .faq-item.active {
+        border-color: #60A5FA;
+        box-shadow: 0 10px 40px rgba(59, 130, 246, 0.15);
+    }
+
+    .process-faq-section .faq-question {
+        padding: 25px 30px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        user-select: none;
+    }
+
+    .process-faq-section .faq-item.active .faq-question {
+        background: #ffffff;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .process-faq-section .faq-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
+        color: #ffffff;
+        border-radius: 50%;
+        font-size: 14px;
+        font-weight: 700;
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+    }
+
+    .process-faq-section .faq-item.active .faq-number {
+        background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%);
+        box-shadow: 0 0 25px rgba(59, 130, 246, 0.5);
+    }
+
+    .process-faq-section .faq-question-text {
+        flex: 1;
+        font-size: 18px;
+        font-weight: 600;
+        color: #2D3748;
+        line-height: 1.4;
+    }
+
+    .process-faq-section .faq-toggle {
+        width: 24px;
+        height: 24px;
+        min-width: 24px;
+        position: relative;
+        border-radius: 50%;
+        background: #e5e7eb;
+    }
+
+    .process-faq-section .faq-toggle::before,
+    .process-faq-section .faq-toggle::after {
+        content: '';
+        position: absolute;
+        background: #718096;
+        transition: all 0.3s ease;
+    }
+
+    .process-faq-section .faq-toggle::before {
+        width: 12px;
+        height: 2px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .process-faq-section .faq-toggle::after {
+        width: 2px;
+        height: 12px;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        transition: opacity 0.3s ease;
+    }
+
+    .process-faq-section .faq-item:hover .faq-toggle {
+        background: #60A5FA;
+    }
+
+    .process-faq-section .faq-item:hover .faq-toggle::before,
+    .process-faq-section .faq-item:hover .faq-toggle::after {
+        background: #ffffff;
+    }
+
+    .process-faq-section .faq-item.active .faq-toggle {
+        background: #60A5FA;
+    }
+
+    .process-faq-section .faq-item.active .faq-toggle::before {
+        background: #ffffff;
+    }
+
+    .process-faq-section .faq-item.active .faq-toggle::after {
+        opacity: 0;
+    }
+
+    .process-faq-section .faq-answer {
+        display: none;
+        padding: 25px 30px 25px 84px;
+        background: #ffffff;
+    }
+
+    .process-faq-section .faq-item.active .faq-answer {
+        display: block;
+    }
+
+    .process-faq-section .faq-answer p {
+        font-size: 16px;
+        color: #2D3748;
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    .process-faq-section .faq-answer strong {
+        color: #1a3a5f;
+        font-weight: 700;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(96, 165, 250, 0.1) 100%);
+        padding: 2px 6px;
+        border-radius: 4px;
+    }
+
+    .process-faq-section .highlight-success {
+        color: #3B82F6;
+        font-weight: 700;
+    }
+
+    @media (max-width: 768px) {
+        .process-faq-section {
+            padding: 40px 16px;
+        }
+
+        .process-faq-section .section-header {
+            margin-bottom: 30px;
+        }
+
+        .process-faq-section .section-header h2 {
+            font-size: 28px;
+        }
+
+        .process-faq-section .section-header p {
+            font-size: 16px;
+        }
+
+        .process-faq-section .faq-container {
+            gap: 12px;
+        }
+
+        .process-faq-section .faq-question {
+            padding: 18px 15px;
+        }
+
+        .process-faq-section .faq-number {
+            min-width: 32px;
+            height: 32px;
+            font-size: 13px;
+        }
+
+        .process-faq-section .faq-question-text {
+            font-size: 15px;
+        }
+
+        .process-faq-section .faq-answer {
+            padding: 18px 15px;
+        }
+
+        .process-faq-section .faq-answer p {
+            font-size: 14px;
+        }
+    }
+</style>
+
+<section class="process-faq-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>자주 묻는 질문</h2>
+            <p>KPFC 진행절차에 대해 궁금하신 내용을 확인하세요</p>
+        </div>
+
+        <div class="faq-container" id="processFaqContainer">
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span class="faq-number">Q1</span>
+                    <span class="faq-question-text">왜 심사 통과한 사업자만 계약하나요?</span>
+                    <div class="faq-toggle"></div>
+                </div>
+                <div class="faq-answer">
+                    <p>정책자금은 신청 자체가 이력으로 남는 심사입니다. 가능성이 낮은 상태로 진행하면, 이번뿐 아니라 다음 심사까지 불리해질 수 있습니다.<br><br>그래서 KPFC는<br>✔ 단순 상담 후 계약<br>✔ 가능성 없는 사업자 계약<br>을 진행하지 않습니다.<br><br><strong>기관 심사 기준을 통과한 사업자만 계약하는 것이 대표님과 저희 모두에게 가장 안전한 방식</strong>이기 때문입니다.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span class="faq-number">Q2</span>
+                    <span class="faq-question-text">법인이 아닌 개인사업자·자영업자도 진행이 가능한가요?</span>
+                    <div class="faq-toggle"></div>
+                </div>
+                <div class="faq-answer">
+                    <p>코로나 이후 <strong>음식점·카페·미용실 등 자영업자분들</strong>의 정책자금 관련 문의가 눈에 띄게 늘었습니다.<br><br>매출 변동과 고정비 부담으로 자금 관리의 중요성을 체감하신 대표님들이 많아졌습니다.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span class="faq-number">Q3</span>
+                    <span class="faq-question-text">다른 정책자금 컨설팅과 차이점은 무엇인가요?</span>
+                    <div class="faq-toggle"></div>
+                </div>
+                <div class="faq-answer">
+                    <p>가장 큰 차이는 <strong>진행 방식과 기준</strong>입니다.<br><br>대부분의 정책자금 컨설팅은<br>상담 → 계약 → 진행 구조입니다.<br><br>KPFC는<br><span class="highlight-success">심사 → 통과 → 계약 → 실행</span> 구조로 진행합니다.<br><br>저희는 먼저 기관의 실제 심사 기준으로 사업자를 점검하고, 통과 가능성이 확인된 경우에만 계약을 진행합니다.<br><br>✔ 단순 전화 상담 후 계약 ❌<br>✔ 가능성 없는 사업자 진행 ❌<br><br>또한 서류 위주의 컨설팅이 아니라, <strong>심사관 관점에서 사업을 어떻게 보느냐</strong>에 초점을 둡니다.<br>그래서 승인률의 차이가 생깁니다.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span class="faq-number">Q4</span>
+                    <span class="faq-question-text">신청부터 자금 실행까지 얼마나 걸리나요?</span>
+                    <div class="faq-toggle"></div>
+                </div>
+                <div class="faq-answer">
+                    <p>자금 종류와 정부 정책 일정에 따라 다릅니다.<br>일반적으로는 <strong>약 1개월 이상</strong>이 소요되며, 정책·기관 상황에 따라 4~6개월 이상 걸리는 경우도 있습니다.<br><br>KPFC는 속도만을 앞세워 무리하게 진행하지 않습니다.<br>2차 심사를 통과한 이후에도, 정책 일정이나 외부 요인으로 자금 집행이 지연될 수 있습니다.<br><br>다만, <strong>2차 심사 통과 후 1년 이내 자금 집행이 이루어지지 않을 경우, 계약서 기준에 따라 법무팀을 통해 착수금 100% 환불</strong>을 진행합니다.<br><br>👉 실행 가능성에 대한 책임까지 끝까지 관리하는 구조로 운영합니다.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span class="faq-number">Q5</span>
+                    <span class="faq-question-text">컨설팅 비용은 어떻게 책정되나요?</span>
+                    <div class="faq-toggle"></div>
+                </div>
+                <div class="faq-answer">
+                    <p><strong>1차 유선·서류 심사는 무료</strong>로 진행됩니다.<br>가능성 진단 단계에서는 어떠한 비용도 발생하지 않습니다.<br><br>2차 현장 심사를 통과한 사업자에 한해 계약이 진행되며, 이 시점부터 계약금이 발생합니다.<br><br><strong>연 매출 5억 이하 사업자: 110만 원</strong><br><strong>연 매출 5억 초과 사업자: 220만 원</strong><br><br>이는 단순 상담 비용이 아닌, 심사 통과 이후 실제 자금 집행까지 이어지는 컨설팅 계약금입니다.<br><br>👉 심사 통과 전에는 비용을 받지 않습니다.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span class="faq-number">Q6</span>
+                    <span class="faq-question-text">정책자금 혼자 준비할 때 주의할 점?</span>
+                    <div class="faq-toggle"></div>
+                </div>
+                <div class="faq-answer">
+                    <p>정책자금은 연습 삼아 신청해보는 제도가 아닙니다.<br>한 번 탈락할 경우, 보통 <strong>1년 뒤에야 재신청이 가능한 경우</strong>가 많기 때문에 첫 신청의 선택과 준비 과정이 매우 중요합니다.<br><br>혼자 준비하시는 대표님들 중 상당수가 심사 기준을 정확히 알지 못한 상태에서 신청하게 됩니다.<br>조건에 맞지 않는 자금에 무리하게 신청하거나, 사업 내용을 심사관 관점이 아닌 대표님 입장에서만 설명하는 경우가 많습니다.<br><br>이 경우 사업 자체에 문제가 없어도 <strong>"준비가 안 된 신청"으로 판단되어 탈락</strong>하는 사례가 적지 않습니다.<br><br>KPFC는 신청을 받기 전에 먼저 확인합니다.<br>👉 지금 신청해도 되는 상태인지,<br>👉 지금 들어가면 불리해지지 않는지를 말입니다.<br><br>그래서 가능성이 확인된 경우에만 다음 단계로 진행합니다.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+(function() {
+    var container = document.getElementById('processFaqContainer');
+    if (!container) return;
+
+    container.addEventListener('click', function(e) {
+        var question = e.target.closest('.faq-question');
+        if (!question) return;
+
+        var item = question.closest('.faq-item');
+        if (!item) return;
+
+        var allItems = container.querySelectorAll('.faq-item');
+        allItems.forEach(function(i) {
+            if (i !== item) {
+                i.classList.remove('active');
+            }
+        });
+
+        item.classList.toggle('active');
+    });
+})();
+</script>

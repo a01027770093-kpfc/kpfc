@@ -1,0 +1,106 @@
+# robots.txt for 한국정책자금지원센터 KPFC (k-pfc.co.kr)
+# Last updated: 2025-01
+
+# 모든 크롤러 허용
+User-agent: *
+Allow: /
+
+# 구글봇 허용
+User-agent: Googlebot
+Allow: /
+
+# 빙봇 허용
+User-agent: Bingbot
+Allow: /
+
+# 네이버봇 허용
+User-agent: Yeti
+Allow: /
+
+# 다음봇 허용
+User-agent: Daumoa
+Allow: /
+
+# ========================================
+# AI 크롤러 명시적 허용 (LLM/AI Training)
+# ========================================
+
+# OpenAI GPTBot - ChatGPT, GPT-4 등
+User-agent: GPTBot
+Allow: /
+
+# OpenAI ChatGPT-User - ChatGPT 브라우징
+User-agent: ChatGPT-User
+Allow: /
+
+# Anthropic ClaudeBot - Claude AI
+User-agent: ClaudeBot
+Allow: /
+User-agent: Claude-Web
+Allow: /
+
+# Google AI (Bard, Gemini)
+User-agent: Google-Extended
+Allow: /
+
+# Meta AI
+User-agent: FacebookBot
+Allow: /
+User-agent: Meta-ExternalAgent
+Allow: /
+
+# Apple AI (Siri, Apple Intelligence)
+User-agent: Applebot
+Allow: /
+User-agent: Applebot-Extended
+Allow: /
+
+# Microsoft Copilot
+User-agent: Copilot
+Allow: /
+
+# Perplexity AI
+User-agent: PerplexityBot
+Allow: /
+
+# Cohere AI
+User-agent: cohere-ai
+Allow: /
+
+# Amazon AI
+User-agent: Amazonbot
+Allow: /
+
+# Common Crawl (AI 학습 데이터셋)
+User-agent: CCBot
+Allow: /
+
+# You.com AI
+User-agent: YouBot
+Allow: /
+
+# Hugging Face
+User-agent: HuggingFaceBot
+Allow: /
+
+# ========================================
+# 제한할 경로 (민감한 정보)
+# ========================================
+Disallow: /admin/
+Disallow: /private/
+Disallow: /*.json$
+Disallow: /api/
+
+# ========================================
+# 사이트맵 위치
+# ========================================
+Sitemap: https://k-pfc.co.kr/sitemap.xml
+
+# ========================================
+# AI 전용 정보 파일
+# ========================================
+# AI 크롤러는 llms.txt 파일을 참조하세요
+# https://k-pfc.co.kr/llms.txt
+
+# Host
+Host: https://k-pfc.co.kr

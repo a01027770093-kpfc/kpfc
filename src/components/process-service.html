@@ -1,0 +1,596 @@
+<!-- 진행절차 서비스 특징 섹션 -->
+<style>
+    .process-service-section {
+        position: relative;
+        width: 100%;
+        padding: 50px 20px;
+        background: linear-gradient(135deg, #0a1628 0%, #1a3a5f 50%, #0a1628 100%);
+        overflow: hidden;
+    }
+
+    .process-service-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 80% 80%, rgba(96, 165, 250, 0.08) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
+    .process-service-section::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(180deg, transparent 0%, rgba(0, 20, 40, 0.3) 100%);
+        pointer-events: none;
+    }
+
+    .process-service-section .container {
+        position: relative;
+        z-index: 2;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* PC 그리드 */
+    .process-service-section .features-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
+    }
+
+    /* 카드 스타일 */
+    .process-service-section .feature-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        padding: 35px 28px;
+        border-radius: 16px;
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        box-shadow: 0 0 30px rgba(59, 130, 246, 0.1), 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .process-service-section .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(180deg, #60A5FA 0%, #3B82F6 100%);
+        box-shadow: 0 0 10px rgba(96, 165, 250, 0.8);
+        transition: all 0.3s ease;
+    }
+
+    .process-service-section .feature-card::after {
+        content: '';
+        position: absolute;
+        bottom: -20px;
+        right: -20px;
+        width: 120px;
+        height: 120px;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+        opacity: 0.3;
+        transition: all 0.3s ease;
+    }
+
+    .process-service-section .feature-card:hover {
+        transform: translateY(-8px);
+        border-color: rgba(96, 165, 250, 0.5);
+        box-shadow: 0 0 50px rgba(59, 130, 246, 0.3), 0 10px 30px rgba(0, 0, 0, 0.3);
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .process-service-section .feature-card:hover::before {
+        width: 8px;
+        box-shadow: 0 0 20px rgba(96, 165, 250, 1);
+    }
+
+    .process-service-section .feature-card:hover::after {
+        opacity: 0.6;
+        transform: scale(1.5);
+    }
+
+    /* 아이콘 */
+    .process-service-section .feature-icon {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 20px;
+        background: rgba(59, 130, 246, 0.1);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #60A5FA;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 2;
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+    }
+
+    .process-service-section .feature-card:hover .feature-icon {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(96, 165, 250, 0.1) 100%);
+        color: #ffffff;
+        box-shadow: 0 0 30px rgba(96, 165, 250, 0.5);
+        transform: scale(1.1);
+    }
+
+    .process-service-section .feature-icon svg {
+        width: 36px;
+        height: 36px;
+    }
+
+    /* 제목 */
+    .process-service-section .feature-title {
+        font-size: 22px;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 14px;
+        text-shadow: 0 0 15px rgba(96, 165, 250, 0.5);
+        position: relative;
+        z-index: 2;
+    }
+
+    /* 설명 */
+    .process-service-section .feature-description {
+        font-size: 16px;
+        color: rgba(255, 255, 255, 0.85);
+        line-height: 1.5;
+        margin-bottom: 18px;
+        position: relative;
+        z-index: 2;
+    }
+
+    /* 리스트 */
+    .process-service-section .feature-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: inline-block;
+        text-align: left;
+        position: relative;
+        z-index: 2;
+    }
+
+    .process-service-section .feature-list li {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.8);
+        padding-left: 24px;
+        position: relative;
+        margin-bottom: 8px;
+        line-height: 1.4;
+    }
+
+    .process-service-section .feature-list li:last-child {
+        margin-bottom: 0;
+    }
+
+    .process-service-section .feature-list li::before {
+        content: '▸';
+        position: absolute;
+        left: 0;
+        color: #60A5FA;
+        font-weight: 700;
+        font-size: 14px;
+        text-shadow: 0 0 5px rgba(96, 165, 250, 0.8);
+    }
+
+    /* 모바일 스와이프 (기본 숨김) */
+    .process-service-section .features-swipe {
+        display: none;
+    }
+
+    .process-service-section .swipe-indicator {
+        display: none;
+    }
+
+    @media (max-width: 1024px) {
+        .process-service-section .features-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+    }
+
+    /* 모바일 */
+    @media (max-width: 767px) {
+        .process-service-section {
+            padding: 40px 16px 60px;
+        }
+
+        /* PC 그리드 숨김 */
+        .process-service-section .features-grid {
+            display: none;
+        }
+
+        /* 모바일 스와이프 표시 */
+        .process-service-section .features-swipe {
+            display: block;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .process-service-section .features-swipe::-webkit-scrollbar {
+            display: none;
+        }
+
+        .process-service-section .swipe-container {
+            display: inline-flex;
+            gap: 14px;
+            padding: 15px calc(50% - 140px);
+        }
+
+        .process-service-section .swipe-card {
+            flex: 0 0 280px;
+            scroll-snap-align: center;
+            padding: 25px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 14px;
+            text-align: center;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .process-service-section .swipe-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #60A5FA, transparent);
+            transform: translateX(-50%);
+            transition: width 0.3s ease;
+            border-radius: 0 0 3px 3px;
+        }
+
+        .process-service-section .swipe-card.active::before {
+            width: 60px;
+            box-shadow: 0 0 10px rgba(96, 165, 250, 0.8);
+        }
+
+        .process-service-section .swipe-card .feature-icon {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 16px;
+        }
+
+        .process-service-section .swipe-card .feature-icon svg {
+            width: 26px;
+            height: 26px;
+        }
+
+        .process-service-section .swipe-card .feature-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .process-service-section .swipe-card .feature-description {
+            font-size: 13px;
+            margin-bottom: 14px;
+        }
+
+        .process-service-section .swipe-card .feature-list li {
+            font-size: 12px;
+            margin-bottom: 6px;
+        }
+
+        /* 스와이프 인디케이터 */
+        .process-service-section .swipe-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 25px;
+        }
+
+        .process-service-section .swipe-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .process-service-section .swipe-dot.active {
+            width: 20px;
+            border-radius: 3px;
+            background: #60A5FA;
+            box-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+        }
+    }
+</style>
+
+<section class="process-service-section">
+    <div class="container">
+        <!-- PC용 그리드 -->
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 11l3 3L22 4"></path>
+                        <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
+                    </svg>
+                </div>
+                <h3 class="feature-title">95% 승인률 실현</h3>
+                <p class="feature-description">전문 심사관 시스템으로<br>정책자금 성공률 최대화</p>
+                <ul class="feature-list">
+                    <li>평균 2.8억원 승인 성과</li>
+                    <li>심사 포인트 정밀 분석</li>
+                    <li>최적화 전략 설계</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                    </svg>
+                </div>
+                <h3 class="feature-title">전문 심사관 매칭</h3>
+                <p class="feature-description">정책자금 전문가의<br>1:1 맞춤 심사 진행</p>
+                <ul class="feature-list">
+                    <li>업종별 전담 배정</li>
+                    <li>전담 밀착 관리</li>
+                    <li>진행 단계별 공유</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                </div>
+                <h3 class="feature-title">24시간 빠른 진단</h3>
+                <p class="feature-description">신속한 기업 분석으로<br>최적 타이밍 확보</p>
+                <ul class="feature-list">
+                    <li>당일 진단 완성</li>
+                    <li>실시간 피드백 제공</li>
+                    <li>스마트 진단 시스템</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                </div>
+                <h3 class="feature-title">맞춤 자금 설계</h3>
+                <p class="feature-description">기업별 특성 분석<br>최적 자금 포트폴리오</p>
+                <ul class="feature-list">
+                    <li>업종별 최적 매칭</li>
+                    <li>잠재 지원사업 발굴</li>
+                    <li>승인 한도 극대화</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                </div>
+                <h3 class="feature-title">전 과정 밀착 관리</h3>
+                <p class="feature-description">서류부터 심사까지<br>단계별 완벽 준비</p>
+                <ul class="feature-list">
+                    <li>발표 자료 전문 제작</li>
+                    <li>예상 질문 철저 대비</li>
+                    <li>심사자 관점 코칭</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                </div>
+                <h3 class="feature-title">지속 사후 관리</h3>
+                <p class="feature-description">선정 이후에도 지속<br>성장 동반 파트너십</p>
+                <ul class="feature-list">
+                    <li>추가 자금 연계 지원</li>
+                    <li>정기 성장 진단 제공</li>
+                    <li>인증·연구소 지원</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 모바일용 스와이프 -->
+        <div class="features-swipe">
+            <div class="swipe-container">
+                <div class="swipe-card active">
+                    <div class="feature-icon">
+                        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 11l3 3L22 4"></path>
+                            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">95% 승인률 실현</h3>
+                    <p class="feature-description">전문 심사관 시스템으로<br>정책자금 성공률 최대화</p>
+                    <ul class="feature-list">
+                        <li>평균 2.8억원 승인 성과</li>
+                        <li>심사 포인트 정밀 분석</li>
+                        <li>최적화 전략 설계</li>
+                    </ul>
+                </div>
+
+                <div class="swipe-card">
+                    <div class="feature-icon">
+                        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">전문 심사관 매칭</h3>
+                    <p class="feature-description">정책자금 전문가의<br>1:1 맞춤 심사 진행</p>
+                    <ul class="feature-list">
+                        <li>업종별 전담 배정</li>
+                        <li>전담 밀착 관리</li>
+                        <li>진행 단계별 공유</li>
+                    </ul>
+                </div>
+
+                <div class="swipe-card">
+                    <div class="feature-icon">
+                        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">24시간 빠른 진단</h3>
+                    <p class="feature-description">신속한 기업 분석으로<br>최적 타이밍 확보</p>
+                    <ul class="feature-list">
+                        <li>당일 진단 완성</li>
+                        <li>실시간 피드백 제공</li>
+                        <li>스마트 진단 시스템</li>
+                    </ul>
+                </div>
+
+                <div class="swipe-card">
+                    <div class="feature-icon">
+                        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">맞춤 자금 설계</h3>
+                    <p class="feature-description">기업별 특성 분석<br>최적 자금 포트폴리오</p>
+                    <ul class="feature-list">
+                        <li>업종별 최적 매칭</li>
+                        <li>잠재 지원사업 발굴</li>
+                        <li>승인 한도 극대화</li>
+                    </ul>
+                </div>
+
+                <div class="swipe-card">
+                    <div class="feature-icon">
+                        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">전 과정 밀착 관리</h3>
+                    <p class="feature-description">서류부터 심사까지<br>단계별 완벽 준비</p>
+                    <ul class="feature-list">
+                        <li>발표 자료 전문 제작</li>
+                        <li>예상 질문 철저 대비</li>
+                        <li>심사자 관점 코칭</li>
+                    </ul>
+                </div>
+
+                <div class="swipe-card">
+                    <div class="feature-icon">
+                        <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">지속 사후 관리</h3>
+                    <p class="feature-description">선정 이후에도 지속<br>성장 동반 파트너십</p>
+                    <ul class="feature-list">
+                        <li>추가 자금 연계 지원</li>
+                        <li>정기 성장 진단 제공</li>
+                        <li>인증·연구소 지원</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 인디케이터 -->
+        <div class="swipe-indicator">
+            <span class="swipe-dot active"></span>
+            <span class="swipe-dot"></span>
+            <span class="swipe-dot"></span>
+            <span class="swipe-dot"></span>
+            <span class="swipe-dot"></span>
+            <span class="swipe-dot"></span>
+        </div>
+    </div>
+</section>
+
+<script>
+(function() {
+    // PC 스크롤 애니메이션
+    const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                setTimeout(() => {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }, index * 100);
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.process-service-section .feature-card').forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'all 0.6s ease';
+        observer.observe(card);
+    });
+
+    // 모바일 스와이프 인디케이터 업데이트
+    const swipeContainer = document.querySelector('.process-service-section .features-swipe');
+    const dots = document.querySelectorAll('.process-service-section .swipe-dot');
+    const cards = document.querySelectorAll('.process-service-section .swipe-card');
+
+    if (swipeContainer && dots.length > 0 && cards.length > 0) {
+        swipeContainer.addEventListener('scroll', function() {
+            const scrollLeft = this.scrollLeft;
+            const containerWidth = this.offsetWidth;
+            const center = scrollLeft + containerWidth / 2;
+
+            let activeIndex = 0;
+            let minDistance = Infinity;
+
+            cards.forEach((card, index) => {
+                const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+                const distance = Math.abs(cardCenter - center);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    activeIndex = index;
+                }
+            });
+
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === activeIndex);
+            });
+
+            cards.forEach((card, index) => {
+                card.classList.toggle('active', index === activeIndex);
+            });
+        });
+    }
+})();
+</script>

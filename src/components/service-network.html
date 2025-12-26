@@ -1,0 +1,540 @@
+<!-- ================================================ -->
+<!-- BIZEN 전문가 네트워크 섹션 -->
+<!-- ================================================ -->
+<style>
+    .expert-network-section {
+        width: 100%;
+        background: linear-gradient(135deg, #0a1628 0%, #1a3a5f 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .expert-network-section .section-wrapper {
+        width: 100%;
+        padding: 50px 0;
+        background: transparent;
+    }
+
+    .expert-network-section .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    /* 헤더 영역 */
+    .expert-network-section .section-header {
+        text-align: center;
+        margin-bottom: 40px;
+        color: #F5F5F5;
+    }
+
+    .expert-network-section .section-title {
+        font-size: 38px;
+        font-weight: 700;
+        color: #FFFFFF;
+        margin-bottom: 16px;
+        line-height: 1.2;
+        text-shadow: 0 0 20px rgba(96, 165, 250, 0.3);
+    }
+
+    .expert-network-section .section-subtitle {
+        font-size: 18px;
+        font-weight: 400;
+        color: #60A5FA;
+        line-height: 1.5;
+    }
+
+    .expert-network-section .mobile-br {
+        display: none;
+    }
+
+    /* 전문가 카드 그리드 */
+    .expert-network-section .expert-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+        margin-bottom: 45px;
+    }
+
+    /* 전문가 카드 */
+    .expert-network-section .expert-card {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(37, 99, 235, 0.03) 100%);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        border-radius: 14px;
+        padding: 32px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        backdrop-filter: blur(10px);
+    }
+
+    .expert-network-section .expert-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(59, 130, 246, 0.2);
+        border-color: #60A5FA;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%);
+    }
+
+    /* 아이콘 영역 */
+    .expert-network-section .expert-icon {
+        width: 54px;
+        height: 54px;
+        background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+    }
+
+    .expert-network-section .expert-icon svg {
+        width: 28px;
+        height: 28px;
+        fill: #FFFFFF;
+    }
+
+    /* 카드 콘텐츠 */
+    .expert-network-section .expert-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: #60A5FA;
+        margin-bottom: 14px;
+        text-align: center;
+        text-shadow: 0 0 10px rgba(96, 165, 250, 0.5);
+    }
+
+    .expert-network-section .expert-list {
+        list-style: none;
+        margin-bottom: 20px;
+        padding: 0;
+        width: 100%;
+        max-width: 280px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .expert-network-section .expert-list li {
+        position: relative;
+        padding-left: 60px;
+        margin-bottom: 10px;
+        font-size: 16px;
+        line-height: 1.5;
+        color: #E5E5E5;
+        text-align: left;
+        width: 100%;
+        max-width: 270px;
+    }
+
+    .expert-network-section .expert-list li::before {
+        content: '';
+        position: absolute;
+        left: 40px;
+        top: 7px;
+        width: 5px;
+        height: 5px;
+        background-color: #60A5FA;
+        border-radius: 50%;
+        box-shadow: 0 0 6px rgba(96, 165, 250, 0.8);
+    }
+
+    /* 서비스 영역 */
+    .expert-network-section .service-area {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid rgba(59, 130, 246, 0.2);
+        width: 100%;
+        max-width: 320px;
+    }
+
+    .expert-network-section .service-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #60A5FA;
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        text-align: center;
+    }
+
+    .expert-network-section .service-items {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        justify-items: center;
+    }
+
+    .expert-network-section .service-tag {
+        background-color: rgba(59, 130, 246, 0.1);
+        border: 1px solid rgba(59, 130, 246, 0.3);
+        padding: 8px 12px;
+        border-radius: 18px;
+        font-size: 14px;
+        color: #F5F5F5;
+        transition: all 0.2s ease;
+        width: 150px;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 36px;
+    }
+
+    .expert-network-section .service-tag:hover {
+        background-color: rgba(96, 165, 250, 0.2);
+        border-color: #60A5FA;
+        box-shadow: 0 0 10px rgba(96, 165, 250, 0.3);
+    }
+
+    /* CTA 영역 */
+    .expert-network-section .cta-area {
+        text-align: center;
+        margin-top: 45px;
+    }
+
+    .expert-network-section .cta-description {
+        font-size: 17px;
+        color: #E5E5E5;
+        margin-bottom: 24px;
+        line-height: 1.5;
+    }
+
+    .expert-network-section .cta-button {
+        display: inline-block;
+        background: linear-gradient(135deg, #60A5FA 0%, #3B82F6 100%);
+        color: #FFFFFF;
+        font-size: 17px;
+        font-weight: 700;
+        padding: 14px 40px;
+        border-radius: 50px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+    }
+
+    .expert-network-section .cta-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 25px rgba(59, 130, 246, 0.6);
+        background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+    }
+
+    /* 배경 장식 요소 */
+    .expert-network-section .network-decoration {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        opacity: 0.03;
+        background-image:
+            radial-gradient(circle at 20% 30%, #60A5FA 1px, transparent 1px),
+            radial-gradient(circle at 80% 70%, #3B82F6 1px, transparent 1px);
+        background-size: 50px 50px;
+    }
+
+    /* 스와이프 인디케이터 */
+    .expert-network-section .swipe-indicator {
+        display: none;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 16px;
+    }
+
+    .expert-network-section .swipe-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(96, 165, 250, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .expert-network-section .swipe-dot.active {
+        background: #60A5FA;
+        width: 24px;
+        border-radius: 4px;
+    }
+
+    /* 반응형 디자인 */
+    @media (max-width: 768px) {
+        .expert-network-section .section-wrapper {
+            padding: 35px 0;
+        }
+
+        .expert-network-section .container {
+            padding: 0;
+        }
+
+        .expert-network-section .section-header {
+            padding: 0 20px;
+        }
+
+        .expert-network-section .section-title {
+            font-size: clamp(20px, 5.5vw, 28px);
+            word-break: keep-all;
+        }
+
+        .expert-network-section .section-subtitle {
+            font-size: clamp(14px, 4vw, 16px);
+            word-break: keep-all;
+        }
+
+        .expert-network-section .mobile-br {
+            display: inline;
+        }
+
+        /* 스와이프 카드 그리드 */
+        .expert-network-section .expert-grid {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            gap: 16px;
+            padding: 0 20px 16px;
+            margin-bottom: 0;
+            scrollbar-width: none;
+        }
+
+        .expert-network-section .expert-grid::-webkit-scrollbar {
+            display: none;
+        }
+
+        .expert-network-section .expert-card {
+            flex: 0 0 calc(100vw - 60px);
+            scroll-snap-align: center;
+            padding: 24px 20px;
+            min-height: auto;
+        }
+
+        .expert-network-section .expert-icon {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 16px;
+        }
+
+        .expert-network-section .expert-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .expert-network-section .expert-title {
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .expert-network-section .expert-list {
+            max-width: 200px;
+            margin: 0 auto 16px;
+            align-items: flex-start;
+        }
+
+        .expert-network-section .expert-list li {
+            font-size: 14px;
+            padding-left: 41px;
+            max-width: 100%;
+            margin-bottom: 8px;
+            text-align: left;
+        }
+
+        .expert-network-section .expert-list li::before {
+            left: 25px;
+            top: 6px;
+            width: 4px;
+            height: 4px;
+        }
+
+        .expert-network-section .service-area {
+            max-width: 100%;
+            margin-top: 16px;
+            padding-top: 16px;
+        }
+
+        .expert-network-section .service-label {
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .expert-network-section .service-items {
+            gap: 6px;
+            justify-items: stretch;
+        }
+
+        .expert-network-section .service-tag {
+            width: 100%;
+            padding: 6px 12px;
+            font-size: 12px;
+            min-height: 32px;
+        }
+
+        .expert-network-section .swipe-indicator {
+            display: flex;
+        }
+
+        .expert-network-section .cta-area {
+            padding: 0 20px;
+            margin-top: 30px;
+        }
+
+        .expert-network-section .cta-description {
+            font-size: 15px;
+        }
+
+        .expert-network-section .cta-button {
+            padding: 12px 32px;
+            font-size: 15px;
+        }
+    }
+</style>
+
+<section class="expert-network-section">
+    <div class="section-wrapper">
+        <div class="network-decoration"></div>
+        <div class="container">
+            <!-- 섹션 헤더 -->
+            <div class="section-header">
+                <h2 class="section-title">검증된 전문가 네트워크로<br>기업 운영의 모든 과제를 해결합니다</h2>
+                <p class="section-subtitle">BIZEN 파트너스가 연결하는<br class="mobile-br"> 각 분야 최고의 전문가 그룹</p>
+            </div>
+
+            <!-- 전문가 카드 그리드 -->
+            <div class="expert-grid">
+                <!-- 재무/회계 전문가 카드 -->
+                <div class="expert-card">
+                    <div class="expert-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z M12 11.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V8.93l7-3.11v6.17z"/>
+                        </svg>
+                    </div>
+                    <h3 class="expert-title">재무/회계 전문가 그룹</h3>
+                    <ul class="expert-list">
+                        <li>공인회계사 및 세무사</li>
+                        <li>재무제표 분석 전문가</li>
+                        <li>자금관리 컨설턴트</li>
+                    </ul>
+                    <div class="service-area">
+                        <p class="service-label">주요 서비스</p>
+                        <div class="service-items">
+                            <span class="service-tag">재무진단</span>
+                            <span class="service-tag">세무컨설팅</span>
+                            <span class="service-tag">회계감사</span>
+                            <span class="service-tag">자금관리</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 법무/노무 전문가 카드 -->
+                <div class="expert-card">
+                    <div class="expert-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="expert-title">법무/노무 전문가 그룹</h3>
+                    <ul class="expert-list">
+                        <li>기업 전문 변호사</li>
+                        <li>공인노무사 네트워크</li>
+                        <li>계약 및 분쟁 전문가</li>
+                    </ul>
+                    <div class="service-area">
+                        <p class="service-label">주요 서비스</p>
+                        <div class="service-items">
+                            <span class="service-tag">법률자문</span>
+                            <span class="service-tag">노동관계</span>
+                            <span class="service-tag">계약검토</span>
+                            <span class="service-tag">분쟁해결</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 특허/지식재산 전문가 카드 -->
+                <div class="expert-card">
+                    <div class="expert-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/>
+                        </svg>
+                    </div>
+                    <h3 class="expert-title">특허/지식재산 전문가</h3>
+                    <ul class="expert-list">
+                        <li>변리사 및 특허전문가</li>
+                        <li>IP 전략 컨설턴트</li>
+                        <li>기술가치평가 전문가</li>
+                    </ul>
+                    <div class="service-area">
+                        <p class="service-label">주요 서비스</p>
+                        <div class="service-items">
+                            <span class="service-tag">특허출원</span>
+                            <span class="service-tag">상표등록</span>
+                            <span class="service-tag">IP전략</span>
+                            <span class="service-tag">기술평가</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 행정/인증 전문가 카드 -->
+                <div class="expert-card">
+                    <div class="expert-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <h3 class="expert-title">행정/인증 전문가</h3>
+                    <ul class="expert-list">
+                        <li>정부사업 행정 전문가</li>
+                        <li>각종 인증 취득 컨설턴트</li>
+                        <li>행정서류 작성 전문가</li>
+                    </ul>
+                    <div class="service-area">
+                        <p class="service-label">주요 서비스</p>
+                        <div class="service-items">
+                            <span class="service-tag">인허가 취득</span>
+                            <span class="service-tag">인증 컨설팅</span>
+                            <span class="service-tag">행정 대행</span>
+                            <span class="service-tag">서류 작성</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 스와이프 인디케이터 -->
+            <div class="swipe-indicator">
+                <span class="swipe-dot active"></span>
+                <span class="swipe-dot"></span>
+                <span class="swipe-dot"></span>
+                <span class="swipe-dot"></span>
+            </div>
+
+            <!-- CTA 영역 -->
+            <div class="cta-area">
+                <p class="cta-description">
+                    BIZEN 파트너스의 전문가 네트워크가<br>
+                    귀사에 필요한 전문 서비스를 원스톱으로 제공합니다
+                </p>
+                <a href="#contact-form" class="cta-button">전문가 상담 신청하기</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+(function() {
+    const grid = document.querySelector('.expert-network-section .expert-grid');
+    const dots = document.querySelectorAll('.expert-network-section .swipe-dot');
+
+    if (!grid || dots.length === 0) return;
+
+    grid.addEventListener('scroll', function() {
+        const scrollLeft = grid.scrollLeft;
+        const cardWidth = grid.querySelector('.expert-card').offsetWidth + 16;
+        const activeIndex = Math.round(scrollLeft / cardWidth);
+
+        dots.forEach((dot, index) => {
+            dot.classList.toggle('active', index === activeIndex);
+        });
+    });
+})();
+</script>

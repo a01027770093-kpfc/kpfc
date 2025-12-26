@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>대시보드 - 한국정책자금지원센터</title>
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="/js/admin-auth.js"></script>
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- 사이드바 오버레이 (모바일) -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- 사이드바 -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1 class="logo">KPFC</h1>
+        <span class="logo-sub">관리자</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="/admin/" class="nav-item active">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"/>
+              <rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/>
+              <rect x="3" y="14" width="7" height="7"/>
+            </svg>
+          </span>
+          <span class="nav-text">대시보드</span>
+        </a>
+        <a href="/admin/leads.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/>
+              <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
+            </svg>
+          </span>
+          <span class="nav-text">접수내역</span>
+        </a>
+        <a href="/admin/board.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </span>
+          <span class="nav-text">게시판 관리</span>
+        </a>
+        <a href="/admin/analytics.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"/>
+              <line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+          </span>
+          <span class="nav-text">방문통계</span>
+        </a>
+        <a href="/admin/settings.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </span>
+          <span class="nav-text">설정</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="/" class="nav-item" target="_blank">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+          </span>
+          <span class="nav-text">사이트 보기</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- 메인 콘텐츠 -->
+    <main class="main-content">
+      <!-- 헤더 -->
+      <header class="dashboard-header">
+        <div class="header-left">
+          <button class="mobile-menu-btn" onclick="toggleSidebar()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
+          <div>
+            <h1 class="page-title">대시보드</h1>
+            <p class="page-subtitle">실시간 현황을 확인하세요</p>
+          </div>
+        </div>
+        <div class="header-right">
+          <span class="user-name">관리자</span>
+          <button class="btn-logout" onclick="logout()">로그아웃</button>
+        </div>
+      </header>
+
+      <!-- 통계 카드 -->
+      <section class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon icon-inbox">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/>
+              <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <p class="stat-label">전체 접수</p>
+            <p class="stat-value" id="totalLeads">-</p>
+            <p class="stat-change" id="totalLeadsChange">로딩 중...</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <p class="stat-label">대기 중</p>
+            <p class="stat-value" id="pendingLeads">-</p>
+            <p class="stat-change" id="pendingLeadsChange">로딩 중...</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon icon-page">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <p class="stat-label">완료</p>
+            <p class="stat-value" id="completedLeads">-</p>
+            <p class="stat-change" id="completedLeadsChange">로딩 중...</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon icon-time">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <p class="stat-label">게시글 수</p>
+            <p class="stat-value" id="totalPosts">-</p>
+            <p class="stat-change" id="totalPostsChange">로딩 중...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 차트 영역 -->
+      <section class="charts-grid">
+        <div class="chart-card chart-card-full">
+          <div class="chart-header">
+            <h3 class="chart-title">주간 현황</h3>
+            <div class="chart-legend">
+              <span class="legend-item"><span class="legend-color" style="background:#1D00AD"></span>방문자</span>
+              <span class="legend-item"><span class="legend-color" style="background:#10B981"></span>페이지뷰</span>
+              <span class="legend-item"><span class="legend-color" style="background:#F59E0B"></span>체류시간</span>
+              <span class="legend-item"><span class="legend-color" style="background:#EF4444"></span>접수</span>
+            </div>
+            <select class="chart-filter">
+              <option value="7">7일</option>
+              <option value="14">14일</option>
+              <option value="30">30일</option>
+            </select>
+          </div>
+          <div class="chart-body chart-body-large">
+            <canvas id="combinedChart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3 class="chart-title">인기 검색 키워드</h3>
+          </div>
+          <ul class="keyword-list">
+            <li class="keyword-item">
+              <span class="keyword-rank">1</span>
+              <span class="keyword-text">정책자금</span>
+              <span class="keyword-count">128</span>
+            </li>
+            <li class="keyword-item">
+              <span class="keyword-rank">2</span>
+              <span class="keyword-text">중소기업 대출</span>
+              <span class="keyword-count">95</span>
+            </li>
+            <li class="keyword-item">
+              <span class="keyword-rank">3</span>
+              <span class="keyword-text">정부지원금</span>
+              <span class="keyword-count">82</span>
+            </li>
+            <li class="keyword-item">
+              <span class="keyword-rank">4</span>
+              <span class="keyword-text">창업자금</span>
+              <span class="keyword-count">67</span>
+            </li>
+            <li class="keyword-item">
+              <span class="keyword-rank">5</span>
+              <span class="keyword-text">기업 컨설팅</span>
+              <span class="keyword-count">54</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 최근 접수 내역 -->
+      <section class="recent-section">
+        <div class="section-header">
+          <h3 class="section-title">최근 접수 내역</h3>
+          <a href="/admin/leads.html" class="section-link">전체보기 →</a>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>접수일</th>
+                <th>기업명</th>
+                <th>대표자</th>
+                <th>연락처</th>
+                <th>필요자금</th>
+                <th>상태</th>
+              </tr>
+            </thead>
+            <tbody id="recentLeadsBody">
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 40px; color: var(--neutral-400);">
+                  데이터를 불러오는 중...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 최근 게시글 -->
+      <section class="recent-section">
+        <div class="section-header">
+          <h3 class="section-title">최근 게시글</h3>
+          <a href="/admin/board.html" class="section-link">전체보기 →</a>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>작성일</th>
+                <th>제목</th>
+                <th>카테고리</th>
+                <th>조회수</th>
+                <th>상태</th>
+              </tr>
+            </thead>
+            <tbody id="recentPostsBody">
+              <tr>
+                <td colspan="5" style="text-align: center; padding: 40px; color: var(--neutral-400);">
+                  데이터를 불러오는 중...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- 하단 메뉴바 (모바일) -->
+  <nav class="bottom-nav">
+    <ul class="bottom-nav-list">
+      <li class="bottom-nav-item">
+        <a href="/admin/" class="bottom-nav-link active">
+          <span class="bottom-nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+            </svg>
+          </span>
+          <span class="bottom-nav-text">대시보드</span>
+        </a>
+      </li>
+      <li class="bottom-nav-item">
+        <a href="/admin/leads.html" class="bottom-nav-link">
+          <span class="bottom-nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/>
+              <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
+            </svg>
+          </span>
+          <span class="bottom-nav-text">접수</span>
+        </a>
+      </li>
+      <li class="bottom-nav-item">
+        <a href="/admin/board.html" class="bottom-nav-link">
+          <span class="bottom-nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </span>
+          <span class="bottom-nav-text">게시판</span>
+        </a>
+      </li>
+      <li class="bottom-nav-item">
+        <a href="/admin/analytics.html" class="bottom-nav-link">
+          <span class="bottom-nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+          </span>
+          <span class="bottom-nav-text">통계</span>
+        </a>
+      </li>
+      <li class="bottom-nav-item">
+        <a href="/admin/settings.html" class="bottom-nav-link">
+          <span class="bottom-nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </span>
+          <span class="bottom-nav-text">설정</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <script src="/js/components.js"></script>
+  <script src="/js/dashboard.js"></script>
+  <script>
+    // 사이드바 토글
+    function toggleSidebar() {
+      document.querySelector('.sidebar').classList.toggle('open');
+      document.querySelector('.sidebar-overlay').classList.toggle('open');
+    }
+
+    // 로그아웃
+    function logout() {
+      if (confirm('로그아웃 하시겠습니까?')) {
+        // 로그아웃 처리
+        window.location.href = '/';
+      }
+    }
+
+    // 페이지 로드 시 초기화
+    document.addEventListener('DOMContentLoaded', function() {
+      loadStats();
+      loadRecentLeads();
+      loadRecentPosts();
+    });
+
+    // 통계 로드 (샘플 데이터)
+    async function loadStats() {
+      try {
+        // TODO: 실제 API 연동 시 수정
+        document.getElementById('totalLeads').textContent = '47';
+        document.getElementById('totalLeadsChange').textContent = '전체 접수 건수';
+        document.getElementById('totalLeadsChange').className = 'stat-change';
+
+        document.getElementById('pendingLeads').textContent = '12';
+        document.getElementById('pendingLeadsChange').textContent = '처리 필요';
+        document.getElementById('pendingLeadsChange').className = 'stat-change negative';
+
+        document.getElementById('completedLeads').textContent = '32';
+        document.getElementById('completedLeadsChange').textContent = '처리 완료';
+        document.getElementById('completedLeadsChange').className = 'stat-change positive';
+
+        document.getElementById('totalPosts').textContent = '15';
+        document.getElementById('totalPostsChange').textContent = '12개 게시 중';
+        document.getElementById('totalPostsChange').className = 'stat-change positive';
+
+      } catch (error) {
+        console.error('Stats load error:', error);
+      }
+    }
+
+    // 최근 접수 내역 로드 (샘플 데이터)
+    async function loadRecentLeads() {
+      const tbody = document.getElementById('recentLeadsBody');
+
+      // 샘플 데이터
+      const leads = [
+        { date: '2024-12-26', company: '(주)테크솔루션', name: '김민수', phone: '010-1234-5678', amount: '3억원', status: '대기중' },
+        { date: '2024-12-25', company: '스마트커머스', name: '이영희', phone: '010-2345-6789', amount: '5천만원', status: '상담중' },
+        { date: '2024-12-24', company: '푸드테크', name: '박철수', phone: '010-3456-7890', amount: '1억원', status: '완료' },
+        { date: '2024-12-23', company: '그린에너지', name: '최지은', phone: '010-4567-8901', amount: '2억원', status: '상담중' },
+        { date: '2024-12-22', company: '디지털마케팅', name: '정수민', phone: '010-5678-9012', amount: '8천만원', status: '대기중' }
+      ];
+
+      tbody.innerHTML = leads.map(lead => `
+        <tr>
+          <td>${lead.date}</td>
+          <td>${lead.company}</td>
+          <td>${lead.name}</td>
+          <td>${lead.phone}</td>
+          <td>${lead.amount}</td>
+          <td><span class="status-badge ${getStatusClass(lead.status)}">${lead.status}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    // 최근 게시글 로드 (샘플 데이터)
+    async function loadRecentPosts() {
+      const tbody = document.getElementById('recentPostsBody');
+
+      // 샘플 데이터
+      const posts = [
+        { date: '2024-12-26', title: '2025년 정책자금 신청 가이드', category: '정보', views: 256, published: true },
+        { date: '2024-12-25', title: '중소기업 대출 성공사례', category: '성공사례', views: 189, published: true },
+        { date: '2024-12-24', title: '신규 정책자금 안내', category: '공지', views: 342, published: true },
+        { date: '2024-12-23', title: '기업 신용평가 향상 방법', category: '정보', views: 127, published: true },
+        { date: '2024-12-22', title: '창업자금 지원 프로그램', category: '뉴스', views: 98, published: false }
+      ];
+
+      tbody.innerHTML = posts.map(post => `
+        <tr>
+          <td>${post.date}</td>
+          <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${post.title}</td>
+          <td><span class="status-badge ${getCategoryClass(post.category)}">${post.category}</span></td>
+          <td>${post.views.toLocaleString()}</td>
+          <td><span class="status-badge ${post.published ? 'complete' : 'pending'}">${post.published ? '공개' : '비공개'}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    // 상태 클래스
+    function getStatusClass(status) {
+      const classes = {
+        '신규': 'pending',
+        '대기중': 'pending',
+        '상담중': 'progress',
+        '진행중': 'progress',
+        '완료': 'complete'
+      };
+      return classes[status] || 'pending';
+    }
+
+    // 카테고리 클래스
+    function getCategoryClass(category) {
+      const classes = {
+        '공지': 'complete',
+        '뉴스': 'pending',
+        '정보': 'progress',
+        '성공사례': 'complete'
+      };
+      return classes[category] || '';
+    }
+  </script>
+</body>
+</html>
