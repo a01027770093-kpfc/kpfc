@@ -2130,16 +2130,11 @@
         const modalOverlay = document.getElementById('board-modal-overlay');
         const modalClose = document.getElementById('board-modal-close');
 
-        // 게시글 로드 (현재 데모 데이터 사용)
+        // 게시글 로드 (API 연동)
         async function fetchPosts() {
             if (isLoading) return;
             isLoading = true;
 
-            // 데모 데이터 사용 (API 연동 시 아래 주석 해제)
-            loadDemoData();
-            isLoading = false;
-
-            /* API 연동 시 사용
             try {
                 const response = await fetch(`${WORKER_URL}/board`);
 
@@ -2149,29 +2144,28 @@
 
                 const result = await response.json();
 
-                if (!result.success) {
-                    throw new Error(result.error || 'Failed to load posts');
+                // API 응답이 records 배열 형태
+                if (result.records && result.records.length > 0) {
+                    allPosts = result.records.map(record => ({
+                        id: record.id,
+                        title: record['제목'] || record.title || '',
+                        content: record['내용'] || record.content || '',
+                        excerpt: record['요약'] || (record['내용'] || '').substring(0, 100),
+                        category: record['카테고리'] || record['태그'] || '공지',
+                        thumbnail: record['썸네일URL'] || record.thumbnail || '',
+                        date: record['작성일'] || record.date || '',
+                        views: record['조회수'] || 0
+                    }));
+                    renderPosts();
+                } else {
+                    throw new Error('게시글이 없습니다');
                 }
-
-                allPosts = result.posts.map(post => ({
-                    id: post.id,
-                    title: post.제목,
-                    content: post.내용,
-                    excerpt: post.요약 || (post.내용 || '').substring(0, 100),
-                    category: post.카테고리 || '공지',
-                    thumbnail: post.썸네일,
-                    date: post.작성일,
-                    views: post.조회수 || 0
-                }));
-
-                renderPosts();
             } catch (error) {
                 console.error('게시글 로드 실패:', error);
                 loadDemoData();
             } finally {
                 isLoading = false;
             }
-            */
         }
 
         // 데모 데이터 (API 연동 전 테스트용)
