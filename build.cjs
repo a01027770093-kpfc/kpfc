@@ -1,8 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const SRC_DIR = path.join(__dirname, 'src');
-const COMPONENTS_DIR = path.join(SRC_DIR, 'components');
+const ROOT_DIR = __dirname;
 const DIST_DIR = path.join(__dirname, 'dist');
 
 // dist 폴더 생성
@@ -10,75 +9,37 @@ if (!fs.existsSync(DIST_DIR)) {
     fs.mkdirSync(DIST_DIR, { recursive: true });
 }
 
-// 빌드할 페이지 목록
-const pages = ['index.html', 'about.html', 'process.html', 'fund.html', 'service.html', 'marketing.html'];
+// 루트의 HTML 파일들을 그대로 dist로 복사
+const htmlFiles = ['index.html', 'about.html', 'process.html', 'fund.html', 'service.html', 'marketing.html', 'post.html', 'policy.html', 'privacy.html'];
 
-// 단독 페이지 (include 없이 그대로 복사)
-const standalonePages = ['post.html'];
-
-pages.forEach(pageName => {
-    const templatePath = path.join(SRC_DIR, pageName);
-
-    if (!fs.existsSync(templatePath)) {
-        console.log(`⏭ 스킵: ${pageName} (파일 없음)`);
-        return;
-    }
-
-    let html = fs.readFileSync(templatePath, 'utf8');
-
-    // <!-- include:파일명.html --> 패턴 찾아서 교체
-    const includePattern = /<!--\s*include:(\S+)\s*-->/g;
-
-    html = html.replace(includePattern, (match, filename) => {
-        const componentPath = path.join(COMPONENTS_DIR, filename);
-
-        if (fs.existsSync(componentPath)) {
-            const content = fs.readFileSync(componentPath, 'utf8');
-            console.log(`✓ 포함됨: ${filename}`);
-            return content;
-        } else {
-            console.warn(`⚠ 파일 없음: ${filename}`);
-            return `<!-- 파일 없음: ${filename} -->`;
-        }
-    });
-
-    // dist로 저장
-    const outputPath = path.join(DIST_DIR, pageName);
-    fs.writeFileSync(outputPath, html, 'utf8');
-    console.log(`📄 빌드됨: ${pageName}`);
-});
-
-// 단독 페이지 복사
-standalonePages.forEach(pageName => {
-    const srcPath = path.join(SRC_DIR, pageName);
-    const destPath = path.join(DIST_DIR, pageName);
+htmlFiles.forEach(file => {
+    const srcPath = path.join(ROOT_DIR, file);
+    const destPath = path.join(DIST_DIR, file);
 
     if (fs.existsSync(srcPath)) {
         fs.copyFileSync(srcPath, destPath);
-        console.log(`📄 복사됨: ${pageName}`);
+        console.log(`📄 복사됨: ${file}`);
     }
 });
 
 console.log('\n✅ 빌드 완료!');
 
-// CSS, JS, 이미지 파일도 dist로 복사
-const filesToCopy = ['css', 'js', 'images'];
-const rootFiles = fs.readdirSync(__dirname);
-
 // 이미지 파일들 (png, jpg, svg 등) 복사
+const rootFiles = fs.readdirSync(ROOT_DIR);
 rootFiles.forEach(file => {
     const ext = path.extname(file).toLowerCase();
     if (['.png', '.jpg', '.jpeg', '.svg', '.gif', '.webp', '.ico'].includes(ext)) {
-        const src = path.join(__dirname, file);
+        const src = path.join(ROOT_DIR, file);
         const dest = path.join(DIST_DIR, file);
         fs.copyFileSync(src, dest);
         console.log(`✓ 복사됨: ${file}`);
     }
 });
 
-// css, js 폴더 복사
+// css, js, images 폴더 복사
+const filesToCopy = ['css', 'js', 'images'];
 filesToCopy.forEach(folder => {
-    const srcFolder = path.join(__dirname, folder);
+    const srcFolder = path.join(ROOT_DIR, folder);
     const destFolder = path.join(DIST_DIR, folder);
 
     if (fs.existsSync(srcFolder)) {
