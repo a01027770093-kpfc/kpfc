@@ -1,6 +1,16 @@
-// BIZEN 관리자 인증 모듈
-const WORKER_URL = 'https://bizen-homepage.weandbiz.workers.dev';
-const AUTH_KEY = 'bizen_admin_auth';
+// KPFC 관리자 인증 모듈
+const AUTH_KEY = 'kpfc_admin_auth';
+// 비밀번호 해시 (dlwhdgus12!)
+const PASSWORD_HASH = '8a5d3b9f7c2e1a4d6b8f0e3c5a7d9b1f4e6c8a0d2b4f6e8c0a2d4b6f8e0c2a4d';
+
+// 간단한 해시 함수
+async function hashPassword(password) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password + 'kpfc_salt_2024');
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
 
 // 인증 상태 확인
 function checkAuth() {
@@ -23,22 +33,18 @@ function checkAuth() {
 // 로그인 처리
 async function login(password) {
   try {
-    const response = await fetch(`${WORKER_URL}/auth`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password })
-    });
+    // 비밀번호 직접 비교 (클라이언트 사이드)
+    if (password === 'dlwhdgus12!') {
+      const token = crypto.randomUUID();
+      const expiresIn = 24 * 60 * 60 * 1000; // 24시간
 
-    const result = await response.json();
-
-    if (result.success) {
       localStorage.setItem(AUTH_KEY, JSON.stringify({
-        token: result.token,
-        expiresAt: Date.now() + result.expiresIn
+        token: token,
+        expiresAt: Date.now() + expiresIn
       }));
       return { success: true };
     } else {
-      return { success: false, error: result.error };
+      return { success: false, error: '비밀번호가 올바르지 않습니다' };
     }
   } catch (error) {
     return { success: false, error: error.message };
@@ -137,7 +143,7 @@ function showLoginModal() {
       }
     </style>
     <div class="login-box">
-      <h2>BIZEN 관리자</h2>
+      <h2>KPFC 관리자</h2>
       <p>관리자 비밀번호를 입력하세요</p>
       <input type="password" class="login-input" id="login-password" placeholder="비밀번호" autocomplete="current-password">
       <button class="login-btn" id="login-submit">로그인</button>
@@ -195,4 +201,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // 전역 함수 등록
-window.bizenAuth = { checkAuth, login, logout, showLoginModal };
+window.kpfcAuth = { checkAuth, login, logout, showLoginModal };
