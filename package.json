@@ -4,9 +4,9 @@
   "type": "module",
   "description": "한국정책자금지원센터 홈페이지",
   "scripts": {
-    "build": "node build.js",
-    "dev": "node build.js && npx live-server dist --port=8080",
-    "watch": "nodemon --watch src --watch css --exec \"node build.js\" -e html,css,js",
+    "build": "node build.cjs",
+    "dev": "node build.cjs && npx live-server dist --port=8080",
+    "watch": "nodemon --watch src --watch css --exec \"node build.cjs\" -e html,css,js",
     "generate-images": "node scripts/generate-images.mjs"
   },
   "keywords": [
