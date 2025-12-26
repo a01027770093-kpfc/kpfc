@@ -434,11 +434,13 @@
       const tbody = document.getElementById('recentPostsBody');
 
       try {
-        const response = await fetch(`${API_URL}/posts`);
+        const response = await fetch(`${API_URL}/board`);
         const data = await response.json();
 
-        if (data.success && data.posts && data.posts.length > 0) {
-          const recentPosts = data.posts.slice(0, 5);
+        // API 응답: { records: [...] }
+        const posts = data.records || [];
+        if (posts.length > 0) {
+          const recentPosts = posts.slice(0, 5);
 
           tbody.innerHTML = recentPosts.map(post => `
             <tr>
@@ -453,11 +455,11 @@
                      </div>`
                 }
               </td>
-              <td data-label="작성일">${post.createdTime ? post.createdTime.split('T')[0] : '-'}</td>
-              <td data-label="제목">${post.제목 || post.title || '-'}</td>
-              <td data-label="카테고리"><span class="category-badge ${getCategoryClass(post.카테고리 || post.category)}">${post.카테고리 || post.category || '-'}</span></td>
-              <td data-label="조회수">${post.조회수 || post.views || 0}</td>
-              <td data-label="상태"><span class="status-badge ${post.공개 ? 'complete' : 'pending'}">${post.공개 ? '공개' : '비공개'}</span></td>
+              <td data-label="작성일">${post.작성일 || '-'}</td>
+              <td data-label="제목">${post.제목 || '-'}</td>
+              <td data-label="카테고리"><span class="category-badge ${getCategoryClass(post.카테고리)}">${post.카테고리 || '-'}</span></td>
+              <td data-label="조회수">${post.조회수 || 0}</td>
+              <td data-label="상태"><span class="status-badge ${post.게시여부 ? 'complete' : 'pending'}">${post.게시여부 ? '공개' : '비공개'}</span></td>
             </tr>
           `).join('');
         } else {
