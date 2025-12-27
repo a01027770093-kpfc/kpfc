@@ -1231,6 +1231,271 @@ async function handleBoardAPI(request, env, path) {
 }
 
 // ================================================
+// 임직원 API 핸들러
+// ================================================
+
+async function handleEmployeesAPI(request, env, path) {
+  const method = request.method;
+
+  // GET /employees - 공개 임직원 목록 조회 (프론트엔드용)
+  if (method === 'GET' && path === '/employees') {
+    try {
+      const airtableResponse = await fetch(
+        `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/${encodeURIComponent('임직원')}?` +
+        `filterByFormula={공개여부}=TRUE()&sort[0][field]=${encodeURIComponent('순서')}&sort[0][direction]=asc`,
+        {
+          headers: { 'Authorization': `Bearer ${env.AIRTABLE_TOKEN}` }
+        }
+      );
+
+      if (!airtableResponse.ok) {
+        return new Response(JSON.stringify({ employees: [], message: 'No employees table or empty' }), {
+          headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const data = await airtableResponse.json();
+      const employees = (data.records || []).map(record => ({
+        id: record.id,
+        이름: record.fields['이름'] || '',
+        직책: record.fields['직책'] || '',
+        소개: record.fields['소개'] || '',
+        프로필이미지URL: record.fields['프로필이미지URL'] || '',
+        순서: record.fields['순서'] || 0
+      }));
+
+      return new Response(JSON.stringify({ employees }), {
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    } catch (error) {
+      return new Response(JSON.stringify({ error: error.message }), {
+        status: 500,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    }
+  }
+
+  // GET /employees/all - 전체 임직원 목록 조회 (관리자용)
+  if (method === 'GET' && path === '/employees/all') {
+    try {
+      const airtableResponse = await fetch(
+        `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/${encodeURIComponent('임직원')}?` +
+        `sort[0][field]=${encodeURIComponent('순서')}&sort[0][direction]=asc`,
+        {
+          headers: { 'Authorization': `Bearer ${env.AIRTABLE_TOKEN}` }
+        }
+      );
+
+      if (!airtableResponse.ok) {
+        return new Response(JSON.stringify({ employees: [], message: 'No employees table or empty' }), {
+          headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const data = await airtableResponse.json();
+      const employees = (data.records || []).map(record => ({
+        id: record.id,
+        이름: record.fields['이름'] || '',
+        직책: record.fields['직책'] || '',
+        소개: record.fields['소개'] || '',
+        프로필이미지URL: record.fields['프로필이미지URL'] || '',
+        순서: record.fields['순서'] || 0,
+        공개여부: record.fields['공개여부'] || false,
+        createdTime: record.createdTime
+      }));
+
+      return new Response(JSON.stringify({ employees }), {
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    } catch (error) {
+      return new Response(JSON.stringify({ error: error.message }), {
+        status: 500,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    }
+  }
+
+  // POST /employees - 임직원 등록
+  if (method === 'POST' && path === '/employees') {
+    try {
+      const data = await request.json();
+      console.log('📝 Creating employee:', data.이름);
+
+      const fields = {
+        '이름': data.이름 || '',
+        '직책': data.직책 || '',
+        '소개': data.소개 || '',
+        '프로필이미지URL': data.프로필이미지URL || '',
+        '순서': data.순서 || 1,
+        '공개여부': data.공개여부 !== false
+      };
+
+      const airtableResponse = await fetch(
+        `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/${encodeURIComponent('임직원')}`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${env.AIRTABLE_TOKEN}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ fields })
+        }
+      );
+
+      if (!airtableResponse.ok) {
+        const error = await airtableResponse.json();
+        return new Response(JSON.stringify({
+          success: false,
+          error: error.error?.message || 'Failed to create employee'
+        }), {
+          status: 500,
+          headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const result = await airtableResponse.json();
+      console.log('✅ Employee created:', result.id);
+
+      return new Response(JSON.stringify({
+        success: true,
+        id: result.id
+      }), {
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    } catch (error) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: error.message
+      }), {
+        status: 500,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    }
+  }
+
+  // PATCH /employees/:id - 임직원 수정
+  if (method === 'PATCH' && path.startsWith('/employees/')) {
+    const recordId = path.replace('/employees/', '');
+    if (recordId === 'all') return new Response(JSON.stringify({ error: 'Invalid ID' }), {
+      status: 400,
+      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+    });
+
+    try {
+      const data = await request.json();
+      console.log('✏️ Updating employee:', recordId);
+
+      const fields = {};
+      if (data.이름 !== undefined) fields['이름'] = data.이름;
+      if (data.직책 !== undefined) fields['직책'] = data.직책;
+      if (data.소개 !== undefined) fields['소개'] = data.소개;
+      if (data.프로필이미지URL !== undefined) fields['프로필이미지URL'] = data.프로필이미지URL;
+      if (data.순서 !== undefined) fields['순서'] = data.순서;
+      if (data.공개여부 !== undefined) fields['공개여부'] = data.공개여부;
+
+      const airtableResponse = await fetch(
+        `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/${encodeURIComponent('임직원')}/${recordId}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${env.AIRTABLE_TOKEN}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ fields })
+        }
+      );
+
+      if (!airtableResponse.ok) {
+        const error = await airtableResponse.json();
+        return new Response(JSON.stringify({
+          success: false,
+          error: error.error?.message || 'Failed to update employee'
+        }), {
+          status: 500,
+          headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const result = await airtableResponse.json();
+      console.log('✅ Employee updated:', recordId);
+
+      return new Response(JSON.stringify({
+        success: true,
+        id: result.id
+      }), {
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    } catch (error) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: error.message
+      }), {
+        status: 500,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    }
+  }
+
+  // DELETE /employees/:id - 임직원 삭제
+  if (method === 'DELETE' && path.startsWith('/employees/')) {
+    const recordId = path.replace('/employees/', '');
+    if (recordId === 'all') return new Response(JSON.stringify({ error: 'Invalid ID' }), {
+      status: 400,
+      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+    });
+
+    try {
+      console.log('🗑️ Deleting employee:', recordId);
+
+      const airtableResponse = await fetch(
+        `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/${encodeURIComponent('임직원')}/${recordId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${env.AIRTABLE_TOKEN}`
+          }
+        }
+      );
+
+      if (!airtableResponse.ok) {
+        const error = await airtableResponse.json();
+        return new Response(JSON.stringify({
+          success: false,
+          error: error.error?.message || 'Failed to delete employee'
+        }), {
+          status: 500,
+          headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const result = await airtableResponse.json();
+      console.log('✅ Employee deleted:', recordId);
+
+      return new Response(JSON.stringify({
+        success: true,
+        deleted: true,
+        id: result.id
+      }), {
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    } catch (error) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: error.message
+      }), {
+        status: 500,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    }
+  }
+
+  return new Response(JSON.stringify({ error: 'Not found' }), {
+    status: 404,
+    headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+  });
+}
+
+// ================================================
 // 메인 핸들러
 // ================================================
 
@@ -1438,6 +1703,13 @@ export default {
       // ================================================
       if (path === '/board' || path.startsWith('/board/') || path === '/posts' || path.startsWith('/posts/')) {
         return await handleBoardAPI(request, env, path);
+      }
+
+      // ================================================
+      // 임직원 API (/employees)
+      // ================================================
+      if (path === '/employees' || path.startsWith('/employees/')) {
+        return await handleEmployeesAPI(request, env, path);
       }
 
       // ================================================
@@ -1698,6 +1970,11 @@ export default {
           'DELETE /board/:id - 게시글 삭제',
           'GET /posts - 게시글 목록',
           'GET /posts/:id - 게시글 상세',
+          'GET /employees - 공개 임직원 목록',
+          'GET /employees/all - 전체 임직원 목록 (관리자)',
+          'POST /employees - 임직원 등록',
+          'PATCH /employees/:id - 임직원 수정',
+          'DELETE /employees/:id - 임직원 삭제',
           'GET /analytics/all - GA4 전체 데이터',
           'GET /analytics/overview - GA4 개요',
           'GET /analytics/cached - 캐시된 히스토리',

@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>임직원 관리 - 한국정책자금지원센터</title>
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <script src="/js/admin-auth.js"></script>
+  <style>
+    .profile-preview {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 50%;
+      background: var(--neutral-100);
+    }
+    .profile-placeholder {
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--neutral-100);
+      border-radius: 50%;
+      color: var(--neutral-400);
+      font-size: 24px;
+    }
+    .employee-name-cell {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .employee-name-cell .info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .employee-name-cell .name {
+      font-weight: 600;
+      color: var(--neutral-800);
+    }
+    .employee-name-cell .position {
+      font-size: 13px;
+      color: var(--neutral-500);
+    }
+    .employee-table {
+      table-layout: fixed;
+      width: 100%;
+    }
+    .employee-table td {
+      vertical-align: middle;
+    }
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .loading-overlay.hidden { display: none; }
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .profile-upload {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .profile-preview-wrap {
+      position: relative;
+      width: 100px;
+      height: 100px;
+    }
+    .profile-upload-preview {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 50%;
+      background: var(--neutral-100);
+      border: 2px dashed var(--neutral-300);
+    }
+    .profile-upload-placeholder {
+      width: 100px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--neutral-100);
+      border-radius: 50%;
+      border: 2px dashed var(--neutral-300);
+      color: var(--neutral-400);
+      font-size: 36px;
+    }
+    .profile-upload-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .badge-active {
+      background: #10B981;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .badge-inactive {
+      background: var(--neutral-200);
+      color: var(--neutral-600);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .order-badge {
+      background: var(--neutral-100);
+      color: var(--neutral-700);
+      padding: 4px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .intro-text {
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--neutral-600);
+      font-size: 13px;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 640px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+    .btn-danger-outline {
+      border-color: var(--error) !important;
+      color: var(--error) !important;
+    }
+    .btn-danger-outline:hover {
+      background: var(--error) !important;
+      color: white !important;
+    }
+    .upload-progress {
+      color: var(--primary);
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- 사이드바 오버레이 (모바일) -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- 사이드바 -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1 class="logo">KPFC</h1>
+        <span class="logo-sub">관리자</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="/admin/" class="nav-item">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"/>
+              <rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/>
+              <rect x="3" y="14" width="7" height="7"/>
+            </svg>
+          </span>
+          <span class="nav-text">대시보드</span>
+        </a>
+        <a href="/admin/leads.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/>
+              <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
+            </svg>
+          </span>
+          <span class="nav-text">접수내역</span>
+        </a>
+        <a href="/admin/board.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </span>
+          <span class="nav-text">게시판 관리</span>
+        </a>
+        <a href="/admin/employees.html" class="nav-item active">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </span>
+          <span class="nav-text">임직원 관리</span>
+        </a>
+        <a href="/admin/analytics.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"/>
+              <line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+          </span>
+          <span class="nav-text">방문통계</span>
+        </a>
+        <a href="/admin/settings.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </span>
+          <span class="nav-text">설정</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="/" class="nav-item">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+          </span>
+          <span class="nav-text">사이트 보기</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+      <!-- 헤더 -->
+      <header class="dashboard-header">
+        <div class="header-left">
+          <button class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="메뉴 열기">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
+          <div>
+            <h2 class="page-title">임직원 관리</h2>
+            <p class="page-subtitle">회사소개 페이지에 표시될 임직원 정보를 관리합니다</p>
+          </div>
+        </div>
+        <div class="header-right">
+          <button class="btn btn-primary" onclick="openAddModal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            임직원 추가
+          </button>
+        </div>
+      </header>
+
+      <!-- 임직원 목록 -->
+      <section class="content-section">
+        <div class="section-header">
+          <h3>임직원 목록</h3>
+          <span class="section-count" id="employeeCount">0명</span>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table employee-table">
+            <thead>
+              <tr>
+                <th style="width: 60px;">순서</th>
+                <th style="width: 240px;">임직원</th>
+                <th>한줄 소개</th>
+                <th style="width: 80px;">상태</th>
+                <th style="width: 120px;">관리</th>
+              </tr>
+            </thead>
+            <tbody id="employeeTableBody">
+              <tr>
+                <td colspan="5" style="text-align: center; padding: 60px 20px; color: var(--neutral-400);">
+                  로딩 중...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- 로딩 오버레이 -->
+  <div class="loading-overlay hidden" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <!-- 임직원 추가/수정 모달 -->
+  <div class="modal" id="employeeModal">
+    <div class="modal-content" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitle">임직원 추가</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <form id="employeeForm" onsubmit="saveEmployee(event)">
+        <div class="modal-body">
+          <!-- 프로필 이미지 -->
+          <div class="form-group">
+            <label>프로필 이미지 <span style="font-weight: 400; color: var(--neutral-500); font-size: 12px;">(자동 WebP 변환, 100KB 이하 압축)</span></label>
+            <div class="profile-upload">
+              <div class="profile-preview-wrap">
+                <img id="profilePreview" class="profile-upload-preview" src="" alt="프로필 미리보기" style="display: none;">
+                <div id="profilePlaceholder" class="profile-upload-placeholder">
+                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="profile-upload-actions">
+                <input type="file" id="profileFile" accept="image/*" style="display: none;" onchange="handleProfileUpload(event)">
+                <input type="hidden" id="profileUrl" value="">
+                <button type="button" class="btn btn-outline btn-sm" id="uploadBtn" onclick="document.getElementById('profileFile').click()">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                  </svg>
+                  이미지 선택
+                </button>
+                <button type="button" class="btn btn-outline btn-sm btn-danger-outline" id="removeBtn" onclick="removeProfileImage()" style="display: none;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                  삭제
+                </button>
+                <span id="uploadStatus" style="font-size: 12px; color: var(--neutral-500);"></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 이름, 직책 -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="employeeName">이름 <span class="required">*</span></label>
+              <input type="text" id="employeeName" class="form-input" placeholder="홍길동" required>
+            </div>
+            <div class="form-group">
+              <label for="employeePosition">직책 <span class="required">*</span></label>
+              <input type="text" id="employeePosition" class="form-input" placeholder="이사" required>
+            </div>
+          </div>
+
+          <!-- 한줄 소개 -->
+          <div class="form-group">
+            <label for="employeeIntro">한줄 소개</label>
+            <input type="text" id="employeeIntro" class="form-input" placeholder="10년 경력의 정책자금 전문가">
+          </div>
+
+          <!-- 순서, 공개여부 -->
+          <div class="form-row">
+            <div class="form-group">
+              <label for="employeeOrder">표시 순서</label>
+              <input type="number" id="employeeOrder" class="form-input" value="1" min="1">
+            </div>
+            <div class="form-group">
+              <label for="employeeActive">공개 여부</label>
+              <div style="display: flex; align-items: center; height: 44px;">
+                <label class="toggle-switch">
+                  <input type="checkbox" id="employeeActive" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+                <span style="margin-left: 8px; color: var(--neutral-600); font-size: 14px;">홈페이지에 표시</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal()">취소</button>
+          <button type="submit" class="btn btn-primary" id="submitBtn">저장</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 삭제 확인 모달 -->
+  <div class="modal" id="deleteModal">
+    <div class="modal-content" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3 class="modal-title">임직원 삭제</h3>
+        <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="color: var(--neutral-600);">
+          <strong id="deleteEmployeeName"></strong>님의 정보를 삭제하시겠습니까?<br>
+          삭제된 정보는 복구할 수 없습니다.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeDeleteModal()">취소</button>
+        <button type="button" class="btn btn-danger" onclick="confirmDelete()">삭제</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // API 베이스 URL
+    const API_BASE = 'https://kpfc-analytics.a01027770093.workers.dev';
+
+    // 상태
+    let employees = [];
+    let editingId = null;
+    let deleteTargetId = null;
+
+    // 페이지 로드 시 데이터 불러오기
+    document.addEventListener('DOMContentLoaded', loadEmployees);
+
+    // 임직원 목록 로드
+    async function loadEmployees() {
+      try {
+        const response = await fetch(`${API_BASE}/employees/all`);
+        const data = await response.json();
+        employees = data.employees || [];
+        renderEmployeeTable();
+      } catch (error) {
+        console.error('임직원 로드 실패:', error);
+        document.getElementById('employeeTableBody').innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 60px 20px; color: var(--error);">
+              데이터를 불러오는데 실패했습니다.
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    // 테이블 렌더링
+    function renderEmployeeTable() {
+      const tbody = document.getElementById('employeeTableBody');
+      document.getElementById('employeeCount').textContent = `${employees.length}명`;
+
+      if (employees.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 60px 20px; color: var(--neutral-400);">
+              등록된 임직원이 없습니다. 우측 상단의 [임직원 추가] 버튼을 클릭하여 등록해주세요.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = employees.map(emp => `
+        <tr>
+          <td><span class="order-badge">${emp.순서 || '-'}</span></td>
+          <td>
+            <div class="employee-name-cell">
+              ${emp.프로필이미지URL
+                ? `<img src="${emp.프로필이미지URL}" alt="${emp.이름}" class="profile-preview">`
+                : `<div class="profile-placeholder">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  </div>`
+              }
+              <div class="info">
+                <span class="name">${emp.이름}</span>
+                <span class="position">${emp.직책}</span>
+              </div>
+            </div>
+          </td>
+          <td><span class="intro-text">${emp.소개 || '-'}</span></td>
+          <td>
+            <span class="${emp.공개여부 ? 'badge-active' : 'badge-inactive'}">
+              ${emp.공개여부 ? '공개' : '비공개'}
+            </span>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn-icon" onclick="editEmployee('${emp.id}')" title="수정">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+              </button>
+              <button class="btn-icon btn-icon-danger" onclick="openDeleteModal('${emp.id}')" title="삭제">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // 추가 모달 열기
+    function openAddModal() {
+      editingId = null;
+      document.getElementById('modalTitle').textContent = '임직원 추가';
+      document.getElementById('submitBtn').textContent = '저장';
+      document.getElementById('employeeForm').reset();
+      document.getElementById('profilePreview').style.display = 'none';
+      document.getElementById('profilePlaceholder').style.display = 'flex';
+      document.getElementById('profileUrl').value = '';
+      document.getElementById('removeBtn').style.display = 'none';
+      document.getElementById('uploadStatus').textContent = '';
+      document.getElementById('employeeActive').checked = true;
+      document.getElementById('employeeOrder').value = employees.length + 1;
+      document.getElementById('employeeModal').classList.add('open');
+    }
+
+    // 수정 모달 열기
+    function editEmployee(id) {
+      const emp = employees.find(e => e.id === id);
+      if (!emp) return;
+
+      editingId = id;
+      document.getElementById('modalTitle').textContent = '임직원 수정';
+      document.getElementById('submitBtn').textContent = '수정';
+      document.getElementById('employeeName').value = emp.이름 || '';
+      document.getElementById('employeePosition').value = emp.직책 || '';
+      document.getElementById('employeeIntro').value = emp.소개 || '';
+      document.getElementById('employeeOrder').value = emp.순서 || 1;
+      document.getElementById('employeeActive').checked = emp.공개여부;
+      document.getElementById('profileUrl').value = emp.프로필이미지URL || '';
+      document.getElementById('uploadStatus').textContent = '';
+
+      if (emp.프로필이미지URL) {
+        document.getElementById('profilePreview').src = emp.프로필이미지URL;
+        document.getElementById('profilePreview').style.display = 'block';
+        document.getElementById('profilePlaceholder').style.display = 'none';
+        document.getElementById('removeBtn').style.display = 'inline-flex';
+      } else {
+        document.getElementById('profilePreview').style.display = 'none';
+        document.getElementById('profilePlaceholder').style.display = 'flex';
+        document.getElementById('removeBtn').style.display = 'none';
+      }
+
+      document.getElementById('employeeModal').classList.add('open');
+    }
+
+    // 모달 닫기
+    function closeModal() {
+      document.getElementById('employeeModal').classList.remove('open');
+      document.getElementById('profileFile').value = '';
+      editingId = null;
+    }
+
+    // 프로필 이미지 삭제
+    function removeProfileImage() {
+      document.getElementById('profileUrl').value = '';
+      document.getElementById('profilePreview').style.display = 'none';
+      document.getElementById('profilePlaceholder').style.display = 'flex';
+      document.getElementById('removeBtn').style.display = 'none';
+      document.getElementById('uploadStatus').textContent = '';
+      document.getElementById('profileFile').value = '';
+    }
+
+    // 이미지를 WebP로 변환하고 100KB 이하로 압축
+    async function compressImageToWebP(file, maxSizeKB = 100) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+
+            // 최대 크기 제한 (800x800)
+            const maxDimension = 800;
+            if (width > maxDimension || height > maxDimension) {
+              if (width > height) {
+                height = Math.round((height / width) * maxDimension);
+                width = maxDimension;
+              } else {
+                width = Math.round((width / height) * maxDimension);
+                height = maxDimension;
+              }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // 품질을 조절하며 100KB 이하가 될 때까지 압축
+            let quality = 0.9;
+            const tryCompress = () => {
+              canvas.toBlob((blob) => {
+                if (!blob) {
+                  reject(new Error('이미지 변환 실패'));
+                  return;
+                }
+
+                const sizeKB = blob.size / 1024;
+                console.log(`압축 시도: quality=${quality.toFixed(2)}, size=${sizeKB.toFixed(1)}KB`);
+
+                if (sizeKB <= maxSizeKB || quality <= 0.1) {
+                  // 파일명 생성 (원본 이름에서 확장자 제거 후 .webp 추가)
+                  const baseName = file.name.replace(/\.[^/.]+$/, '');
+                  const newFile = new File([blob], `${baseName}.webp`, { type: 'image/webp' });
+                  resolve({ file: newFile, sizeKB: sizeKB.toFixed(1) });
+                } else {
+                  quality -= 0.1;
+                  tryCompress();
+                }
+              }, 'image/webp', quality);
+            };
+
+            tryCompress();
+          };
+          img.onerror = () => reject(new Error('이미지 로드 실패'));
+          img.src = e.target.result;
+        };
+        reader.onerror = () => reject(new Error('파일 읽기 실패'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // 프로필 이미지 파일 업로드
+    async function handleProfileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const statusEl = document.getElementById('uploadStatus');
+      statusEl.textContent = '압축 중...';
+      statusEl.className = 'upload-progress';
+
+      try {
+        // WebP 변환 및 압축
+        const { file: compressedFile, sizeKB } = await compressImageToWebP(file, 100);
+        console.log(`압축 완료: ${compressedFile.name}, ${sizeKB}KB`);
+
+        statusEl.textContent = '업로드 중...';
+        showLoading();
+
+        const formData = new FormData();
+        formData.append('file', compressedFile);
+
+        const response = await fetch(`${API_BASE}/upload`, {
+          method: 'POST',
+          body: formData
+        });
+
+        const result = await response.json();
+
+        if (result.success && result.url) {
+          document.getElementById('profileUrl').value = result.url;
+          document.getElementById('profilePreview').src = result.url;
+          document.getElementById('profilePreview').style.display = 'block';
+          document.getElementById('profilePlaceholder').style.display = 'none';
+          document.getElementById('removeBtn').style.display = 'inline-flex';
+          statusEl.textContent = `완료 (${sizeKB}KB)`;
+          statusEl.style.color = 'var(--success)';
+        } else {
+          statusEl.textContent = '';
+          alert('이미지 업로드에 실패했습니다: ' + (result.error || '알 수 없는 오류'));
+        }
+      } catch (error) {
+        console.error('업로드 오류:', error);
+        statusEl.textContent = '';
+        alert('이미지 처리 중 오류가 발생했습니다: ' + error.message);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // 임직원 저장
+    async function saveEmployee(event) {
+      event.preventDefault();
+
+      const data = {
+        이름: document.getElementById('employeeName').value.trim(),
+        직책: document.getElementById('employeePosition').value.trim(),
+        소개: document.getElementById('employeeIntro').value.trim(),
+        순서: parseInt(document.getElementById('employeeOrder').value) || 1,
+        공개여부: document.getElementById('employeeActive').checked,
+        프로필이미지URL: document.getElementById('profileUrl').value.trim()
+      };
+
+      if (!data.이름 || !data.직책) {
+        alert('이름과 직책은 필수 입력 항목입니다.');
+        return;
+      }
+
+      showLoading();
+
+      try {
+        const url = editingId
+          ? `${API_BASE}/employees/${editingId}`
+          : `${API_BASE}/employees`;
+        const method = editingId ? 'PATCH' : 'POST';
+
+        const response = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          closeModal();
+          await loadEmployees();
+          alert(editingId ? '임직원 정보가 수정되었습니다.' : '임직원이 등록되었습니다.');
+        } else {
+          alert('저장 실패: ' + (result.error || '알 수 없는 오류'));
+        }
+      } catch (error) {
+        console.error('저장 오류:', error);
+        alert('저장 중 오류가 발생했습니다.');
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // 삭제 모달 열기
+    function openDeleteModal(id) {
+      const emp = employees.find(e => e.id === id);
+      if (!emp) return;
+
+      deleteTargetId = id;
+      document.getElementById('deleteEmployeeName').textContent = emp.이름;
+      document.getElementById('deleteModal').classList.add('open');
+    }
+
+    // 삭제 모달 닫기
+    function closeDeleteModal() {
+      document.getElementById('deleteModal').classList.remove('open');
+      deleteTargetId = null;
+    }
+
+    // 삭제 확인
+    async function confirmDelete() {
+      if (!deleteTargetId) return;
+
+      showLoading();
+
+      try {
+        const response = await fetch(`${API_BASE}/employees/${deleteTargetId}`, {
+          method: 'DELETE'
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          closeDeleteModal();
+          await loadEmployees();
+          alert('임직원이 삭제되었습니다.');
+        } else {
+          alert('삭제 실패: ' + (result.error || '알 수 없는 오류'));
+        }
+      } catch (error) {
+        console.error('삭제 오류:', error);
+        alert('삭제 중 오류가 발생했습니다.');
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // 로딩 표시
+    function showLoading() {
+      document.getElementById('loadingOverlay').classList.remove('hidden');
+    }
+
+    function hideLoading() {
+      document.getElementById('loadingOverlay').classList.add('hidden');
+    }
+
+    // 사이드바 토글
+    function toggleSidebar() {
+      document.querySelector('.sidebar').classList.toggle('open');
+      document.querySelector('.sidebar-overlay').classList.toggle('open');
+    }
+  </script>
+</body>
+</html>

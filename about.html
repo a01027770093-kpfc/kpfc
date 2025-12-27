@@ -1719,6 +1719,212 @@
 })();
 </script>
 
+    <!-- 임직원 소개 섹션 -->
+    <section class="employees-section" id="employees">
+        <div class="container">
+            <div class="section-label">
+                <span>전문가 팀</span>
+            </div>
+            <h2 class="section-title">함께하는 전문가</h2>
+            <p class="section-desc">KPFC의 경험 있는 전문가 팀이 최상의 컨설팅을 제공합니다.</p>
+
+            <div class="employees-grid" id="employeesGrid">
+                <!-- API에서 동적으로 로드 -->
+            </div>
+        </div>
+    </section>
+
+    <style>
+        .employees-section {
+            background: #ffffff;
+            padding: 80px 20px;
+        }
+
+        .employees-section .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .employees-section .section-label {
+            font-size: 15px;
+            color: #1B3A5F;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .employees-section .section-label::before {
+            content: '';
+            width: 4px;
+            height: 18px;
+            background: #1B3A5F;
+            display: inline-block;
+        }
+
+        .employees-section .section-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1B3A5F;
+            margin-bottom: 12px;
+        }
+
+        .employees-section .section-desc {
+            font-size: 16px;
+            color: #6B7280;
+            margin-bottom: 40px;
+        }
+
+        .employees-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .employee-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .employee-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .employee-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 20px;
+            background: #F3F4F6;
+        }
+
+        .employee-avatar-placeholder {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #E5E7EB 0%, #F3F4F6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: #9CA3AF;
+        }
+
+        .employee-avatar-placeholder svg {
+            width: 48px;
+            height: 48px;
+        }
+
+        .employee-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1B3A5F;
+            margin-bottom: 6px;
+        }
+
+        .employee-position {
+            font-size: 14px;
+            font-weight: 600;
+            color: #3B82F6;
+            margin-bottom: 12px;
+        }
+
+        .employee-intro {
+            font-size: 14px;
+            color: #6B7280;
+            line-height: 1.6;
+        }
+
+        .employees-empty {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 60px 20px;
+            color: #9CA3AF;
+        }
+
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .employees-section {
+                padding: 60px 20px;
+            }
+
+            .employees-section .section-title {
+                font-size: 26px;
+            }
+
+            .employees-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .employee-card {
+                padding: 24px;
+            }
+
+            .employee-avatar,
+            .employee-avatar-placeholder {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    </style>
+
+    <script>
+    (function() {
+        const API_BASE = 'https://kpfc-analytics.a01027770093.workers.dev';
+        const grid = document.getElementById('employeesGrid');
+
+        async function loadEmployees() {
+            try {
+                const response = await fetch(`${API_BASE}/employees`);
+                const data = await response.json();
+                const employees = data.employees || [];
+
+                if (employees.length === 0) {
+                    // 임직원이 없으면 섹션 숨김
+                    document.getElementById('employees').style.display = 'none';
+                    return;
+                }
+
+                grid.innerHTML = employees.map(emp => `
+                    <div class="employee-card">
+                        ${emp.프로필이미지URL
+                            ? `<img src="${emp.프로필이미지URL}" alt="${emp.이름}" class="employee-avatar">`
+                            : `<div class="employee-avatar-placeholder">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                    <circle cx="12" cy="7" r="4"/>
+                                </svg>
+                              </div>`
+                        }
+                        <h3 class="employee-name">${emp.이름}</h3>
+                        <p class="employee-position">${emp.직책}</p>
+                        ${emp.소개 ? `<p class="employee-intro">${emp.소개}</p>` : ''}
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('임직원 로드 실패:', error);
+                // 오류 시 섹션 숨김
+                document.getElementById('employees').style.display = 'none';
+            }
+        }
+
+        // 페이지 로드 시 실행
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadEmployees);
+        } else {
+            loadEmployees();
+        }
+    })();
+    </script>
+
         <!-- Form 섹션 - BIZEN 무료진단 신청 (에어테이블 + 워커 연동) -->
     <style>
         /* BIZEN 색상 변수 */
