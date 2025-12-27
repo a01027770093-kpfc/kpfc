@@ -1381,7 +1381,7 @@
       }
 
       let trendItems = trendData.trend || [];
-      if (currentPeriod === 'daily' && trendItems.length > 7) {
+      if (filterDays <= 7 && trendItems.length > 7) {
         trendItems = trendItems.slice(-7);
       }
       const labels = trendItems.map(item => formatChartDate(item.date));
