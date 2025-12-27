@@ -1043,12 +1043,24 @@
       // 기간 표시 업데이트
       updatePeriodDisplay();
 
-      // 모든 데이터 로드
-      await Promise.all([
-        loadAnalyticsDataWithFilter(),
-        loadHistoryDataWithFilter(),
-        loadCompareData()
-      ]);
+      // 각 데이터를 독립적으로 로드 (하나가 실패해도 다른 것은 계속)
+      try {
+        await loadAnalyticsDataWithFilter();
+      } catch (e) {
+        console.error('Analytics load error:', e);
+      }
+
+      try {
+        await loadHistoryDataWithFilter();
+      } catch (e) {
+        console.error('History load error:', e);
+      }
+
+      try {
+        await loadCompareData();
+      } catch (e) {
+        console.error('Compare load error:', e);
+      }
     }
 
     // API 미설정 상태 표시
@@ -1271,12 +1283,7 @@
 
     // 대시보드 렌더링
     function renderDashboard(data) {
-      // 기간 표시
-      if (data.overview && data.overview.period) {
-        const { startDate, endDate } = data.overview.period;
-        document.getElementById('period-display').textContent =
-          `${formatDate(startDate)} ~ ${formatDate(endDate)}`;
-      }
+      // 기간 표시는 updatePeriodDisplay에서 관리
 
       // 통계 카드
       if (data.overview) {
