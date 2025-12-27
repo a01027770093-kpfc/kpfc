@@ -1,7 +1,13 @@
-name = "kpfc-analytics"
+name = "kpfc-api"
 main = "worker.js"
 compatibility_date = "2024-01-01"
 account_id = "bf39e5c4b6ef41af31941676cc384300"
+
+# GitHub API 연동 (페이지 에디터용)
+[vars]
+GITHUB_OWNER = "a01027770093-kpfc"
+GITHUB_REPO = "kpfc"
+GITHUB_BRANCH = "main"
 
 # Cron Trigger - 매일 KST 01:00 (UTC 16:00) GA4 데이터 수집
 [triggers]

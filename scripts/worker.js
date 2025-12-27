@@ -1520,6 +1520,246 @@ async function handleEmployeesAPI(request, env, path) {
 }
 
 // ================================================
+// 페이지 에디터 API 핸들러
+// GitHub API를 통한 HTML 파일 수정
+// ================================================
+
+// 페이지 목록 정의
+const PAGES_CONFIG = [
+  { id: 'index', name: '메인 페이지', path: 'index.html' },
+  { id: 'about', name: '회사 소개', path: 'about.html' },
+  { id: 'service', name: '전문가 서비스', path: 'service.html' },
+  { id: 'fund', name: '정책자금 안내', path: 'fund.html' },
+  { id: 'process', name: '진행 절차', path: 'process.html' }
+];
+
+// GitHub API: 파일 읽기
+async function getFileFromGitHub(env, filePath) {
+  const response = await fetch(
+    `https://api.github.com/repos/${env.GITHUB_OWNER}/${env.GITHUB_REPO}/contents/${filePath}?ref=${env.GITHUB_BRANCH || 'main'}`,
+    {
+      headers: {
+        'Authorization': `token ${env.GITHUB_TOKEN}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'User-Agent': 'KPFC-Worker'
+      }
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`GitHub API error: ${response.status} - ${error}`);
+  }
+
+  const data = await response.json();
+  const content = atob(data.content.replace(/\n/g, ''));
+  return { content, sha: data.sha };
+}
+
+// GitHub API: 파일 쓰기 (커밋)
+async function updateFileOnGitHub(env, filePath, content, sha, message) {
+  const response = await fetch(
+    `https://api.github.com/repos/${env.GITHUB_OWNER}/${env.GITHUB_REPO}/contents/${filePath}`,
+    {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${env.GITHUB_TOKEN}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'User-Agent': 'KPFC-Worker',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: message,
+        content: btoa(unescape(encodeURIComponent(content))),
+        sha: sha,
+        branch: env.GITHUB_BRANCH || 'main'
+      })
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`GitHub commit error: ${response.status} - ${error}`);
+  }
+
+  return await response.json();
+}
+
+// HTML에서 data-editable 요소 추출
+function extractEditables(html) {
+  const editables = [];
+  const regex = /<([a-z0-9]+)[^>]*data-editable="([^"]+)"[^>]*>([\s\S]*?)<\/\1>/gi;
+  let match;
+
+  while ((match = regex.exec(html)) !== null) {
+    const tag = match[1];
+    const id = match[2];
+    // 내부 HTML에서 태그 제거하고 텍스트만 추출
+    let text = match[3].replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    editables.push({ id, text, tag });
+  }
+
+  return editables;
+}
+
+// HTML 텍스트 안전 교체 (HTMLRewriter 대신 정규식 사용)
+function updateEditableText(html, changes) {
+  let updatedHtml = html;
+
+  for (const [id, newText] of Object.entries(changes)) {
+    // XSS 방지를 위한 이스케이프
+    const escapedText = escapeHtml(newText);
+
+    // data-editable 요소 찾아서 내용 교체
+    const regex = new RegExp(
+      `(<[^>]*data-editable="${id}"[^>]*>)([\\s\\S]*?)(<\\/[a-z0-9]+>)`,
+      'i'
+    );
+
+    updatedHtml = updatedHtml.replace(regex, (match, openTag, oldContent, closeTag) => {
+      // 기존 내부 HTML 태그 구조 유지하면서 텍스트만 교체
+      // 간단한 텍스트 교체의 경우
+      return `${openTag}${escapedText}${closeTag}`;
+    });
+  }
+
+  return updatedHtml;
+}
+
+async function handlePagesAPI(request, env, path) {
+  const method = request.method;
+
+  // 환경변수 검증
+  if (!env.GITHUB_TOKEN || !env.GITHUB_OWNER || !env.GITHUB_REPO) {
+    return new Response(JSON.stringify({
+      success: false,
+      error: 'GitHub credentials not configured. Required: GITHUB_TOKEN, GITHUB_OWNER, GITHUB_REPO'
+    }), {
+      status: 500,
+      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+    });
+  }
+
+  // GET /api/pages - 페이지 목록
+  if (method === 'GET' && path === '/api/pages') {
+    return new Response(JSON.stringify({
+      success: true,
+      pages: PAGES_CONFIG
+    }), {
+      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+    });
+  }
+
+  // GET /api/pages/:id/editables - 편집 가능 텍스트 조회
+  const editablesMatch = path.match(/^\/api\/pages\/([^/]+)\/editables$/);
+  if (method === 'GET' && editablesMatch) {
+    const pageId = editablesMatch[1];
+    const page = PAGES_CONFIG.find(p => p.id === pageId);
+
+    if (!page) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: '페이지를 찾을 수 없습니다'
+      }), {
+        status: 404,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    }
+
+    try {
+      const { content } = await getFileFromGitHub(env, page.path);
+      const editables = extractEditables(content);
+
+      return new Response(JSON.stringify({
+        success: true,
+        pageId: pageId,
+        pageName: page.name,
+        editables: editables
+      }), {
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    } catch (error) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: error.message
+      }), {
+        status: 500,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    }
+  }
+
+  // POST /api/pages/:id/update - 텍스트 수정 적용
+  const updateMatch = path.match(/^\/api\/pages\/([^/]+)\/update$/);
+  if (method === 'POST' && updateMatch) {
+    const pageId = updateMatch[1];
+    const page = PAGES_CONFIG.find(p => p.id === pageId);
+
+    if (!page) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: '페이지를 찾을 수 없습니다'
+      }), {
+        status: 404,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    }
+
+    try {
+      const data = await request.json();
+      const changes = data.changes || {};
+
+      if (Object.keys(changes).length === 0) {
+        return new Response(JSON.stringify({
+          success: false,
+          error: '변경 사항이 없습니다'
+        }), {
+          status: 400,
+          headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+        });
+      }
+
+      // GitHub에서 현재 파일 가져오기
+      const { content, sha } = await getFileFromGitHub(env, page.path);
+
+      // 텍스트 교체
+      const updatedContent = updateEditableText(content, changes);
+
+      // GitHub에 커밋
+      const changeCount = Object.keys(changes).length;
+      const commitMessage = `Update ${page.name}: ${changeCount}개 텍스트 수정 (관리자 에디터)`;
+
+      const result = await updateFileOnGitHub(env, page.path, updatedContent, sha, commitMessage);
+
+      console.log(`✅ Page updated: ${page.path}, commit: ${result.commit.sha}`);
+
+      return new Response(JSON.stringify({
+        success: true,
+        commitSha: result.commit.sha,
+        message: `${changeCount}개 항목이 수정되었습니다. 배포까지 약 1-2분 소요됩니다.`
+      }), {
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+
+    } catch (error) {
+      console.error('❌ Page update error:', error.message);
+      return new Response(JSON.stringify({
+        success: false,
+        error: error.message
+      }), {
+        status: 500,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    }
+  }
+
+  return new Response(JSON.stringify({ error: 'Not found' }), {
+    status: 404,
+    headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+  });
+}
+
+// ================================================
 // 메인 핸들러
 // ================================================
 
@@ -1564,8 +1804,8 @@ export default {
         return new Response(JSON.stringify({
           status: 'ok',
           service: 'kpfc-api',
-          version: '2.0.1',
-          features: ['analytics', 'submit', 'leads', 'board'],
+          version: '2.1.0',
+          features: ['analytics', 'submit', 'leads', 'board', 'employees', 'pages'],
           env_status: {
             GA4_PROPERTY_ID: !!env.GA4_PROPERTY_ID,
             SERVICE_ACCOUNT_EMAIL: !!env.SERVICE_ACCOUNT_EMAIL,
@@ -1573,7 +1813,10 @@ export default {
             AIRTABLE_TOKEN: !!env.AIRTABLE_TOKEN,
             AIRTABLE_BASE_ID: !!env.AIRTABLE_BASE_ID,
             TELEGRAM_BOT_TOKEN: !!env.TELEGRAM_BOT_TOKEN,
-            RESEND_API_KEY: !!env.RESEND_API_KEY
+            RESEND_API_KEY: !!env.RESEND_API_KEY,
+            GITHUB_TOKEN: !!env.GITHUB_TOKEN,
+            GITHUB_OWNER: !!env.GITHUB_OWNER,
+            GITHUB_REPO: !!env.GITHUB_REPO
           }
         }), {
           headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
@@ -1734,6 +1977,13 @@ export default {
       // ================================================
       if (path === '/employees' || path.startsWith('/employees/')) {
         return await handleEmployeesAPI(request, env, path);
+      }
+
+      // ================================================
+      // 페이지 에디터 API (/api/pages)
+      // ================================================
+      if (path === '/api/pages' || path.startsWith('/api/pages/')) {
+        return await handlePagesAPI(request, env, path);
       }
 
       // ================================================
