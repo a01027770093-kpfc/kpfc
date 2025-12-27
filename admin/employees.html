@@ -103,7 +103,7 @@
       color: var(--neutral-400);
       font-size: 36px;
     }
-    /* 이미지 위치 조정 (Drag to Reposition) */
+    /* 이미지 위치 조정 컨테이너 */
     .image-position-container {
       margin-top: 16px;
       display: none;
@@ -114,38 +114,79 @@
     .image-position-label {
       font-size: 12px;
       color: var(--neutral-500);
-      margin-bottom: 8px;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
       gap: 6px;
     }
-    /* 실제 about.html 카드와 동일한 비율 미리보기 */
-    .image-position-preview {
-      position: relative;
-      width: 200px;
-      height: 250px;
-      border-radius: 12px 0 0 12px;
-      overflow: hidden;
-      background: linear-gradient(135deg, #E5E7EB 0%, #F3F4F6 100%);
-      cursor: grab;
-      border: 2px solid var(--neutral-200);
+
+    /* ========================================
+       실제 about.html 카드와 동일한 CSS
+       ======================================== */
+    .preview-card-wrapper {
+      max-width: 400px;
       margin: 0 auto;
     }
-    .image-position-preview:active {
+    .preview-employee-card {
+      background: #ffffff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: row;
+      min-height: 180px;
+      border: 2px solid var(--neutral-200);
+    }
+    .preview-image-area {
+      flex: 0 0 40%;
+      min-height: 180px;
+      background: linear-gradient(135deg, #E5E7EB 0%, #F3F4F6 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      cursor: grab;
+    }
+    .preview-image-area:active {
       cursor: grabbing;
     }
-    .image-position-preview img {
+    .preview-avatar {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      pointer-events: none;
-      transition: object-position 0.1s ease, transform 0.1s ease;
       position: absolute;
       top: 0;
       left: 0;
       transform-origin: center center;
+      pointer-events: none;
+      transition: object-position 0.1s ease, transform 0.1s ease;
     }
-    .image-position-hint {
+    .preview-info-area {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .preview-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1B3A5F;
+      margin-bottom: 4px;
+    }
+    .preview-position {
+      font-size: 13px;
+      font-weight: 600;
+      color: #3B82F6;
+      margin-bottom: 8px;
+    }
+    .preview-intro {
+      font-size: 12px;
+      color: #6B7280;
+      line-height: 1.5;
+    }
+    .preview-drag-hint {
       position: absolute;
       top: 50%;
       left: 50%;
@@ -160,19 +201,25 @@
       gap: 6px;
       pointer-events: none;
       opacity: 0.9;
+      white-space: nowrap;
     }
-    .image-position-hint svg {
+    .preview-drag-hint svg {
       width: 14px;
       height: 14px;
     }
+
+    /* 확대/축소 컨트롤 */
     .zoom-control {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-top: 10px;
+      margin-top: 12px;
       padding: 8px 12px;
       background: var(--neutral-50);
       border-radius: 8px;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
     }
     .zoom-control label {
       display: flex;
@@ -207,7 +254,7 @@
     .image-position-value {
       font-size: 11px;
       color: var(--neutral-400);
-      margin-top: 6px;
+      margin-top: 8px;
       text-align: center;
     }
     .profile-upload-actions {
@@ -541,7 +588,7 @@
               </div>
             </div>
 
-            <!-- 이미지 위치 조정 (Zoom + Position) -->
+            <!-- 실제 카드 형태 미리보기 -->
             <div class="image-position-container" id="imagePositionContainer">
               <div class="image-position-label">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -549,17 +596,29 @@
                   <circle cx="8.5" cy="8.5" r="1.5"/>
                   <polyline points="21 15 16 10 5 21"/>
                 </svg>
-                실제 화면 미리보기 (드래그로 위치 조정)
+                실제 화면과 동일한 카드 미리보기
               </div>
-              <div class="image-position-preview" id="imagePositionPreview">
-                <img id="positionPreviewImg" src="" alt="위치 조정">
-                <div class="image-position-hint">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3"/>
-                  </svg>
-                  드래그로 위치 조정
+
+              <!-- 실제 about.html 카드와 동일한 구조 -->
+              <div class="preview-card-wrapper">
+                <div class="preview-employee-card">
+                  <div class="preview-image-area" id="imagePositionPreview">
+                    <img id="positionPreviewImg" src="" alt="미리보기" class="preview-avatar">
+                    <div class="preview-drag-hint">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3"/>
+                      </svg>
+                      드래그로 조정
+                    </div>
+                  </div>
+                  <div class="preview-info-area">
+                    <div class="preview-name" id="previewName">이름</div>
+                    <div class="preview-position" id="previewPosition">직책</div>
+                    <div class="preview-intro" id="previewIntro">한줄 소개가 여기에 표시됩니다.</div>
+                  </div>
                 </div>
               </div>
+
               <!-- 확대/축소 슬라이더 -->
               <div class="zoom-control">
                 <label>
@@ -1198,8 +1257,32 @@
       document.getElementById('zoomValue').textContent = `${zoomLevel}%`;
 
       updateImagePosition();
+      updatePreviewCard(); // 카드 정보 업데이트
       initDragEvents();
       initZoomEvents();
+      initPreviewCardSync(); // 입력 필드와 미리보기 동기화
+    }
+
+    // 미리보기 카드 정보 업데이트
+    function updatePreviewCard() {
+      const name = document.getElementById('employeeName').value || '이름';
+      const position = document.getElementById('employeePosition').value || '직책';
+      const intro = document.getElementById('employeeIntro').value || '한줄 소개가 여기에 표시됩니다.';
+
+      document.getElementById('previewName').textContent = name;
+      document.getElementById('previewPosition').textContent = position;
+      document.getElementById('previewIntro').textContent = intro;
+    }
+
+    // 입력 필드와 미리보기 카드 동기화
+    function initPreviewCardSync() {
+      const nameInput = document.getElementById('employeeName');
+      const positionInput = document.getElementById('employeePosition');
+      const introInput = document.getElementById('employeeIntro');
+
+      nameInput.oninput = updatePreviewCard;
+      positionInput.oninput = updatePreviewCard;
+      introInput.oninput = updatePreviewCard;
     }
 
     // 위치 문자열 파싱
