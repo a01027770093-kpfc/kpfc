@@ -1776,20 +1776,26 @@
             margin-bottom: 40px;
         }
 
+        /* 임직원 그리드 - 2x2 (홀수 카드 확장 방지) */
         .employees-grid {
             display: flex;
-            flex-direction: column;
+            flex-wrap: wrap;
             gap: 24px;
         }
 
+        /* 임직원 카드 - 고정 너비 (확장 안 됨) */
         .employee-card {
             background: #ffffff;
-            border-radius: 20px;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
             display: flex;
             flex-direction: row;
+            min-height: 200px;
+            width: calc(50% - 12px); /* 2열 고정, gap 24px의 절반 */
+            flex-grow: 0; /* 확장 방지 */
+            flex-shrink: 0; /* 축소 방지 */
         }
 
         .employee-card:hover {
@@ -1797,10 +1803,10 @@
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
         }
 
-        /* 왼쪽 이미지 영역 (50%) */
+        /* 왼쪽 이미지 영역 */
         .employee-image-area {
-            flex: 0 0 45%;
-            min-height: 280px;
+            flex: 0 0 40%;
+            min-height: 200px;
             background: linear-gradient(135deg, #E5E7EB 0%, #F3F4F6 100%);
             display: flex;
             align-items: center;
@@ -1830,56 +1836,56 @@
             height: 80px;
         }
 
-        /* 오른쪽 정보 영역 (50%) */
+        /* 오른쪽 정보 영역 */
         .employee-info-area {
             flex: 1;
-            padding: 32px;
+            padding: 24px;
             display: flex;
             flex-direction: column;
             justify-content: center;
         }
 
         .employee-name {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
             color: #1B3A5F;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .employee-position {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             color: #3B82F6;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
         .employee-intro {
-            font-size: 15px;
+            font-size: 14px;
             color: #6B7280;
-            line-height: 1.7;
-            margin-bottom: 20px;
+            line-height: 1.6;
+            margin-bottom: 16px;
         }
 
         /* 전문분야 뱃지 */
         .employee-badges {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 6px;
         }
 
         .employee-badge {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 13px;
+            gap: 4px;
+            padding: 5px 10px;
+            border-radius: 16px;
+            font-size: 12px;
             font-weight: 500;
         }
 
         .employee-badge svg {
-            width: 14px;
-            height: 14px;
+            width: 12px;
+            height: 12px;
         }
 
         /* 자금유형 - 파랑 */
@@ -1922,32 +1928,24 @@
 
             .employee-card {
                 flex-direction: column;
+                width: 100%; /* 모바일에서는 전체 너비 */
             }
 
             .employee-image-area {
                 flex: none;
-                min-height: 240px;
+                min-height: 200px;
             }
 
             .employee-info-area {
-                padding: 24px;
+                padding: 20px;
             }
 
             .employee-name {
-                font-size: 20px;
+                font-size: 18px;
             }
 
             .employee-intro {
-                font-size: 14px;
-            }
-
-            .employee-badges {
-                gap: 6px;
-            }
-
-            .employee-badge {
-                font-size: 12px;
-                padding: 5px 10px;
+                font-size: 13px;
             }
         }
     </style>
@@ -2015,11 +2013,14 @@
                         return badges.length > 0 ? `<div class="employee-badges">${badges.join('')}</div>` : '';
                     };
 
+                    // 이미지 위치 (기본값: center 20%)
+                    const imagePosition = emp.이미지위치 || 'center 20%';
+
                     return `
                         <div class="employee-card">
                             <div class="employee-image-area">
                                 ${emp.프로필이미지URL
-                                    ? `<img src="${emp.프로필이미지URL}" alt="${emp.이름}" class="employee-avatar">`
+                                    ? `<img src="${emp.프로필이미지URL}" alt="${emp.이름}" class="employee-avatar" style="object-position: ${imagePosition};">`
                                     : `<div class="employee-avatar-placeholder">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>

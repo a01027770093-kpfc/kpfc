@@ -103,6 +103,68 @@
       color: var(--neutral-400);
       font-size: 36px;
     }
+    /* 이미지 위치 조정 (Drag to Reposition) */
+    .image-position-container {
+      margin-top: 16px;
+      display: none;
+    }
+    .image-position-container.active {
+      display: block;
+    }
+    .image-position-label {
+      font-size: 12px;
+      color: var(--neutral-500);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .image-position-preview {
+      position: relative;
+      width: 100%;
+      height: 120px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--neutral-100);
+      cursor: grab;
+      border: 2px solid var(--neutral-200);
+    }
+    .image-position-preview:active {
+      cursor: grabbing;
+    }
+    .image-position-preview img {
+      width: 100%;
+      height: 200%;
+      object-fit: cover;
+      pointer-events: none;
+      transition: transform 0.1s ease;
+    }
+    .image-position-hint {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.6);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      pointer-events: none;
+      opacity: 0.9;
+    }
+    .image-position-hint svg {
+      width: 14px;
+      height: 14px;
+    }
+    .image-position-value {
+      font-size: 11px;
+      color: var(--neutral-400);
+      margin-top: 6px;
+      text-align: center;
+    }
     .profile-upload-actions {
       display: flex;
       flex-direction: column;
@@ -359,6 +421,7 @@
               <div class="profile-upload-actions">
                 <input type="file" id="profileFile" accept="image/*" style="display: none;" onchange="handleProfileUpload(event)">
                 <input type="hidden" id="profileUrl" value="">
+                <input type="hidden" id="imagePosition" value="center 20%">
                 <button type="button" class="btn btn-outline btn-sm" id="uploadBtn" onclick="document.getElementById('profileFile').click()">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
@@ -376,6 +439,33 @@
                 </button>
                 <span id="uploadStatus" style="font-size: 12px; color: var(--neutral-500);"></span>
               </div>
+            </div>
+
+            <!-- 이미지 위치 조정 (Drag to Reposition) -->
+            <div class="image-position-container" id="imagePositionContainer">
+              <div class="image-position-label">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="5 9 2 12 5 15"/>
+                  <polyline points="9 5 12 2 15 5"/>
+                  <polyline points="15 19 12 22 9 19"/>
+                  <polyline points="19 9 22 12 19 15"/>
+                  <line x1="2" y1="12" x2="22" y2="12"/>
+                  <line x1="12" y1="2" x2="12" y2="22"/>
+                </svg>
+                얼굴 위치 조정 (드래그)
+              </div>
+              <div class="image-position-preview" id="imagePositionPreview">
+                <img id="positionPreviewImg" src="" alt="위치 조정">
+                <div class="image-position-hint">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="5 9 2 12 5 15"/>
+                    <polyline points="19 9 22 12 19 15"/>
+                    <line x1="2" y1="12" x2="22" y2="12"/>
+                  </svg>
+                  위아래로 드래그
+                </div>
+              </div>
+              <div class="image-position-value" id="positionValue">위치: center 20%</div>
             </div>
           </div>
 
@@ -603,6 +693,9 @@
       document.getElementById('fundType').value = '';
       document.getElementById('workArea').value = '';
       document.getElementById('industry').value = '';
+      // 이미지 위치 초기화
+      document.getElementById('imagePosition').value = 'center 20%';
+      document.getElementById('imagePositionContainer').classList.remove('active');
       document.getElementById('employeeModal').classList.add('open');
     }
 
@@ -626,15 +719,22 @@
       document.getElementById('workArea').value = emp.업무영역 || '';
       document.getElementById('industry').value = emp.산업분야 || '';
 
+      // 이미지 위치 로드
+      const imgPosition = emp.이미지위치 || 'center 20%';
+      document.getElementById('imagePosition').value = imgPosition;
+
       if (emp.프로필이미지URL) {
         document.getElementById('profilePreview').src = emp.프로필이미지URL;
         document.getElementById('profilePreview').style.display = 'block';
         document.getElementById('profilePlaceholder').style.display = 'none';
         document.getElementById('removeBtn').style.display = 'inline-flex';
+        // 이미지 위치 조정 UI 표시
+        showImagePositionUI(emp.프로필이미지URL, imgPosition);
       } else {
         document.getElementById('profilePreview').style.display = 'none';
         document.getElementById('profilePlaceholder').style.display = 'flex';
         document.getElementById('removeBtn').style.display = 'none';
+        document.getElementById('imagePositionContainer').classList.remove('active');
       }
 
       document.getElementById('employeeModal').classList.add('open');
@@ -655,6 +755,9 @@
       document.getElementById('removeBtn').style.display = 'none';
       document.getElementById('uploadStatus').textContent = '';
       document.getElementById('profileFile').value = '';
+      // 이미지 위치 초기화 및 숨김
+      document.getElementById('imagePosition').value = 'center 20%';
+      document.getElementById('imagePositionContainer').classList.remove('active');
     }
 
     // 이미지를 WebP로 변환하고 100KB 이하로 압축
@@ -754,6 +857,8 @@
           document.getElementById('removeBtn').style.display = 'inline-flex';
           statusEl.textContent = `완료 (${sizeKB}KB)`;
           statusEl.style.color = 'var(--success)';
+          // 이미지 위치 조정 UI 표시
+          showImagePositionUI(result.url, 'center 20%');
         } else {
           statusEl.textContent = '';
           alert('이미지 업로드에 실패했습니다: ' + (result.error || '알 수 없는 오류'));
@@ -778,6 +883,7 @@
         순서: parseInt(document.getElementById('employeeOrder').value) || 1,
         공개여부: document.getElementById('employeeActive').checked,
         프로필이미지URL: document.getElementById('profileUrl').value.trim(),
+        이미지위치: document.getElementById('imagePosition').value || 'center 20%',
         자금유형: document.getElementById('fundType').value,
         업무영역: document.getElementById('workArea').value,
         산업분야: document.getElementById('industry').value
@@ -870,6 +976,100 @@
 
     function hideLoading() {
       document.getElementById('loadingOverlay').classList.add('hidden');
+    }
+
+    // ========================================
+    // 이미지 위치 조정 (Drag to Reposition)
+    // ========================================
+    let isDragging = false;
+    let startY = 0;
+    let currentPosition = 20; // 0-100 (%)
+
+    // 이미지 위치 UI 표시
+    function showImagePositionUI(imageUrl, position) {
+      const container = document.getElementById('imagePositionContainer');
+      const previewImg = document.getElementById('positionPreviewImg');
+
+      previewImg.src = imageUrl;
+      container.classList.add('active');
+
+      // 현재 위치 파싱 (예: "center 20%" → 20)
+      const match = position.match(/center\s*(\d+)%/);
+      currentPosition = match ? parseInt(match[1]) : 20;
+
+      updateImagePosition();
+      initDragEvents();
+    }
+
+    // 이미지 위치 업데이트
+    function updateImagePosition() {
+      const previewImg = document.getElementById('positionPreviewImg');
+      const positionValue = document.getElementById('positionValue');
+      const hiddenInput = document.getElementById('imagePosition');
+
+      // translateY 계산: 0% = 상단, 50% = 중앙, 100% = 하단
+      // 이미지 높이가 200%이므로 translateY 범위는 0 ~ -50%
+      const translateY = -(currentPosition / 2);
+      previewImg.style.transform = `translateY(${translateY}%)`;
+
+      const positionStr = `center ${currentPosition}%`;
+      positionValue.textContent = `위치: ${positionStr}`;
+      hiddenInput.value = positionStr;
+    }
+
+    // 드래그 이벤트 초기화
+    function initDragEvents() {
+      const preview = document.getElementById('imagePositionPreview');
+
+      // 기존 이벤트 제거
+      preview.onmousedown = null;
+      preview.ontouchstart = null;
+
+      // 마우스 이벤트
+      preview.onmousedown = (e) => {
+        isDragging = true;
+        startY = e.clientY;
+        preview.style.cursor = 'grabbing';
+        e.preventDefault();
+      };
+
+      document.onmousemove = (e) => {
+        if (!isDragging) return;
+        const deltaY = startY - e.clientY;
+        startY = e.clientY;
+
+        // 위로 드래그 = 이미지 아래 보임 = position 감소
+        // 아래로 드래그 = 이미지 위 보임 = position 증가
+        currentPosition = Math.max(0, Math.min(100, currentPosition + deltaY * 0.5));
+        updateImagePosition();
+      };
+
+      document.onmouseup = () => {
+        if (isDragging) {
+          isDragging = false;
+          preview.style.cursor = 'grab';
+        }
+      };
+
+      // 터치 이벤트 (모바일)
+      preview.ontouchstart = (e) => {
+        isDragging = true;
+        startY = e.touches[0].clientY;
+        e.preventDefault();
+      };
+
+      document.ontouchmove = (e) => {
+        if (!isDragging) return;
+        const deltaY = startY - e.touches[0].clientY;
+        startY = e.touches[0].clientY;
+
+        currentPosition = Math.max(0, Math.min(100, currentPosition + deltaY * 0.5));
+        updateImagePosition();
+      };
+
+      document.ontouchend = () => {
+        isDragging = false;
+      };
     }
 
     // 사이드바 토글

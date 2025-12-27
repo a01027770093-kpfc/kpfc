@@ -1265,7 +1265,8 @@ async function handleEmployeesAPI(request, env, path) {
         순서: record.fields['order'] || 0,
         자금유형: record.fields['fundType'] || '',
         업무영역: record.fields['workArea'] || '',
-        산업분야: record.fields['industry'] || ''
+        산업분야: record.fields['industry'] || '',
+        이미지위치: record.fields['imagePosition'] || 'center 20%'
       }));
 
       return new Response(JSON.stringify({ employees }), {
@@ -1309,6 +1310,7 @@ async function handleEmployeesAPI(request, env, path) {
         자금유형: record.fields['fundType'] || '',
         업무영역: record.fields['workArea'] || '',
         산업분야: record.fields['industry'] || '',
+        이미지위치: record.fields['imagePosition'] || 'center 20%',
         createdTime: record.createdTime
       }));
 
@@ -1339,7 +1341,8 @@ async function handleEmployeesAPI(request, env, path) {
         'isActive': data.공개여부 !== false,
         'fundType': data.자금유형 || '',
         'workArea': data.업무영역 || '',
-        'industry': data.산업분야 || ''
+        'industry': data.산업분야 || '',
+        'imagePosition': data.이미지위치 || 'center 20%'
       };
 
       const airtableResponse = await fetch(
@@ -1408,6 +1411,7 @@ async function handleEmployeesAPI(request, env, path) {
       if (data.자금유형 !== undefined) fields['fundType'] = data.자금유형;
       if (data.업무영역 !== undefined) fields['workArea'] = data.업무영역;
       if (data.산업분야 !== undefined) fields['industry'] = data.산업분야;
+      if (data.이미지위치 !== undefined) fields['imagePosition'] = data.이미지위치;
 
       const airtableResponse = await fetch(
         `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/employees/${recordId}`,
