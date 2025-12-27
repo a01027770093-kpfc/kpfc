@@ -544,7 +544,7 @@
 
           <!-- 전문분야 뱃지 (다중 선택) -->
           <div class="form-group">
-            <label>전문분야 뱃지 <span style="font-weight: 400; color: var(--neutral-500); font-size: 12px;">(카테고리별 최대 4개 선택)</span></label>
+            <label>전문분야 뱃지 <span style="font-weight: 400; color: var(--neutral-500); font-size: 12px;">(전체 최대 4개 선택)</span></label>
 
             <!-- 자금유형 -->
             <div class="badge-category">
@@ -671,14 +671,15 @@
     let editingId = null;
     let deleteTargetId = null;
 
-    // 뱃지 체크박스 토글 (최대 4개 제한)
+    // 뱃지 체크박스 토글 (전체 최대 4개 제한)
     function toggleBadge(label, groupName) {
       const checkbox = label.querySelector('input[type="checkbox"]');
-      const group = document.querySelectorAll(`input[name="${groupName}"]:checked`);
+      // 전체 선택된 뱃지 개수 확인
+      const totalSelected = document.querySelectorAll('input[name="fundType"]:checked, input[name="workArea"]:checked, input[name="industry"]:checked').length;
 
-      // 체크하려는 경우 최대 4개 제한
-      if (!checkbox.checked && group.length >= 4) {
-        alert('각 카테고리별 최대 4개까지 선택할 수 있습니다.');
+      // 체크하려는 경우 전체 최대 4개 제한
+      if (!checkbox.checked && totalSelected >= 4) {
+        alert('전문분야 뱃지는 전체 최대 4개까지 선택할 수 있습니다.');
         return;
       }
 
