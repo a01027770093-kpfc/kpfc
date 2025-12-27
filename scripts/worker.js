@@ -1241,8 +1241,8 @@ async function handleEmployeesAPI(request, env, path) {
   if (method === 'GET' && path === '/employees') {
     try {
       const airtableResponse = await fetch(
-        `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/${encodeURIComponent('임직원')}?` +
-        `filterByFormula={공개여부}=TRUE()&sort[0][field]=${encodeURIComponent('순서')}&sort[0][direction]=asc`,
+        `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/employees?` +
+        `filterByFormula={isActive}=TRUE()&sort[0][field]=order&sort[0][direction]=asc`,
         {
           headers: { 'Authorization': `Bearer ${env.AIRTABLE_TOKEN}` }
         }
@@ -1255,13 +1255,17 @@ async function handleEmployeesAPI(request, env, path) {
       }
 
       const data = await airtableResponse.json();
+      // Airtable 영문 필드 → 프론트엔드 한글 필드로 변환
       const employees = (data.records || []).map(record => ({
         id: record.id,
-        이름: record.fields['이름'] || '',
-        직책: record.fields['직책'] || '',
-        소개: record.fields['소개'] || '',
-        프로필이미지URL: record.fields['프로필이미지URL'] || '',
-        순서: record.fields['순서'] || 0
+        이름: record.fields['name'] || '',
+        직책: record.fields['position'] || '',
+        소개: record.fields['intro'] || '',
+        프로필이미지URL: record.fields['profileImageUrl'] || '',
+        순서: record.fields['order'] || 0,
+        자금유형: record.fields['fundType'] || '',
+        업무영역: record.fields['workArea'] || '',
+        산업분야: record.fields['industry'] || ''
       }));
 
       return new Response(JSON.stringify({ employees }), {
@@ -1279,8 +1283,8 @@ async function handleEmployeesAPI(request, env, path) {
   if (method === 'GET' && path === '/employees/all') {
     try {
       const airtableResponse = await fetch(
-        `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/${encodeURIComponent('임직원')}?` +
-        `sort[0][field]=${encodeURIComponent('순서')}&sort[0][direction]=asc`,
+        `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/employees?` +
+        `sort[0][field]=order&sort[0][direction]=asc`,
         {
           headers: { 'Authorization': `Bearer ${env.AIRTABLE_TOKEN}` }
         }
@@ -1293,14 +1297,18 @@ async function handleEmployeesAPI(request, env, path) {
       }
 
       const data = await airtableResponse.json();
+      // Airtable 영문 필드 → 프론트엔드 한글 필드로 변환
       const employees = (data.records || []).map(record => ({
         id: record.id,
-        이름: record.fields['이름'] || '',
-        직책: record.fields['직책'] || '',
-        소개: record.fields['소개'] || '',
-        프로필이미지URL: record.fields['프로필이미지URL'] || '',
-        순서: record.fields['순서'] || 0,
-        공개여부: record.fields['공개여부'] || false,
+        이름: record.fields['name'] || '',
+        직책: record.fields['position'] || '',
+        소개: record.fields['intro'] || '',
+        프로필이미지URL: record.fields['profileImageUrl'] || '',
+        순서: record.fields['order'] || 0,
+        공개여부: record.fields['isActive'] || false,
+        자금유형: record.fields['fundType'] || '',
+        업무영역: record.fields['workArea'] || '',
+        산업분야: record.fields['industry'] || '',
         createdTime: record.createdTime
       }));
 
@@ -1321,17 +1329,21 @@ async function handleEmployeesAPI(request, env, path) {
       const data = await request.json();
       console.log('📝 Creating employee:', data.이름);
 
+      // 프론트엔드 한글 필드 → Airtable 영문 필드로 변환
       const fields = {
-        '이름': data.이름 || '',
-        '직책': data.직책 || '',
-        '소개': data.소개 || '',
-        '프로필이미지URL': data.프로필이미지URL || '',
-        '순서': data.순서 || 1,
-        '공개여부': data.공개여부 !== false
+        'name': data.이름 || '',
+        'position': data.직책 || '',
+        'intro': data.소개 || '',
+        'profileImageUrl': data.프로필이미지URL || '',
+        'order': data.순서 || 1,
+        'isActive': data.공개여부 !== false,
+        'fundType': data.자금유형 || '',
+        'workArea': data.업무영역 || '',
+        'industry': data.산업분야 || ''
       };
 
       const airtableResponse = await fetch(
-        `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/${encodeURIComponent('임직원')}`,
+        `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/employees`,
         {
           method: 'POST',
           headers: {
@@ -1385,16 +1397,20 @@ async function handleEmployeesAPI(request, env, path) {
       const data = await request.json();
       console.log('✏️ Updating employee:', recordId);
 
+      // 프론트엔드 한글 필드 → Airtable 영문 필드로 변환
       const fields = {};
-      if (data.이름 !== undefined) fields['이름'] = data.이름;
-      if (data.직책 !== undefined) fields['직책'] = data.직책;
-      if (data.소개 !== undefined) fields['소개'] = data.소개;
-      if (data.프로필이미지URL !== undefined) fields['프로필이미지URL'] = data.프로필이미지URL;
-      if (data.순서 !== undefined) fields['순서'] = data.순서;
-      if (data.공개여부 !== undefined) fields['공개여부'] = data.공개여부;
+      if (data.이름 !== undefined) fields['name'] = data.이름;
+      if (data.직책 !== undefined) fields['position'] = data.직책;
+      if (data.소개 !== undefined) fields['intro'] = data.소개;
+      if (data.프로필이미지URL !== undefined) fields['profileImageUrl'] = data.프로필이미지URL;
+      if (data.순서 !== undefined) fields['order'] = data.순서;
+      if (data.공개여부 !== undefined) fields['isActive'] = data.공개여부;
+      if (data.자금유형 !== undefined) fields['fundType'] = data.자금유형;
+      if (data.업무영역 !== undefined) fields['workArea'] = data.업무영역;
+      if (data.산업분야 !== undefined) fields['industry'] = data.산업분야;
 
       const airtableResponse = await fetch(
-        `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/${encodeURIComponent('임직원')}/${recordId}`,
+        `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/employees/${recordId}`,
         {
           method: 'PATCH',
           headers: {
@@ -1448,7 +1464,7 @@ async function handleEmployeesAPI(request, env, path) {
       console.log('🗑️ Deleting employee:', recordId);
 
       const airtableResponse = await fetch(
-        `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/${encodeURIComponent('임직원')}/${recordId}`,
+        `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/employees/${recordId}`,
         {
           method: 'DELETE',
           headers: {
