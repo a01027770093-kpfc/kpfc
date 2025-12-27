@@ -202,11 +202,11 @@
 
         <div class="chart-card">
           <div class="chart-header">
-            <h3 class="chart-title">인기 검색 키워드</h3>
+            <h3 class="chart-title">인기 페이지</h3>
           </div>
           <ul class="keyword-list" id="keywordList">
             <li style="text-align: center; padding: 40px; color: var(--neutral-400);">
-              데이터 없음
+              데이터를 불러오는 중...
             </li>
           </ul>
         </div>
@@ -358,16 +358,19 @@
       loadStats();
       loadRecentLeads();
       loadRecentPosts();
+      loadWeeklyChart();
+      loadPopularPages();
     });
 
     // 통계 로드
     async function loadStats() {
       try {
-        const response = await fetch(`${API_URL}/leads`);
-        const data = await response.json();
+        // 접수 내역 로드
+        const leadsResponse = await fetch(`${API_URL}/leads`);
+        const leadsData = await leadsResponse.json();
 
-        if (data.success && data.leads) {
-          const leads = data.leads;
+        if (leadsData.success && leadsData.leads) {
+          const leads = leadsData.leads;
           const total = leads.length;
           const pending = leads.filter(l => l.상태 === '신규').length;
           const completed = leads.filter(l => l.상태 === '완료').length;
@@ -385,15 +388,22 @@
           document.getElementById('completedLeadsChange').className = 'stat-change positive';
         }
 
-        // 게시글 수는 별도 API 필요
-        document.getElementById('totalPosts').textContent = '-';
-        document.getElementById('totalPostsChange').textContent = '연동 필요';
-        document.getElementById('totalPostsChange').className = 'stat-change';
+        // 게시글 수 로드
+        const boardResponse = await fetch(`${API_URL}/board`);
+        const boardData = await boardResponse.json();
+        const posts = boardData.records || [];
+        const publishedPosts = posts.filter(p => p.게시여부 === true);
+
+        document.getElementById('totalPosts').textContent = posts.length;
+        document.getElementById('totalPostsChange').textContent = `공개 ${publishedPosts.length}개`;
+        document.getElementById('totalPostsChange').className = 'stat-change positive';
 
       } catch (error) {
         console.error('Stats load error:', error);
         document.getElementById('totalLeads').textContent = '0';
         document.getElementById('totalLeadsChange').textContent = '로드 실패';
+        document.getElementById('totalPosts').textContent = '-';
+        document.getElementById('totalPostsChange').textContent = '연동 실패';
       }
     }
 
@@ -515,6 +525,250 @@
         '성공사례': 'complete'
       };
       return classes[category] || '';
+    }
+
+    // 주간 현황 차트 로드
+    async function loadWeeklyChart() {
+      try {
+        const response = await fetch(`${API_URL}/history/cached?days=7`);
+        const data = await response.json();
+
+        if (data.data && data.data.length > 0) {
+          // 날짜순 정렬 (오래된 순)
+          const sortedData = [...data.data].sort((a, b) => a.date.localeCompare(b.date));
+
+          const labels = sortedData.map(d => {
+            const month = d.date.substring(5, 7);
+            const day = d.date.substring(8, 10);
+            return `${parseInt(month)}/${parseInt(day)}`;
+          });
+          const visitors = sortedData.map(d => d.visitors || 0);
+          const pageviews = sortedData.map(d => d.pageviews || 0);
+          const durations = sortedData.map(d => Math.round((d.avg_duration || 0) / 60)); // 분 단위
+
+          // 접수 데이터도 가져오기
+          const leadsResponse = await fetch(`${API_URL}/leads`);
+          const leadsData = await leadsResponse.json();
+          const leads = leadsData.leads || [];
+
+          // 날짜별 접수 수 계산
+          const leadsByDate = sortedData.map(d => {
+            const dateStr = d.date;
+            return leads.filter(l => l.createdTime && l.createdTime.startsWith(dateStr)).length;
+          });
+
+          // 차트 업데이트
+          updateCombinedChart(labels, visitors, pageviews, durations, leadsByDate);
+        }
+      } catch (error) {
+        console.error('Weekly chart load error:', error);
+      }
+    }
+
+    // 복합 차트 업데이트
+    function updateCombinedChart(labels, visitors, pageviews, durations, leads) {
+      const ctx = document.getElementById('combinedChart');
+      if (!ctx) return;
+
+      // 기존 차트가 있으면 제거
+      if (window.combinedChartInstance) {
+        window.combinedChartInstance.destroy();
+      }
+
+      const mobile = window.innerWidth <= 768;
+      const pointRadius = mobile ? 2 : 4;
+      const borderWidth = mobile ? 1.5 : 2;
+
+      window.combinedChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: '방문자',
+              data: visitors,
+              borderColor: '#1D00AD',
+              backgroundColor: 'rgba(29, 0, 173, 0.1)',
+              borderWidth: borderWidth,
+              fill: false,
+              tension: 0.4,
+              pointRadius: pointRadius,
+              yAxisID: 'y'
+            },
+            {
+              label: '페이지뷰',
+              data: pageviews,
+              borderColor: '#10B981',
+              backgroundColor: 'rgba(16, 185, 129, 0.1)',
+              borderWidth: borderWidth,
+              fill: false,
+              tension: 0.4,
+              pointRadius: pointRadius,
+              yAxisID: 'y'
+            },
+            {
+              label: '체류시간(분)',
+              data: durations,
+              borderColor: '#F59E0B',
+              backgroundColor: 'rgba(245, 158, 11, 0.1)',
+              borderWidth: borderWidth,
+              fill: false,
+              tension: 0.4,
+              pointRadius: pointRadius,
+              yAxisID: 'y'
+            },
+            {
+              label: '접수',
+              data: leads,
+              borderColor: '#EF4444',
+              backgroundColor: 'rgba(239, 68, 68, 0.1)',
+              borderWidth: borderWidth,
+              fill: false,
+              tension: 0.4,
+              pointRadius: pointRadius,
+              yAxisID: 'y1'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#1F2937',
+              padding: 12,
+              cornerRadius: 8,
+              mode: 'index',
+              intersect: false
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: false },
+              ticks: { color: '#9CA3AF' }
+            },
+            y: {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              beginAtZero: true,
+              grid: { color: '#F3F4F6' },
+              ticks: { color: '#9CA3AF' }
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              beginAtZero: true,
+              grid: { drawOnChartArea: false },
+              ticks: { color: '#EF4444' }
+            }
+          }
+        }
+      });
+    }
+
+    // 인기 페이지 로드 (인기 검색 키워드 대체)
+    async function loadPopularPages() {
+      const keywordList = document.getElementById('keywordList');
+
+      try {
+        const response = await fetch(`${API_URL}/analytics/all?period=weekly`);
+        const data = await response.json();
+
+        if (data.pages && data.pages.pages && data.pages.pages.length > 0) {
+          const pages = data.pages.pages.slice(0, 5);
+          const maxViews = pages[0].views;
+
+          const pageNames = {
+            '/': '메인 페이지',
+            '/index.html': '메인 페이지',
+            '/about': '회사 소개',
+            '/about.html': '회사 소개',
+            '/process': '진행 프로세스',
+            '/process.html': '진행 프로세스',
+            '/fund': '정책자금',
+            '/fund.html': '정책자금',
+            '/service': '서비스',
+            '/service.html': '서비스',
+            '/marketing': '마케팅',
+            '/marketing.html': '마케팅',
+            '/post': '게시글',
+            '/post.html': '게시글'
+          };
+
+          keywordList.innerHTML = pages.map((page, idx) => {
+            const pageName = pageNames[page.path] || page.path;
+            const percentage = Math.round((page.views / maxViews) * 100);
+            return `
+              <li class="keyword-item">
+                <span class="keyword-rank">${idx + 1}</span>
+                <div class="keyword-info">
+                  <span class="keyword-text">${pageName}</span>
+                  <div class="keyword-bar">
+                    <div class="keyword-bar-fill" style="width: ${percentage}%"></div>
+                  </div>
+                </div>
+                <span class="keyword-count">${page.views}회</span>
+              </li>
+            `;
+          }).join('');
+        } else {
+          keywordList.innerHTML = `
+            <li style="text-align: center; padding: 40px; color: var(--neutral-400);">
+              아직 페이지 방문 데이터가 없습니다.
+            </li>
+          `;
+        }
+      } catch (error) {
+        console.error('Popular pages load error:', error);
+        keywordList.innerHTML = `
+          <li style="text-align: center; padding: 40px; color: var(--neutral-400);">
+            데이터를 불러올 수 없습니다.
+          </li>
+        `;
+      }
+    }
+
+    // 차트 필터 이벤트
+    document.querySelector('.chart-filter')?.addEventListener('change', function(e) {
+      const days = e.target.value;
+      loadWeeklyChartWithDays(parseInt(days));
+    });
+
+    // 일수 지정 차트 로드
+    async function loadWeeklyChartWithDays(days) {
+      try {
+        const response = await fetch(`${API_URL}/history/cached?days=${days}`);
+        const data = await response.json();
+
+        if (data.data && data.data.length > 0) {
+          const sortedData = [...data.data].sort((a, b) => a.date.localeCompare(b.date));
+
+          const labels = sortedData.map(d => {
+            const month = d.date.substring(5, 7);
+            const day = d.date.substring(8, 10);
+            return `${parseInt(month)}/${parseInt(day)}`;
+          });
+          const visitors = sortedData.map(d => d.visitors || 0);
+          const pageviews = sortedData.map(d => d.pageviews || 0);
+          const durations = sortedData.map(d => Math.round((d.avg_duration || 0) / 60));
+
+          const leadsResponse = await fetch(`${API_URL}/leads`);
+          const leadsData = await leadsResponse.json();
+          const leads = leadsData.leads || [];
+
+          const leadsByDate = sortedData.map(d => {
+            const dateStr = d.date;
+            return leads.filter(l => l.createdTime && l.createdTime.startsWith(dateStr)).length;
+          });
+
+          updateCombinedChart(labels, visitors, pageviews, durations, leadsByDate);
+        }
+      } catch (error) {
+        console.error('Chart update error:', error);
+      }
     }
   </script>
 </body>
