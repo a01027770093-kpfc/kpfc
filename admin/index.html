@@ -358,8 +358,8 @@
       loadStats();
       loadRecentLeads();
       loadRecentPosts();
-      loadWeeklyChart();
       loadPopularPages();
+      // 차트는 dashboard.js에서 처리
     });
 
     // 통계 로드
@@ -527,148 +527,6 @@
       return classes[category] || '';
     }
 
-    // 주간 현황 차트 로드
-    async function loadWeeklyChart() {
-      try {
-        const response = await fetch(`${API_URL}/history/cached?days=7`);
-        const data = await response.json();
-
-        if (data.data && data.data.length > 0) {
-          // 날짜순 정렬 (오래된 순)
-          const sortedData = [...data.data].sort((a, b) => a.date.localeCompare(b.date));
-
-          const labels = sortedData.map(d => {
-            const month = d.date.substring(5, 7);
-            const day = d.date.substring(8, 10);
-            return `${parseInt(month)}/${parseInt(day)}`;
-          });
-          const visitors = sortedData.map(d => d.visitors || 0);
-          const pageviews = sortedData.map(d => d.pageviews || 0);
-          const durations = sortedData.map(d => Math.round((d.avg_duration || 0) / 60)); // 분 단위
-
-          // 접수 데이터도 가져오기
-          const leadsResponse = await fetch(`${API_URL}/leads`);
-          const leadsData = await leadsResponse.json();
-          const leads = leadsData.leads || [];
-
-          // 날짜별 접수 수 계산
-          const leadsByDate = sortedData.map(d => {
-            const dateStr = d.date;
-            return leads.filter(l => l.createdTime && l.createdTime.startsWith(dateStr)).length;
-          });
-
-          // 차트 업데이트
-          updateCombinedChart(labels, visitors, pageviews, durations, leadsByDate);
-        }
-      } catch (error) {
-        console.error('Weekly chart load error:', error);
-      }
-    }
-
-    // 복합 차트 업데이트
-    function updateCombinedChart(labels, visitors, pageviews, durations, leads) {
-      const ctx = document.getElementById('combinedChart');
-      if (!ctx) return;
-
-      // 기존 차트가 있으면 제거
-      if (window.combinedChartInstance) {
-        window.combinedChartInstance.destroy();
-      }
-
-      const mobile = window.innerWidth <= 768;
-      const pointRadius = mobile ? 2 : 4;
-      const borderWidth = mobile ? 1.5 : 2;
-
-      window.combinedChartInstance = new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: labels,
-          datasets: [
-            {
-              label: '방문자',
-              data: visitors,
-              borderColor: '#1D00AD',
-              backgroundColor: 'rgba(29, 0, 173, 0.1)',
-              borderWidth: borderWidth,
-              fill: false,
-              tension: 0.4,
-              pointRadius: pointRadius,
-              yAxisID: 'y'
-            },
-            {
-              label: '페이지뷰',
-              data: pageviews,
-              borderColor: '#10B981',
-              backgroundColor: 'rgba(16, 185, 129, 0.1)',
-              borderWidth: borderWidth,
-              fill: false,
-              tension: 0.4,
-              pointRadius: pointRadius,
-              yAxisID: 'y'
-            },
-            {
-              label: '체류시간(분)',
-              data: durations,
-              borderColor: '#F59E0B',
-              backgroundColor: 'rgba(245, 158, 11, 0.1)',
-              borderWidth: borderWidth,
-              fill: false,
-              tension: 0.4,
-              pointRadius: pointRadius,
-              yAxisID: 'y'
-            },
-            {
-              label: '접수',
-              data: leads,
-              borderColor: '#EF4444',
-              backgroundColor: 'rgba(239, 68, 68, 0.1)',
-              borderWidth: borderWidth,
-              fill: false,
-              tension: 0.4,
-              pointRadius: pointRadius,
-              yAxisID: 'y1'
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              backgroundColor: '#1F2937',
-              padding: 12,
-              cornerRadius: 8,
-              mode: 'index',
-              intersect: false
-            }
-          },
-          scales: {
-            x: {
-              grid: { display: false },
-              ticks: { color: '#9CA3AF' }
-            },
-            y: {
-              type: 'linear',
-              display: true,
-              position: 'left',
-              beginAtZero: true,
-              grid: { color: '#F3F4F6' },
-              ticks: { color: '#9CA3AF' }
-            },
-            y1: {
-              type: 'linear',
-              display: true,
-              position: 'right',
-              beginAtZero: true,
-              grid: { drawOnChartArea: false },
-              ticks: { color: '#EF4444' }
-            }
-          }
-        }
-      });
-    }
-
     // 인기 페이지 로드 (인기 검색 키워드 대체)
     async function loadPopularPages() {
       const keywordList = document.getElementById('keywordList');
@@ -730,46 +588,7 @@
         `;
       }
     }
-
-    // 차트 필터 이벤트
-    document.querySelector('.chart-filter')?.addEventListener('change', function(e) {
-      const days = e.target.value;
-      loadWeeklyChartWithDays(parseInt(days));
-    });
-
-    // 일수 지정 차트 로드
-    async function loadWeeklyChartWithDays(days) {
-      try {
-        const response = await fetch(`${API_URL}/history/cached?days=${days}`);
-        const data = await response.json();
-
-        if (data.data && data.data.length > 0) {
-          const sortedData = [...data.data].sort((a, b) => a.date.localeCompare(b.date));
-
-          const labels = sortedData.map(d => {
-            const month = d.date.substring(5, 7);
-            const day = d.date.substring(8, 10);
-            return `${parseInt(month)}/${parseInt(day)}`;
-          });
-          const visitors = sortedData.map(d => d.visitors || 0);
-          const pageviews = sortedData.map(d => d.pageviews || 0);
-          const durations = sortedData.map(d => Math.round((d.avg_duration || 0) / 60));
-
-          const leadsResponse = await fetch(`${API_URL}/leads`);
-          const leadsData = await leadsResponse.json();
-          const leads = leadsData.leads || [];
-
-          const leadsByDate = sortedData.map(d => {
-            const dateStr = d.date;
-            return leads.filter(l => l.createdTime && l.createdTime.startsWith(dateStr)).length;
-          });
-
-          updateCombinedChart(labels, visitors, pageviews, durations, leadsByDate);
-        }
-      } catch (error) {
-        console.error('Chart update error:', error);
-      }
-    }
+    // 차트 관련 기능은 dashboard.js에서 처리
   </script>
 </body>
 </html>

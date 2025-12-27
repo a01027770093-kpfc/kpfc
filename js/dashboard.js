@@ -2,12 +2,15 @@
    KPFC 한국정책자금지원센터 대시보드 JavaScript
    ================================================ */
 
+// API URL
+const DASHBOARD_API_URL = 'https://kpfc-analytics.a01027770093.workers.dev';
+
 // 차트 인스턴스 저장
 let combinedChart = null;
 
 // DOM 로드 후 실행
 document.addEventListener('DOMContentLoaded', function() {
-  initCombinedChart();
+  loadWeeklyChartData(7);
 });
 
 // 모바일 여부 감지
@@ -17,18 +20,76 @@ function isMobile() {
 
 // 화면 크기 변경 시 차트 재생성
 let resizeTimeout;
+let lastChartData = null;
 window.addEventListener('resize', function() {
   clearTimeout(resizeTimeout);
   resizeTimeout = setTimeout(function() {
-    initCombinedChart();
+    if (lastChartData) {
+      renderCombinedChart(lastChartData);
+    }
   }, 250);
 });
 
 /* ================================================
-   복합 통계 차트 (Chart.js)
-   방문자, 페이지뷰, 체류시간, 접수량
+   주간 현황 차트 데이터 로드
    ================================================ */
-function initCombinedChart() {
+async function loadWeeklyChartData(days = 7) {
+  const ctx = document.getElementById('combinedChart');
+  if (!ctx) return;
+
+  try {
+    // 히스토리 데이터 가져오기
+    const historyResponse = await fetch(`${DASHBOARD_API_URL}/history/cached?days=${days}`);
+    const historyData = await historyResponse.json();
+
+    // 접수 데이터 가져오기
+    const leadsResponse = await fetch(`${DASHBOARD_API_URL}/leads`);
+    const leadsData = await leadsResponse.json();
+    const leads = leadsData.leads || [];
+
+    if (historyData.data && historyData.data.length > 0) {
+      // 날짜순 정렬 (오래된 순)
+      const sortedData = [...historyData.data].sort((a, b) => a.date.localeCompare(b.date));
+
+      // 라벨 생성
+      const labels = sortedData.map(d => {
+        const month = d.date.substring(5, 7);
+        const day = d.date.substring(8, 10);
+        return `${parseInt(month)}/${parseInt(day)}`;
+      });
+
+      // 데이터 추출
+      const visitors = sortedData.map(d => d.visitors || 0);
+      const pageviews = sortedData.map(d => d.pageviews || 0);
+      const durations = sortedData.map(d => Math.round((d.avg_duration || 0) / 60)); // 분 단위
+
+      // 날짜별 접수 수 계산
+      const leadsByDate = sortedData.map(d => {
+        const dateStr = d.date;
+        return leads.filter(l => l.createdTime && l.createdTime.startsWith(dateStr)).length;
+      });
+
+      // 차트 데이터 저장 (리사이즈 시 재사용)
+      lastChartData = {
+        labels,
+        visitors,
+        pageviews,
+        durations,
+        leads: leadsByDate
+      };
+
+      // 차트 렌더링
+      renderCombinedChart(lastChartData);
+    }
+  } catch (error) {
+    console.error('차트 데이터 로드 오류:', error);
+  }
+}
+
+/* ================================================
+   복합 통계 차트 렌더링
+   ================================================ */
+function renderCombinedChart(data) {
   const ctx = document.getElementById('combinedChart');
   if (!ctx) return;
 
@@ -40,21 +101,19 @@ function initCombinedChart() {
   const mobile = isMobile();
 
   // 모바일용 설정
-  const fontSize = mobile ? 9 : 12;
   const tickFontSize = mobile ? 8 : 12;
   const pointRadius = mobile ? 2 : 4;
   const pointHoverRadius = mobile ? 4 : 6;
   const borderWidth = mobile ? 1.5 : 2;
 
-  // 빈 데이터로 초기화 (실제 API 연동 필요)
   combinedChart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: [],
+      labels: data.labels,
       datasets: [
         {
           label: '방문자',
-          data: [],
+          data: data.visitors,
           borderColor: '#1D00AD',
           backgroundColor: 'rgba(29, 0, 173, 0.1)',
           borderWidth: borderWidth,
@@ -69,7 +128,7 @@ function initCombinedChart() {
         },
         {
           label: '페이지뷰',
-          data: [],
+          data: data.pageviews,
           borderColor: '#10B981',
           backgroundColor: 'rgba(16, 185, 129, 0.1)',
           borderWidth: borderWidth,
@@ -83,8 +142,8 @@ function initCombinedChart() {
           yAxisID: 'y'
         },
         {
-          label: '체류시간(초)',
-          data: [],
+          label: '체류시간(분)',
+          data: data.durations,
           borderColor: '#F59E0B',
           backgroundColor: 'rgba(245, 158, 11, 0.1)',
           borderWidth: borderWidth,
@@ -99,7 +158,7 @@ function initCombinedChart() {
         },
         {
           label: '접수',
-          data: [],
+          data: data.leads,
           borderColor: '#EF4444',
           backgroundColor: 'rgba(239, 68, 68, 0.1)',
           borderWidth: borderWidth,
@@ -211,45 +270,15 @@ function initCombinedChart() {
       }
     }
   });
+}
 
-  // 필터 변경 시 차트 업데이트
+// 필터 변경 이벤트
+document.addEventListener('DOMContentLoaded', function() {
   const chartFilter = document.querySelector('.chart-filter');
   if (chartFilter) {
     chartFilter.addEventListener('change', function(e) {
-      const days = e.target.value;
-      // TODO: API 호출하여 데이터 업데이트
-      console.log('차트 기간 변경:', days + '일');
+      const days = parseInt(e.target.value);
+      loadWeeklyChartData(days);
     });
   }
-}
-
-/* ================================================
-   모바일 메뉴 토글 - components.js에서 처리
-   ================================================ */
-
-/* ================================================
-   TODO: Airtable API 연동
-   ================================================ */
-
-// 접수 내역 가져오기 (예시)
-async function fetchLeads() {
-  // const AIRTABLE_TOKEN = 'your_token';
-  // const BASE_ID = 'your_base_id';
-  // const TABLE_NAME = '고객정보';
-
-  // const response = await fetch(
-  //   `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`,
-  //   {
-  //     headers: {
-  //       'Authorization': `Bearer ${AIRTABLE_TOKEN}`
-  //     }
-  //   }
-  // );
-  // const data = await response.json();
-  // return data.records;
-}
-
-// 통계 데이터 가져오기 (Vercel Analytics API 예시)
-async function fetchAnalytics() {
-  // TODO: Vercel Analytics API 연동
-}
+});
