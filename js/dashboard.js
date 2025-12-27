@@ -47,40 +47,64 @@ async function loadWeeklyChartData(days = 7) {
     const leadsData = await leadsResponse.json();
     const leads = leadsData.leads || [];
 
-    if (historyData.data && historyData.data.length > 0) {
-      // 날짜순 정렬 (오래된 순)
-      const sortedData = [...historyData.data].sort((a, b) => a.date.localeCompare(b.date));
-
-      // 라벨 생성
-      const labels = sortedData.map(d => {
-        const month = d.date.substring(5, 7);
-        const day = d.date.substring(8, 10);
-        return `${parseInt(month)}/${parseInt(day)}`;
+    // API 데이터를 날짜별 맵으로 변환
+    const dataMap = {};
+    if (historyData.data) {
+      historyData.data.forEach(d => {
+        dataMap[d.date] = d;
       });
-
-      // 데이터 추출
-      const visitors = sortedData.map(d => d.visitors || 0);
-      const pageviews = sortedData.map(d => d.pageviews || 0);
-      const durations = sortedData.map(d => Math.round((d.avg_duration || 0) / 60)); // 분 단위
-
-      // 날짜별 접수 수 계산
-      const leadsByDate = sortedData.map(d => {
-        const dateStr = d.date;
-        return leads.filter(l => l.createdTime && l.createdTime.startsWith(dateStr)).length;
-      });
-
-      // 차트 데이터 저장 (리사이즈 시 재사용)
-      lastChartData = {
-        labels,
-        visitors,
-        pageviews,
-        durations,
-        leads: leadsByDate
-      };
-
-      // 차트 렌더링
-      renderCombinedChart(lastChartData);
     }
+
+    // 요청한 days 수만큼 날짜 범위 직접 생성 (오늘부터 과거로)
+    const dateRange = [];
+    const today = new Date();
+    for (let i = days - 1; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0]; // YYYY-MM-DD
+      dateRange.push(dateStr);
+    }
+
+    // 라벨 생성
+    const labels = dateRange.map(dateStr => {
+      const month = dateStr.substring(5, 7);
+      const day = dateStr.substring(8, 10);
+      return `${parseInt(month)}/${parseInt(day)}`;
+    });
+
+    // 데이터 추출 (없는 날짜는 0)
+    const visitors = dateRange.map(dateStr => {
+      const d = dataMap[dateStr];
+      return d ? (d.visitors || 0) : 0;
+    });
+
+    const pageviews = dateRange.map(dateStr => {
+      const d = dataMap[dateStr];
+      return d ? (d.pageviews || 0) : 0;
+    });
+
+    const durations = dateRange.map(dateStr => {
+      const d = dataMap[dateStr];
+      return d ? Math.round((d.avg_duration || 0) / 60) : 0; // 분 단위
+    });
+
+    // 날짜별 접수 수 계산
+    const leadsByDate = dateRange.map(dateStr => {
+      return leads.filter(l => l.createdTime && l.createdTime.startsWith(dateStr)).length;
+    });
+
+    // 차트 데이터 저장 (리사이즈 시 재사용)
+    lastChartData = {
+      labels,
+      visitors,
+      pageviews,
+      durations,
+      leads: leadsByDate
+    };
+
+    // 차트 렌더링
+    renderCombinedChart(lastChartData);
+
   } catch (error) {
     console.error('차트 데이터 로드 오류:', error);
   }
