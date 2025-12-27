@@ -726,29 +726,29 @@
                 <h3 class="bizen-rate-title" data-editable="index-hero-rate-title">📊 KPFC와 함께한 승인률</h3>
                 <div class="bizen-rate-comparison">
                     <div class="bizen-rate-item premium">
-                        <div class="bizen-rate-label">KPFC 컨설팅</div>
+                        <div class="bizen-rate-label" data-editable="index-hero-rate-premium-label">KPFC 컨설팅</div>
                         <div class="bizen-rate-value"><span class="count-up" data-count="95" data-suffix="%">0%</span></div>
-                        <div class="bizen-rate-status">✅ 높은 승인률</div>
+                        <div class="bizen-rate-status" data-editable="index-hero-rate-premium-status">✅ 높은 승인률</div>
                     </div>
                     <div class="bizen-rate-item standard">
-                        <div class="bizen-rate-label">일반 신청</div>
+                        <div class="bizen-rate-label" data-editable="index-hero-rate-standard-label">일반 신청</div>
                         <div class="bizen-rate-value"><span class="count-up" data-count="45" data-suffix="%">0%</span></div>
-                        <div class="bizen-rate-status">❌ 낮은 승인률</div>
+                        <div class="bizen-rate-status" data-editable="index-hero-rate-standard-status">❌ 낮은 승인률</div>
                     </div>
                 </div>
                 <div class="bizen-graph-container">
                     <div class="bizen-graph-bar premium">
                         <span class="bizen-graph-value"><span class="count-up" data-count="95" data-suffix="%">0%</span></span>
-                        <span class="bizen-graph-label">KPFC 컨설팅</span>
+                        <span class="bizen-graph-label" data-editable="index-hero-graph-premium-label">KPFC 컨설팅</span>
                     </div>
                     <div class="bizen-graph-bar standard">
                         <span class="bizen-graph-value"><span class="count-up" data-count="45" data-suffix="%">0%</span></span>
-                        <span class="bizen-graph-label">일반 신청</span>
+                        <span class="bizen-graph-label" data-editable="index-hero-graph-standard-label">일반 신청</span>
                     </div>
                 </div>
                 <div class="bizen-graph-legend">
-                    <div class="bizen-legend-item"><span class="bizen-legend-label">✅ 전문가 컨설팅</span></div>
-                    <div class="bizen-legend-item"><span class="bizen-legend-label">❌ 직접 신청</span></div>
+                    <div class="bizen-legend-item"><span class="bizen-legend-label" data-editable="index-hero-legend-premium">✅ 전문가 컨설팅</span></div>
+                    <div class="bizen-legend-item"><span class="bizen-legend-label" data-editable="index-hero-legend-standard">❌ 직접 신청</span></div>
                 </div>
             </div>
             <div class="bizen-info-section">
@@ -773,8 +773,8 @@
             </div>
         </div>
         <div class="bizen-cta-section">
-            <a href="fund.html" class="bizen-cta-btn">정책자금 로드맵</a>
-            <a href="service.html" class="bizen-cta-btn bizen-cta-secondary">전문가 네트워크</a>
+            <a href="fund.html" class="bizen-cta-btn" data-editable="index-hero-cta-primary">정책자금 로드맵</a>
+            <a href="service.html" class="bizen-cta-btn bizen-cta-secondary" data-editable="index-hero-cta-secondary">전문가 네트워크</a>
         </div>
     </div>
 </section>
@@ -1093,10 +1093,10 @@
                 <p class="bizen-service-subtitle" data-editable="index-service-subtitle">체계적인 프로세스로 기업의 성공을 이끕니다</p>
             </div>
             <div class="bizen-tab-nav">
-                <button class="bizen-tab-btn active" data-tab="svc-tab1">심층 기업 분석</button>
-                <button class="bizen-tab-btn" data-tab="svc-tab2">맞춤 자금 설계</button>
-                <button class="bizen-tab-btn" data-tab="svc-tab3">성장 전략 구축</button>
-                <button class="bizen-tab-btn" data-tab="svc-tab4">전담 컨설팅</button>
+                <button class="bizen-tab-btn active" data-tab="svc-tab1" data-editable="index-service-tab1-btn">심층 기업 분석</button>
+                <button class="bizen-tab-btn" data-tab="svc-tab2" data-editable="index-service-tab2-btn">맞춤 자금 설계</button>
+                <button class="bizen-tab-btn" data-tab="svc-tab3" data-editable="index-service-tab3-btn">성장 전략 구축</button>
+                <button class="bizen-tab-btn" data-tab="svc-tab4" data-editable="index-service-tab4-btn">전담 컨설팅</button>
             </div>
             <div class="bizen-tab-wrapper">
                 <div id="svc-tab1" class="bizen-tab-content active">
@@ -1140,7 +1140,7 @@
                 <div class="bizen-trust-content">
                     <div class="bizen-trust-title">
                         <svg viewBox="0 0 24 24" class="bizen-banner-icon"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
-                        <span>KPFC는 절대 하지 않습니다</span>
+                        <span data-editable="index-service-notrust-title">KPFC는 절대 하지 않습니다</span>
                     </div>
                     <div class="bizen-trust-items">
                         <div class="bizen-trust-item">
@@ -1148,21 +1148,21 @@
                                 <svg viewBox="0 0 24 24" class="icon-base"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1.81.45 1.61 1.67 1.61 1.16 0 1.6-.64 1.6-1.36 0-.84-.68-1.3-2.07-1.73-1.54-.46-3.2-1.04-3.2-3.12 0-1.23.77-2.48 2.61-2.96V6h2.67v1.15c1.29.32 2.51 1.07 2.64 2.81h-1.94c-.05-.5-.38-1.26-1.36-1.26-1.08 0-1.54.67-1.54 1.25 0 .85.75 1.18 2.07 1.61 1.54.48 3.2 1.06 3.2 3.19.01 1.6-1.15 2.58-2.97 3.04z"/></svg>
                                 <svg viewBox="0 0 24 24" class="icon-x"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                             </div>
-                            <p class="bizen-trust-text">불법 대출알선</p>
+                            <p class="bizen-trust-text" data-editable="index-service-notrust1">불법 대출알선</p>
                         </div>
                         <div class="bizen-trust-item">
                             <div class="bizen-trust-icon-wrap">
                                 <svg viewBox="0 0 24 24" class="icon-base"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
                                 <svg viewBox="0 0 24 24" class="icon-x"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                             </div>
-                            <p class="bizen-trust-text">개인정보 유출</p>
+                            <p class="bizen-trust-text" data-editable="index-service-notrust2">개인정보 유출</p>
                         </div>
                         <div class="bizen-trust-item">
                             <div class="bizen-trust-icon-wrap">
                                 <svg viewBox="0 0 24 24" class="icon-base"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
                                 <svg viewBox="0 0 24 24" class="icon-x"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
                             </div>
-                            <p class="bizen-trust-text">보험상품 권유</p>
+                            <p class="bizen-trust-text" data-editable="index-service-notrust3">보험상품 권유</p>
                         </div>
                     </div>
                 </div>
@@ -1622,7 +1622,7 @@
                 </div>
             </div>
             <div class="trust-cta">
-                <a href="#contact-form" class="trust-cta-btn">지금 바로 자격 확인하기</a>
+                <a href="#contact-form" class="trust-cta-btn" data-editable="index-trust-cta">지금 바로 자격 확인하기</a>
             </div>
         </div>
     </section>

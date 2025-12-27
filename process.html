@@ -666,9 +666,9 @@
                 <h3 class="feature-title" data-editable="process-service-feature1-title">95% 승인률 실현</h3>
                 <p class="feature-description" data-editable="process-service-feature1-desc">전문 심사관 시스템으로<br>정책자금 성공률 최대화</p>
                 <ul class="feature-list">
-                    <li>평균 2.8억원 승인 성과</li>
-                    <li>심사 포인트 정밀 분석</li>
-                    <li>최적화 전략 설계</li>
+                    <li data-editable="process-service-feature1-list1">평균 2.8억원 승인 성과</li>
+                    <li data-editable="process-service-feature1-list2">심사 포인트 정밀 분석</li>
+                    <li data-editable="process-service-feature1-list3">최적화 전략 설계</li>
                 </ul>
             </div>
 
@@ -681,9 +681,9 @@
                 <h3 class="feature-title" data-editable="process-service-feature2-title">전문 심사관 매칭</h3>
                 <p class="feature-description" data-editable="process-service-feature2-desc">정책자금 전문가의<br>1:1 맞춤 심사 진행</p>
                 <ul class="feature-list">
-                    <li>업종별 전담 배정</li>
-                    <li>전담 밀착 관리</li>
-                    <li>진행 단계별 공유</li>
+                    <li data-editable="process-service-feature2-list1">업종별 전담 배정</li>
+                    <li data-editable="process-service-feature2-list2">전담 밀착 관리</li>
+                    <li data-editable="process-service-feature2-list3">진행 단계별 공유</li>
                 </ul>
             </div>
 
@@ -697,9 +697,9 @@
                 <h3 class="feature-title" data-editable="process-service-feature3-title">24시간 빠른 진단</h3>
                 <p class="feature-description" data-editable="process-service-feature3-desc">신속한 기업 분석으로<br>최적 타이밍 확보</p>
                 <ul class="feature-list">
-                    <li>당일 진단 완성</li>
-                    <li>실시간 피드백 제공</li>
-                    <li>스마트 진단 시스템</li>
+                    <li data-editable="process-service-feature3-list1">당일 진단 완성</li>
+                    <li data-editable="process-service-feature3-list2">실시간 피드백 제공</li>
+                    <li data-editable="process-service-feature3-list3">스마트 진단 시스템</li>
                 </ul>
             </div>
 
@@ -716,9 +716,9 @@
                 <h3 class="feature-title" data-editable="process-service-feature4-title">맞춤 자금 설계</h3>
                 <p class="feature-description" data-editable="process-service-feature4-desc">기업별 특성 분석<br>최적 자금 포트폴리오</p>
                 <ul class="feature-list">
-                    <li>업종별 최적 매칭</li>
-                    <li>잠재 지원사업 발굴</li>
-                    <li>승인 한도 극대화</li>
+                    <li data-editable="process-service-feature4-list1">업종별 최적 매칭</li>
+                    <li data-editable="process-service-feature4-list2">잠재 지원사업 발굴</li>
+                    <li data-editable="process-service-feature4-list3">승인 한도 극대화</li>
                 </ul>
             </div>
 
@@ -734,9 +734,9 @@
                 <h3 class="feature-title" data-editable="process-service-feature5-title">전 과정 밀착 관리</h3>
                 <p class="feature-description" data-editable="process-service-feature5-desc">서류부터 심사까지<br>단계별 완벽 준비</p>
                 <ul class="feature-list">
-                    <li>발표 자료 전문 제작</li>
-                    <li>예상 질문 철저 대비</li>
-                    <li>심사자 관점 코칭</li>
+                    <li data-editable="process-service-feature5-list1">발표 자료 전문 제작</li>
+                    <li data-editable="process-service-feature5-list2">예상 질문 철저 대비</li>
+                    <li data-editable="process-service-feature5-list3">심사자 관점 코칭</li>
                 </ul>
             </div>
 
@@ -749,9 +749,9 @@
                 <h3 class="feature-title" data-editable="process-service-feature6-title">지속 사후 관리</h3>
                 <p class="feature-description" data-editable="process-service-feature6-desc">선정 이후에도 지속<br>성장 동반 파트너십</p>
                 <ul class="feature-list">
-                    <li>추가 자금 연계 지원</li>
-                    <li>정기 성장 진단 제공</li>
-                    <li>인증·연구소 지원</li>
+                    <li data-editable="process-service-feature6-list1">추가 자금 연계 지원</li>
+                    <li data-editable="process-service-feature6-list2">정기 성장 진단 제공</li>
+                    <li data-editable="process-service-feature6-list3">인증·연구소 지원</li>
                 </ul>
             </div>
         </div>
@@ -926,6 +926,44 @@
             });
         });
     }
+
+    // PC-모바일 콘텐츠 동기화: PC 그리드 내용을 모바일 스와이프 카드에 복사
+    function syncPcToMobile() {
+        const pcCards = document.querySelectorAll('.process-service-section .features-grid .feature-card');
+        const mobileCards = document.querySelectorAll('.process-service-section .swipe-card');
+
+        if (pcCards.length === mobileCards.length) {
+            pcCards.forEach((pcCard, index) => {
+                const mobileCard = mobileCards[index];
+
+                // 제목 동기화
+                const pcTitle = pcCard.querySelector('.feature-title');
+                const mobileTitle = mobileCard.querySelector('.feature-title');
+                if (pcTitle && mobileTitle) {
+                    mobileTitle.innerHTML = pcTitle.innerHTML;
+                }
+
+                // 설명 동기화
+                const pcDesc = pcCard.querySelector('.feature-description');
+                const mobileDesc = mobileCard.querySelector('.feature-description');
+                if (pcDesc && mobileDesc) {
+                    mobileDesc.innerHTML = pcDesc.innerHTML;
+                }
+
+                // 리스트 동기화
+                const pcList = pcCard.querySelectorAll('.feature-list li');
+                const mobileList = mobileCard.querySelectorAll('.feature-list li');
+                pcList.forEach((li, liIndex) => {
+                    if (mobileList[liIndex]) {
+                        mobileList[liIndex].innerHTML = li.innerHTML;
+                    }
+                });
+            });
+        }
+    }
+
+    // 페이지 로드 시 동기화 실행
+    syncPcToMobile();
 })();
 </script>
 
@@ -1181,66 +1219,66 @@
             <div class="faq-item">
                 <div class="faq-question">
                     <span class="faq-number">Q1</span>
-                    <span class="faq-question-text">왜 심사 통과한 사업자만 계약하나요?</span>
+                    <span class="faq-question-text" data-editable="process-faq-q1">왜 심사 통과한 사업자만 계약하나요?</span>
                     <div class="faq-toggle"></div>
                 </div>
                 <div class="faq-answer">
-                    <p>정책자금은 신청 자체가 이력으로 남는 심사입니다. 가능성이 낮은 상태로 진행하면, 이번뿐 아니라 다음 심사까지 불리해질 수 있습니다.<br><br>그래서 KPFC는<br>✔ 단순 상담 후 계약<br>✔ 가능성 없는 사업자 계약<br>을 진행하지 않습니다.<br><br><strong>기관 심사 기준을 통과한 사업자만 계약하는 것이 대표님과 저희 모두에게 가장 안전한 방식</strong>이기 때문입니다.</p>
+                    <p data-editable="process-faq-a1">정책자금은 신청 자체가 이력으로 남는 심사입니다. 가능성이 낮은 상태로 진행하면, 이번뿐 아니라 다음 심사까지 불리해질 수 있습니다.<br><br>그래서 KPFC는<br>✔ 단순 상담 후 계약<br>✔ 가능성 없는 사업자 계약<br>을 진행하지 않습니다.<br><br><strong>기관 심사 기준을 통과한 사업자만 계약하는 것이 대표님과 저희 모두에게 가장 안전한 방식</strong>이기 때문입니다.</p>
                 </div>
             </div>
 
             <div class="faq-item">
                 <div class="faq-question">
                     <span class="faq-number">Q2</span>
-                    <span class="faq-question-text">법인이 아닌 개인사업자·자영업자도 진행이 가능한가요?</span>
+                    <span class="faq-question-text" data-editable="process-faq-q2">법인이 아닌 개인사업자·자영업자도 진행이 가능한가요?</span>
                     <div class="faq-toggle"></div>
                 </div>
                 <div class="faq-answer">
-                    <p>코로나 이후 <strong>음식점·카페·미용실 등 자영업자분들</strong>의 정책자금 관련 문의가 눈에 띄게 늘었습니다.<br><br>매출 변동과 고정비 부담으로 자금 관리의 중요성을 체감하신 대표님들이 많아졌습니다.</p>
+                    <p data-editable="process-faq-a2">코로나 이후 <strong>음식점·카페·미용실 등 자영업자분들</strong>의 정책자금 관련 문의가 눈에 띄게 늘었습니다.<br><br>매출 변동과 고정비 부담으로 자금 관리의 중요성을 체감하신 대표님들이 많아졌습니다.</p>
                 </div>
             </div>
 
             <div class="faq-item">
                 <div class="faq-question">
                     <span class="faq-number">Q3</span>
-                    <span class="faq-question-text">다른 정책자금 컨설팅과 차이점은 무엇인가요?</span>
+                    <span class="faq-question-text" data-editable="process-faq-q3">다른 정책자금 컨설팅과 차이점은 무엇인가요?</span>
                     <div class="faq-toggle"></div>
                 </div>
                 <div class="faq-answer">
-                    <p>가장 큰 차이는 <strong>진행 방식과 기준</strong>입니다.<br><br>대부분의 정책자금 컨설팅은<br>상담 → 계약 → 진행 구조입니다.<br><br>KPFC는<br><span class="highlight-success">심사 → 통과 → 계약 → 실행</span> 구조로 진행합니다.<br><br>저희는 먼저 기관의 실제 심사 기준으로 사업자를 점검하고, 통과 가능성이 확인된 경우에만 계약을 진행합니다.<br><br>✔ 단순 전화 상담 후 계약 ❌<br>✔ 가능성 없는 사업자 진행 ❌<br><br>또한 서류 위주의 컨설팅이 아니라, <strong>심사관 관점에서 사업을 어떻게 보느냐</strong>에 초점을 둡니다.<br>그래서 승인률의 차이가 생깁니다.</p>
+                    <p data-editable="process-faq-a3">가장 큰 차이는 <strong>진행 방식과 기준</strong>입니다.<br><br>대부분의 정책자금 컨설팅은<br>상담 → 계약 → 진행 구조입니다.<br><br>KPFC는<br><span class="highlight-success">심사 → 통과 → 계약 → 실행</span> 구조로 진행합니다.<br><br>저희는 먼저 기관의 실제 심사 기준으로 사업자를 점검하고, 통과 가능성이 확인된 경우에만 계약을 진행합니다.<br><br>✔ 단순 전화 상담 후 계약 ❌<br>✔ 가능성 없는 사업자 진행 ❌<br><br>또한 서류 위주의 컨설팅이 아니라, <strong>심사관 관점에서 사업을 어떻게 보느냐</strong>에 초점을 둡니다.<br>그래서 승인률의 차이가 생깁니다.</p>
                 </div>
             </div>
 
             <div class="faq-item">
                 <div class="faq-question">
                     <span class="faq-number">Q4</span>
-                    <span class="faq-question-text">신청부터 자금 실행까지 얼마나 걸리나요?</span>
+                    <span class="faq-question-text" data-editable="process-faq-q4">신청부터 자금 실행까지 얼마나 걸리나요?</span>
                     <div class="faq-toggle"></div>
                 </div>
                 <div class="faq-answer">
-                    <p>자금 종류와 정부 정책 일정에 따라 다릅니다.<br>일반적으로는 <strong>약 1개월 이상</strong>이 소요되며, 정책·기관 상황에 따라 4~6개월 이상 걸리는 경우도 있습니다.<br><br>KPFC는 속도만을 앞세워 무리하게 진행하지 않습니다.<br>2차 심사를 통과한 이후에도, 정책 일정이나 외부 요인으로 자금 집행이 지연될 수 있습니다.<br><br>다만, <strong>2차 심사 통과 후 1년 이내 자금 집행이 이루어지지 않을 경우, 계약서 기준에 따라 법무팀을 통해 착수금 100% 환불</strong>을 진행합니다.<br><br>👉 실행 가능성에 대한 책임까지 끝까지 관리하는 구조로 운영합니다.</p>
+                    <p data-editable="process-faq-a4">자금 종류와 정부 정책 일정에 따라 다릅니다.<br>일반적으로는 <strong>약 1개월 이상</strong>이 소요되며, 정책·기관 상황에 따라 4~6개월 이상 걸리는 경우도 있습니다.<br><br>KPFC는 속도만을 앞세워 무리하게 진행하지 않습니다.<br>2차 심사를 통과한 이후에도, 정책 일정이나 외부 요인으로 자금 집행이 지연될 수 있습니다.<br><br>다만, <strong>2차 심사 통과 후 1년 이내 자금 집행이 이루어지지 않을 경우, 계약서 기준에 따라 법무팀을 통해 착수금 100% 환불</strong>을 진행합니다.<br><br>👉 실행 가능성에 대한 책임까지 끝까지 관리하는 구조로 운영합니다.</p>
                 </div>
             </div>
 
             <div class="faq-item">
                 <div class="faq-question">
                     <span class="faq-number">Q5</span>
-                    <span class="faq-question-text">컨설팅 비용은 어떻게 책정되나요?</span>
+                    <span class="faq-question-text" data-editable="process-faq-q5">컨설팅 비용은 어떻게 책정되나요?</span>
                     <div class="faq-toggle"></div>
                 </div>
                 <div class="faq-answer">
-                    <p><strong>1차 유선·서류 심사는 무료</strong>로 진행됩니다.<br>가능성 진단 단계에서는 어떠한 비용도 발생하지 않습니다.<br><br>2차 현장 심사를 통과한 사업자에 한해 계약이 진행되며, 이 시점부터 계약금이 발생합니다.<br><br><strong>연 매출 5억 이하 사업자: 110만 원</strong><br><strong>연 매출 5억 초과 사업자: 220만 원</strong><br><br>이는 단순 상담 비용이 아닌, 심사 통과 이후 실제 자금 집행까지 이어지는 컨설팅 계약금입니다.<br><br>👉 심사 통과 전에는 비용을 받지 않습니다.</p>
+                    <p data-editable="process-faq-a5"><strong>1차 유선·서류 심사는 무료</strong>로 진행됩니다.<br>가능성 진단 단계에서는 어떠한 비용도 발생하지 않습니다.<br><br>2차 현장 심사를 통과한 사업자에 한해 계약이 진행되며, 이 시점부터 계약금이 발생합니다.<br><br><strong>연 매출 5억 이하 사업자: 110만 원</strong><br><strong>연 매출 5억 초과 사업자: 220만 원</strong><br><br>이는 단순 상담 비용이 아닌, 심사 통과 이후 실제 자금 집행까지 이어지는 컨설팅 계약금입니다.<br><br>👉 심사 통과 전에는 비용을 받지 않습니다.</p>
                 </div>
             </div>
 
             <div class="faq-item">
                 <div class="faq-question">
                     <span class="faq-number">Q6</span>
-                    <span class="faq-question-text">정책자금 혼자 준비할 때 주의할 점?</span>
+                    <span class="faq-question-text" data-editable="process-faq-q6">정책자금 혼자 준비할 때 주의할 점?</span>
                     <div class="faq-toggle"></div>
                 </div>
                 <div class="faq-answer">
-                    <p>정책자금은 연습 삼아 신청해보는 제도가 아닙니다.<br>한 번 탈락할 경우, 보통 <strong>1년 뒤에야 재신청이 가능한 경우</strong>가 많기 때문에 첫 신청의 선택과 준비 과정이 매우 중요합니다.<br><br>혼자 준비하시는 대표님들 중 상당수가 심사 기준을 정확히 알지 못한 상태에서 신청하게 됩니다.<br>조건에 맞지 않는 자금에 무리하게 신청하거나, 사업 내용을 심사관 관점이 아닌 대표님 입장에서만 설명하는 경우가 많습니다.<br><br>이 경우 사업 자체에 문제가 없어도 <strong>"준비가 안 된 신청"으로 판단되어 탈락</strong>하는 사례가 적지 않습니다.<br><br>KPFC는 신청을 받기 전에 먼저 확인합니다.<br>👉 지금 신청해도 되는 상태인지,<br>👉 지금 들어가면 불리해지지 않는지를 말입니다.<br><br>그래서 가능성이 확인된 경우에만 다음 단계로 진행합니다.</p>
+                    <p data-editable="process-faq-a6">정책자금은 연습 삼아 신청해보는 제도가 아닙니다.<br>한 번 탈락할 경우, 보통 <strong>1년 뒤에야 재신청이 가능한 경우</strong>가 많기 때문에 첫 신청의 선택과 준비 과정이 매우 중요합니다.<br><br>혼자 준비하시는 대표님들 중 상당수가 심사 기준을 정확히 알지 못한 상태에서 신청하게 됩니다.<br>조건에 맞지 않는 자금에 무리하게 신청하거나, 사업 내용을 심사관 관점이 아닌 대표님 입장에서만 설명하는 경우가 많습니다.<br><br>이 경우 사업 자체에 문제가 없어도 <strong>"준비가 안 된 신청"으로 판단되어 탈락</strong>하는 사례가 적지 않습니다.<br><br>KPFC는 신청을 받기 전에 먼저 확인합니다.<br>👉 지금 신청해도 되는 상태인지,<br>👉 지금 들어가면 불리해지지 않는지를 말입니다.<br><br>그래서 가능성이 확인된 경우에만 다음 단계로 진행합니다.</p>
                 </div>
             </div>
         </div>
