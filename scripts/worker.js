@@ -1552,7 +1552,13 @@ async function getFileFromGitHub(env, filePath) {
   }
 
   const data = await response.json();
-  const content = atob(data.content.replace(/\n/g, ''));
+  // Base64 디코딩 후 UTF-8로 변환
+  const binaryStr = atob(data.content.replace(/\n/g, ''));
+  const bytes = new Uint8Array(binaryStr.length);
+  for (let i = 0; i < binaryStr.length; i++) {
+    bytes[i] = binaryStr.charCodeAt(i);
+  }
+  const content = new TextDecoder('utf-8').decode(bytes);
   return { content, sha: data.sha };
 }
 
