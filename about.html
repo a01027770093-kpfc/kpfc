@@ -2023,14 +2023,30 @@
                         return badges.length > 0 ? `<div class="employee-badges">${badges.join('')}</div>` : '';
                     };
 
-                    // 이미지 위치 (기본값: center 20%)
-                    const imagePosition = emp.이미지위치 || 'center 20%';
+                    // 이미지 위치 파싱 (새 형식: "X% Y% ZOOM" 또는 기존: "center Y%")
+                    const parseImagePosition = (pos) => {
+                        if (!pos) return { objectPosition: 'center 20%', scale: 1 };
+
+                        // 새 형식: "50% 20% 120"
+                        const newMatch = pos.match(/(\d+)%\s+(\d+)%\s+(\d+)/);
+                        if (newMatch) {
+                            return {
+                                objectPosition: `${newMatch[1]}% ${newMatch[2]}%`,
+                                scale: parseInt(newMatch[3]) / 100
+                            };
+                        }
+
+                        // 기존 형식: "center 20%"
+                        return { objectPosition: pos, scale: 1 };
+                    };
+
+                    const imgStyle = parseImagePosition(emp.이미지위치);
 
                     return `
                         <div class="employee-card">
                             <div class="employee-image-area">
                                 ${emp.프로필이미지URL
-                                    ? `<img src="${emp.프로필이미지URL}" alt="${emp.이름}" class="employee-avatar" style="object-position: ${imagePosition};">`
+                                    ? `<img src="${emp.프로필이미지URL}" alt="${emp.이름}" class="employee-avatar" style="object-position: ${imgStyle.objectPosition}; transform: scale(${imgStyle.scale});">`
                                     : `<div class="employee-avatar-placeholder">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>

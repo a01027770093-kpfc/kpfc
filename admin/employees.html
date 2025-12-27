@@ -160,6 +160,45 @@
       width: 14px;
       height: 14px;
     }
+    .zoom-control {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: var(--neutral-50);
+      border-radius: 8px;
+    }
+    .zoom-control label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--neutral-600);
+      white-space: nowrap;
+    }
+    .zoom-slider {
+      flex: 1;
+      height: 4px;
+      -webkit-appearance: none;
+      background: var(--neutral-200);
+      border-radius: 2px;
+      outline: none;
+    }
+    .zoom-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      background: var(--primary);
+      border-radius: 50%;
+      cursor: pointer;
+    }
+    .zoom-control span {
+      font-size: 11px;
+      color: var(--neutral-500);
+      min-width: 36px;
+      text-align: right;
+    }
     .image-position-value {
       font-size: 11px;
       color: var(--neutral-400);
@@ -497,31 +536,39 @@
               </div>
             </div>
 
-            <!-- 이미지 위치 조정 (Drag to Reposition) -->
+            <!-- 이미지 위치 조정 (Zoom + Position) -->
             <div class="image-position-container" id="imagePositionContainer">
               <div class="image-position-label">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <polyline points="5 9 2 12 5 15"/>
-                  <polyline points="9 5 12 2 15 5"/>
-                  <polyline points="15 19 12 22 9 19"/>
-                  <polyline points="19 9 22 12 19 15"/>
-                  <line x1="2" y1="12" x2="22" y2="12"/>
-                  <line x1="12" y1="2" x2="12" y2="22"/>
+                  <circle cx="11" cy="11" r="8"/>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                  <line x1="11" y1="8" x2="11" y2="14"/>
+                  <line x1="8" y1="11" x2="14" y2="11"/>
                 </svg>
-                얼굴 위치 조정 (드래그)
+                이미지 조정
               </div>
               <div class="image-position-preview" id="imagePositionPreview">
                 <img id="positionPreviewImg" src="" alt="위치 조정">
                 <div class="image-position-hint">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="5 9 2 12 5 15"/>
-                    <polyline points="19 9 22 12 19 15"/>
-                    <line x1="2" y1="12" x2="22" y2="12"/>
+                    <path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3"/>
                   </svg>
-                  위아래로 드래그
+                  드래그로 위치 조정
                 </div>
               </div>
-              <div class="image-position-value" id="positionValue">위치: center 20%</div>
+              <!-- 확대/축소 슬라이더 -->
+              <div class="zoom-control">
+                <label>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                  </svg>
+                  확대
+                </label>
+                <input type="range" id="zoomSlider" min="100" max="200" value="100" class="zoom-slider">
+                <span id="zoomValue">100%</span>
+              </div>
+              <div class="image-position-value" id="positionValue">위치: 50% 20% | 확대: 100%</div>
             </div>
           </div>
 
@@ -1121,26 +1168,67 @@
     }
 
     // ========================================
-    // 이미지 위치 조정 (Drag to Reposition)
+    // 이미지 위치 조정 (Zoom + X/Y Position)
     // ========================================
     let isDragging = false;
+    let startX = 0;
     let startY = 0;
-    let currentPosition = 20; // 0-100 (%)
+    let positionX = 50; // 0-100 (%)
+    let positionY = 20; // 0-100 (%)
+    let zoomLevel = 100; // 100-200 (%)
 
     // 이미지 위치 UI 표시
     function showImagePositionUI(imageUrl, position) {
       const container = document.getElementById('imagePositionContainer');
       const previewImg = document.getElementById('positionPreviewImg');
+      const zoomSlider = document.getElementById('zoomSlider');
 
       previewImg.src = imageUrl;
       container.classList.add('active');
 
-      // 현재 위치 파싱 (예: "center 20%" → 20)
-      const match = position.match(/center\s*(\d+)%/);
-      currentPosition = match ? parseInt(match[1]) : 20;
+      // 위치 파싱 (예: "50% 20% 120" → x=50, y=20, zoom=120)
+      // 기존 형식 호환: "center 20%" → x=50, y=20, zoom=100
+      parsePosition(position);
+
+      zoomSlider.value = zoomLevel;
+      document.getElementById('zoomValue').textContent = `${zoomLevel}%`;
 
       updateImagePosition();
       initDragEvents();
+      initZoomEvents();
+    }
+
+    // 위치 문자열 파싱
+    function parsePosition(position) {
+      if (!position) {
+        positionX = 50;
+        positionY = 20;
+        zoomLevel = 100;
+        return;
+      }
+
+      // 새 형식: "50% 20% 120"
+      const newMatch = position.match(/(\d+)%\s+(\d+)%\s+(\d+)/);
+      if (newMatch) {
+        positionX = parseInt(newMatch[1]);
+        positionY = parseInt(newMatch[2]);
+        zoomLevel = parseInt(newMatch[3]);
+        return;
+      }
+
+      // 기존 형식: "center 20%"
+      const oldMatch = position.match(/center\s*(\d+)%/);
+      if (oldMatch) {
+        positionX = 50;
+        positionY = parseInt(oldMatch[1]);
+        zoomLevel = 100;
+        return;
+      }
+
+      // 기본값
+      positionX = 50;
+      positionY = 20;
+      zoomLevel = 100;
     }
 
     // 이미지 위치 업데이트
@@ -1149,15 +1237,28 @@
       const positionValue = document.getElementById('positionValue');
       const hiddenInput = document.getElementById('imagePosition');
 
-      // object-position 사용 (실제 카드와 동일한 방식)
-      const positionStr = `center ${currentPosition}%`;
-      previewImg.style.objectPosition = positionStr;
+      // transform: scale + object-position 적용
+      const scale = zoomLevel / 100;
+      previewImg.style.transform = `scale(${scale})`;
+      previewImg.style.objectPosition = `${positionX}% ${positionY}%`;
 
-      positionValue.textContent = `위치: ${positionStr}`;
+      // 저장 형식: "X% Y% ZOOM"
+      const positionStr = `${positionX}% ${positionY}% ${zoomLevel}`;
+      positionValue.textContent = `X: ${positionX}% | Y: ${positionY}% | 확대: ${zoomLevel}%`;
       hiddenInput.value = positionStr;
     }
 
-    // 드래그 이벤트 초기화
+    // 확대/축소 이벤트 초기화
+    function initZoomEvents() {
+      const zoomSlider = document.getElementById('zoomSlider');
+      zoomSlider.oninput = (e) => {
+        zoomLevel = parseInt(e.target.value);
+        document.getElementById('zoomValue').textContent = `${zoomLevel}%`;
+        updateImagePosition();
+      };
+    }
+
+    // 드래그 이벤트 초기화 (X, Y 모두 지원)
     function initDragEvents() {
       const preview = document.getElementById('imagePositionPreview');
 
@@ -1168,6 +1269,7 @@
       // 마우스 이벤트
       preview.onmousedown = (e) => {
         isDragging = true;
+        startX = e.clientX;
         startY = e.clientY;
         preview.style.cursor = 'grabbing';
         e.preventDefault();
@@ -1175,12 +1277,14 @@
 
       document.onmousemove = (e) => {
         if (!isDragging) return;
+        const deltaX = startX - e.clientX;
         const deltaY = startY - e.clientY;
+        startX = e.clientX;
         startY = e.clientY;
 
-        // 위로 드래그 = 이미지 아래 보임 = position 감소
-        // 아래로 드래그 = 이미지 위 보임 = position 증가
-        currentPosition = Math.max(0, Math.min(100, currentPosition + deltaY * 0.5));
+        // 드래그 방향과 위치 조정 (감도 조절)
+        positionX = Math.max(0, Math.min(100, positionX + deltaX * 0.5));
+        positionY = Math.max(0, Math.min(100, positionY + deltaY * 0.5));
         updateImagePosition();
       };
 
