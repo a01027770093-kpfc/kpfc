@@ -230,6 +230,68 @@
     .content-wrapper {
       padding-bottom: 100px;
     }
+    /* 섹션 그룹 스타일 */
+    .section-group {
+      margin-bottom: 16px;
+      border: 1px solid var(--neutral-200);
+      border-radius: 12px;
+      overflow: hidden;
+      background: white;
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: var(--neutral-50);
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .section-header:hover {
+      background: var(--neutral-100);
+    }
+    .section-header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-icon {
+      font-size: 18px;
+    }
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--neutral-800);
+    }
+    .section-count {
+      font-size: 12px;
+      color: var(--neutral-500);
+      background: var(--neutral-200);
+      padding: 2px 8px;
+      border-radius: 10px;
+      margin-left: 8px;
+    }
+    .section-toggle {
+      transition: transform 0.2s;
+    }
+    .section-group.collapsed .section-toggle {
+      transform: rotate(-90deg);
+    }
+    .section-content {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 16px;
+      border-top: 1px solid var(--neutral-200);
+    }
+    .section-group.collapsed .section-content {
+      display: none;
+    }
+    .section-content .editable-item {
+      margin: 0;
+      border-radius: 8px;
+    }
     .info-box {
       background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
       border: 1px solid #BFDBFE;
@@ -395,11 +457,45 @@
   <script>
     const API_BASE = 'https://kpfc-api.a01027770093.workers.dev';
 
+    // 섹션 정의
+    const SECTIONS = {
+      index: {
+        hero: { name: '히어로 섹션', icon: '🎯' },
+        process: { name: '진행절차 섹션', icon: '📋' },
+        service: { name: '서비스 섹션', icon: '💼' },
+        trust: { name: '신뢰지표 섹션', icon: '📊' },
+        board: { name: '게시판 섹션', icon: '📰' }
+      },
+      about: {
+        hero: { name: '히어로 섹션', icon: '🎯' },
+        system: { name: '시스템 섹션', icon: '⚙️' },
+        category: { name: '사업분야 섹션', icon: '📁' },
+        employees: { name: '임직원 섹션', icon: '👥' }
+      },
+      fund: {
+        hero: { name: '히어로 섹션', icon: '🎯' },
+        process: { name: '진행절차 섹션', icon: '📋' },
+        detail: { name: '자금상세 섹션', icon: '💰' },
+        success: { name: '성공사례 섹션', icon: '🏆' }
+      },
+      service: {
+        hero: { name: '히어로 섹션', icon: '🎯' },
+        expert: { name: '전문가 섹션', icon: '👨‍💼' }
+      },
+      process: {
+        hero: { name: '히어로 섹션', icon: '🎯' },
+        service: { name: '서비스특징 섹션', icon: '✨' },
+        faq: { name: 'FAQ 섹션', icon: '❓' },
+        cta: { name: 'CTA 섹션', icon: '📢' }
+      }
+    };
+
     let pages = [];
     let currentPage = null;
     let editables = [];
     let originalValues = {};
     let changes = {};
+    let collapsedSections = {};
 
     // 페이지 목록 로드
     async function loadPages() {
@@ -494,6 +590,38 @@
       }
     }
 
+    // ID에서 섹션 추출
+    function extractSection(id) {
+      const parts = id.split('-');
+      if (parts.length >= 2) {
+        return parts[1]; // {page}-{section}-{element}
+      }
+      return 'other';
+    }
+
+    // 섹션별로 그룹화
+    function groupBySection(items) {
+      const groups = {};
+      items.forEach(item => {
+        const section = extractSection(item.id);
+        if (!groups[section]) {
+          groups[section] = [];
+        }
+        groups[section].push(item);
+      });
+      return groups;
+    }
+
+    // 섹션 토글
+    function toggleSection(sectionId) {
+      const key = `${currentPage}-${sectionId}`;
+      collapsedSections[key] = !collapsedSections[key];
+      const group = document.querySelector(`[data-section="${sectionId}"]`);
+      if (group) {
+        group.classList.toggle('collapsed', collapsedSections[key]);
+      }
+    }
+
     // 편집 가능한 항목 렌더링
     function renderEditables(filter = '') {
       const container = document.getElementById('editableList');
@@ -518,27 +646,69 @@
         return;
       }
 
-      container.innerHTML = filtered.map(item => {
-        const isModified = changes[item.id] !== undefined;
-        const currentValue = changes[item.id] !== undefined ? changes[item.id] : item.text;
+      // 검색 필터가 있으면 flat으로 표시
+      if (filter) {
+        container.innerHTML = filtered.map(item => renderEditableItem(item)).join('');
+        return;
+      }
+
+      // 섹션별로 그룹화하여 표시
+      const grouped = groupBySection(filtered);
+      const pageSections = SECTIONS[currentPage] || {};
+      const sectionOrder = Object.keys(pageSections);
+
+      // 정의된 섹션 순서대로 + 나머지
+      const allSections = [...new Set([...sectionOrder, ...Object.keys(grouped)])];
+
+      container.innerHTML = allSections.map(sectionId => {
+        const items = grouped[sectionId];
+        if (!items || items.length === 0) return '';
+
+        const sectionInfo = pageSections[sectionId] || { name: sectionId, icon: '📄' };
+        const key = `${currentPage}-${sectionId}`;
+        const isCollapsed = collapsedSections[key] || false;
 
         return `
-          <div class="editable-item ${isModified ? 'modified' : ''}" data-id="${item.id}">
-            <div class="editable-header">
-              <span class="editable-id">${item.id}</span>
-              <span class="editable-tag">&lt;${item.tag}&gt;</span>
-            </div>
-            <textarea class="editable-input ${isModified ? 'modified' : ''}"
-                      data-id="${item.id}"
-                      oninput="handleInput(this)">${escapeHtml(currentValue)}</textarea>
-            ${isModified ? `
-              <div class="editable-original">
-                <span>원본:</span> ${escapeHtml(item.text)}
+          <div class="section-group ${isCollapsed ? 'collapsed' : ''}" data-section="${sectionId}">
+            <div class="section-header" onclick="toggleSection('${sectionId}')">
+              <div class="section-header-left">
+                <span class="section-icon">${sectionInfo.icon}</span>
+                <span class="section-title">${sectionInfo.name}</span>
+                <span class="section-count">${items.length}개</span>
               </div>
-            ` : ''}
+              <svg class="section-toggle" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+            <div class="section-content">
+              ${items.map(item => renderEditableItem(item)).join('')}
+            </div>
           </div>
         `;
       }).join('');
+    }
+
+    // 개별 항목 렌더링
+    function renderEditableItem(item) {
+      const isModified = changes[item.id] !== undefined;
+      const currentValue = changes[item.id] !== undefined ? changes[item.id] : item.text;
+
+      return `
+        <div class="editable-item ${isModified ? 'modified' : ''}" data-id="${item.id}">
+          <div class="editable-header">
+            <span class="editable-id">${item.id}</span>
+            <span class="editable-tag">&lt;${item.tag}&gt;</span>
+          </div>
+          <textarea class="editable-input ${isModified ? 'modified' : ''}"
+                    data-id="${item.id}"
+                    oninput="handleInput(this)">${escapeHtml(currentValue)}</textarea>
+          ${isModified ? `
+            <div class="editable-original">
+              <span>원본:</span> ${escapeHtml(item.text)}
+            </div>
+          ` : ''}
+        </div>
+      `;
     }
 
     // 입력 핸들러

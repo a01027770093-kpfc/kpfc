@@ -323,5 +323,101 @@ Secret: GITHUB_TOKEN
 
 ---
 
-*문서 버전: 1.0*
+## 11. Phase 3.5: 섹션별 계층화 구현
+
+### 11.1 목표
+- 각 페이지의 모든 편집 가능한 텍스트에 data-editable 속성 부여
+- 관리자 UI에서 섹션별로 그룹화하여 표시
+
+### 11.2 섹션 정의
+
+#### index.html (메인 페이지)
+| 섹션 ID | 섹션명 | 아이콘 |
+|---------|--------|--------|
+| hero | 히어로 섹션 | 🎯 |
+| process | 진행절차 섹션 | 📋 |
+| service | 서비스 섹션 | 💼 |
+| trust | 신뢰지표 섹션 | 📊 |
+| board | 게시판 섹션 | 📰 |
+
+#### about.html (회사 소개)
+| 섹션 ID | 섹션명 | 아이콘 |
+|---------|--------|--------|
+| hero | 히어로 섹션 | 🎯 |
+| system | 시스템 섹션 | ⚙️ |
+| category | 사업분야 섹션 | 📁 |
+| employees | 임직원 섹션 | 👥 |
+
+#### fund.html (정책자금 안내)
+| 섹션 ID | 섹션명 | 아이콘 |
+|---------|--------|--------|
+| hero | 히어로 섹션 | 🎯 |
+| process | 진행절차 섹션 | 📋 |
+| detail | 자금상세 섹션 | 💰 |
+| success | 성공사례 섹션 | 🏆 |
+
+#### service.html (서비스 안내)
+| 섹션 ID | 섹션명 | 아이콘 |
+|---------|--------|--------|
+| hero | 히어로 섹션 | 🎯 |
+| expert | 전문가 섹션 | 👨‍💼 |
+
+#### process.html (진행 절차)
+| 섹션 ID | 섹션명 | 아이콘 |
+|---------|--------|--------|
+| hero | 히어로 섹션 | 🎯 |
+| service | 서비스특징 섹션 | ✨ |
+| faq | FAQ 섹션 | ❓ |
+| cta | CTA 섹션 | 📢 |
+
+### 11.3 작업 체크리스트
+
+#### Phase 3.5.1: data-editable 속성 점검 및 추가 ✅ 완료
+
+**index.html** (+30개 추가, 총 62개)
+- [x] hero 섹션: badge, title, desc, rate-title, info1-2 title/desc
+- [x] process 섹션: title, subtitle, desc, step1-3 title/desc, detail1-3 title/subtitle/message
+- [x] service 섹션: title, subtitle, tab1-4 title/desc
+- [x] trust 섹션: title, subtitle, indicator1-2 label/desc, sub1-4 label, guarantee-title, guarantee1-3, review1-5 text/author
+- [x] board 섹션: title, subtitle
+
+**about.html** (+12개 추가, 총 36개)
+- [x] hero 섹션: badge, title, subtitle, stat1-3 label
+- [x] system 섹션: title, desc, feature1-4 title/desc x2(데스크탑/모바일)
+- [x] category 섹션: title, desc, card1-4 title/desc
+- [x] employees 섹션: title, desc
+
+**fund.html** (+10개 추가, 총 30개)
+- [x] hero 섹션: badge, title, description, card1-4 title/desc
+- [x] process 섹션: section-title, step1-4 title/desc, cta-title
+- [x] detail 섹션: section-title, 4개 fund-name
+- [x] success 섹션: cases-title, case1-3 company
+
+**service.html** (+1개 추가, 총 18개)
+- [x] hero 섹션: badge, title, description, card1-4 title/desc
+- [x] expert 섹션: title, subtitle, card1-4 title, cta-description
+
+**process.html** (+7개 추가, 총 26개)
+- [x] hero 섹션: badge, title, subtitle, feature1-3 title/desc
+- [x] service 섹션: feature1-6 title/desc
+- [x] faq 섹션: title, subtitle
+- [x] cta 섹션: title, desc, gov-title
+
+#### Phase 3.5.2: admin/pages.html 계층화 UI ✅ 완료
+
+- [x] 섹션 그룹 컴포넌트 추가
+- [x] Accordion 접기/펼치기 기능
+- [x] 섹션 헤더 (아이콘 + 섹션명 + 항목 수)
+- [x] 섹션 내 항목 들여쓰기
+- [x] 프론트엔드에서 ID 파싱으로 섹션 추출 (API 수정 불필요)
+
+#### Phase 3.5.3: Worker API 수정 ⏭️ 스킵
+
+- [x] 프론트엔드에서 ID 파싱으로 섹션 추출 가능하므로 API 수정 불필요
+- [x] ID 명명 규칙: {page}-{section}-{element} 형식으로 섹션 자동 추출
+
+---
+
+*문서 버전: 1.1*
 *작성일: 2025-12-27*
+*수정일: 2025-12-27 (Phase 3.5 추가)*
