@@ -308,41 +308,53 @@ POST /api/pages/{pageId}/update
 
 ## 8. 구현 단계
 
-### Phase 1: 기반 작업 (1일)
+### Phase 1: 기반 작업 (1일) ✅ 완료
 
-1. [ ] HTML 파일에 `data-editable` 속성 마킹
-   - index.html
-   - about.html
-   - service.html
-   - fund.html
-   - process.html
+1. [x] HTML 파일에 `data-editable` 속성 마킹
+   - index.html ✅
+   - about.html ✅
+   - service.html ✅
+   - fund.html ✅
+   - process.html ✅
 
-2. [ ] Worker에 GitHub API 연동 함수 추가
-   - 파일 읽기 (`GET /repos/.../contents/...`)
-   - 파일 수정 및 커밋 (`PUT /repos/.../contents/...`)
+2. [x] Worker에 GitHub API 연동 함수 추가
+   - 파일 읽기 (`GET /repos/.../contents/...`) ✅
+   - 파일 수정 및 커밋 (`PUT /repos/.../contents/...`) ✅
 
-### Phase 2: 백엔드 API (1일)
+### Phase 2: 백엔드 API (1일) ✅ 완료
 
-3. [ ] Worker API 엔드포인트 구현
-   - `GET /api/pages` - 페이지 목록
-   - `GET /api/pages/:id/editables` - 편집 가능 텍스트 조회
-   - `POST /api/pages/:id/update` - 텍스트 수정 적용
+3. [x] Worker API 엔드포인트 구현
+   - `GET /api/pages` - 페이지 목록 ✅
+   - `GET /api/pages/:id/editables` - 편집 가능 텍스트 조회 ✅
+   - `POST /api/pages/:id/update` - 텍스트 수정 적용 ✅
 
-4. [ ] HTMLRewriter 기반 안전한 HTML 수정 로직
+4. [x] HTMLRewriter 기반 안전한 HTML 수정 로직 ✅
 
-### Phase 3: 프론트엔드 UI (1일)
+### Phase 3: 프론트엔드 UI (1일) ⏳ 진행 중
 
-5. [ ] `/admin/pages.html` 페이지 생성
-6. [ ] iframe 미리보기 구현
-7. [ ] contentEditable 인라인 편집 구현
-8. [ ] 변경사항 추적 및 표시
-9. [ ] "적용하기" 버튼 및 로딩 상태
+5. [x] `/admin/pages.html` 페이지 생성 ✅
+6. [ ] iframe 미리보기 구현 (목록/폼 방식으로 대체)
+7. [ ] contentEditable 인라인 편집 구현 (textarea 방식으로 대체)
+8. [x] 변경사항 추적 및 표시 ✅
+9. [x] "적용하기" 버튼 및 로딩 상태 ✅
 
-### Phase 4: 테스트 및 안정화 (1일)
+### Phase 4: 배포 및 통합 ✅ 완료
 
-10. [ ] 전체 흐름 테스트
-11. [ ] 엣지 케이스 처리 (빈 텍스트, 특수문자 등)
-12. [ ] 에러 핸들링 및 롤백 방안
+10. [x] dist/admin/pages.html 배포 ✅
+11. [x] 관리자 사이드바에 메뉴 추가 ✅
+    - admin/index.html ✅
+    - admin/leads.html ✅
+    - admin/board.html ✅
+    - admin/employees.html ✅
+    - admin/analytics.html ✅
+    - admin/settings.html ✅
+12. [ ] 프로덕션 테스트 ⏳
+
+### Phase 5: 테스트 및 안정화 (예정)
+
+13. [ ] 전체 흐름 테스트
+14. [ ] 엣지 케이스 처리 (빈 텍스트, 특수문자 등)
+15. [ ] 에러 핸들링 및 롤백 방안
 
 ---
 
