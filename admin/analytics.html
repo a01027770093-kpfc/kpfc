@@ -335,6 +335,176 @@
         order: 3;
       }
     }
+    /* 통합 기간 필터 스타일 */
+    .unified-filter-section {
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid var(--neutral-200);
+    }
+    .filter-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .filter-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--neutral-800);
+    }
+    .filter-desc {
+      font-size: 12px;
+      color: var(--neutral-500);
+    }
+    .filter-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+    }
+    .quick-period-btns {
+      display: flex;
+      gap: 6px;
+    }
+    .quick-btn {
+      padding: 8px 14px;
+      border: 1px solid var(--neutral-200);
+      background: white;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      color: var(--neutral-600);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .quick-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .quick-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+    .date-range-inputs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .date-label {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 11px;
+      color: var(--neutral-500);
+    }
+    .date-input {
+      padding: 8px 12px;
+      border: 1px solid var(--neutral-200);
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      color: var(--neutral-700);
+    }
+    .date-input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    .date-separator {
+      color: var(--neutral-400);
+      padding-top: 16px;
+    }
+    .apply-btn {
+      padding: 8px 16px;
+      background: var(--primary);
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      color: white;
+      cursor: pointer;
+      margin-top: 16px;
+      transition: background 0.2s;
+    }
+    .apply-btn:hover {
+      background: var(--primary-hover, #1500a0);
+    }
+    .current-period-display {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--neutral-100);
+    }
+    .period-icon {
+      font-size: 16px;
+    }
+    .period-text {
+      font-size: 14px;
+      color: var(--neutral-700);
+      font-weight: 500;
+    }
+    @media (max-width: 768px) {
+      .filter-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .quick-period-btns {
+        flex-wrap: wrap;
+      }
+      .date-range-inputs {
+        flex-wrap: wrap;
+      }
+    }
+    /* 분석 평가 섹션 */
+    .analysis-summary {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-top: 24px;
+      border: 1px solid var(--neutral-200);
+    }
+    .analysis-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .analysis-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--neutral-800);
+    }
+    .analysis-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+    .analysis-item {
+      background: white;
+      border-radius: var(--radius-md);
+      padding: 16px;
+      border-left: 4px solid var(--primary);
+    }
+    .analysis-item.positive {
+      border-left-color: #10B981;
+    }
+    .analysis-item.negative {
+      border-left-color: #EF4444;
+    }
+    .analysis-item.neutral {
+      border-left-color: #F59E0B;
+    }
+    .analysis-label {
+      font-size: 12px;
+      color: var(--neutral-500);
+      margin-bottom: 4px;
+    }
+    .analysis-text {
+      font-size: 14px;
+      color: var(--neutral-700);
+      line-height: 1.5;
+    }
   </style>
 </head>
 <body>
@@ -447,25 +617,44 @@
         </div>
       </header>
 
-      <!-- 기간 선택 탭 -->
-      <div class="period-tabs">
-        <button class="period-tab active" data-period="daily">일간</button>
-        <button class="period-tab" data-period="weekly">주간</button>
-        <button class="period-tab" data-period="monthly">월간</button>
-      </div>
-
-      <!-- 기간 표시 -->
-      <div class="period-range">
-        <span class="period-range-label">📅 집계 기간</span>
-        <span class="period-range-value" id="period-display">로딩 중...</span>
-        <div style="flex:1"></div>
-        <button class="refresh-btn" onclick="refreshData()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M23 4v6h-6M1 20v-6h6"/>
-            <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
-          </svg>
-          새로고침
-        </button>
+      <!-- 통합 기간 필터 -->
+      <div class="unified-filter-section">
+        <div class="filter-header">
+          <span class="filter-title">📅 조회 기간 설정</span>
+          <span class="filter-desc">설정한 기간이 모든 통계에 적용됩니다</span>
+        </div>
+        <div class="filter-controls">
+          <div class="quick-period-btns">
+            <button class="quick-btn active" data-days="1">오늘</button>
+            <button class="quick-btn" data-days="7">7일</button>
+            <button class="quick-btn" data-days="14">14일</button>
+            <button class="quick-btn" data-days="30">30일</button>
+            <button class="quick-btn" data-days="90">90일</button>
+          </div>
+          <div class="date-range-inputs">
+            <label class="date-label">
+              시작일
+              <input type="date" id="startDate" class="date-input">
+            </label>
+            <span class="date-separator">~</span>
+            <label class="date-label">
+              종료일
+              <input type="date" id="endDate" class="date-input">
+            </label>
+            <button class="apply-btn" onclick="applyDateFilter()">적용</button>
+          </div>
+          <button class="refresh-btn" onclick="refreshData()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 4v6h-6M1 20v-6h6"/>
+              <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+            </svg>
+            새로고침
+          </button>
+        </div>
+        <div class="current-period-display">
+          <span class="period-icon">📊</span>
+          <span class="period-text" id="period-display">로딩 중...</span>
+        </div>
       </div>
 
       <!-- 통계 카드 -->
@@ -622,11 +811,9 @@
       <div class="section-divider" style="margin-bottom: 100px;">
         <div class="section-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
           <h2 class="section-title" style="margin:0;">📊 기간별 누적 데이터</h2>
-          <div class="days-selector">
-            <button class="days-btn active" data-days="7">7일</button>
-            <button class="days-btn" data-days="30">30일</button>
-            <button class="days-btn" data-days="90">90일</button>
-          </div>
+          <span class="filter-sync-badge" style="font-size:12px; color:var(--primary); background:rgba(29,0,173,0.1); padding:4px 10px; border-radius:12px;">
+            ⬆ 상단 필터와 연동됨
+          </span>
         </div>
 
         <!-- 기간 비교 (일간/주간/월간 한눈에) -->
@@ -720,6 +907,20 @@
             </div>
           </div>
         </div>
+
+        <!-- 기간 분석 평가 -->
+        <div class="analysis-summary" id="analysis-summary">
+          <div class="analysis-header">
+            <span>💡</span>
+            <span class="analysis-title">기간 분석 평가</span>
+          </div>
+          <div class="analysis-content" id="analysis-content">
+            <div class="analysis-item">
+              <div class="analysis-label">분석 중...</div>
+              <div class="analysis-text">데이터를 불러오는 중입니다.</div>
+            </div>
+          </div>
+        </div>
       </div>
 
     </main>
@@ -743,8 +944,10 @@
     // ============================================================
     const GA4_API_URL = 'https://kpfc-analytics.a01027770093.workers.dev';
 
-    // 현재 기간
-    let currentPeriod = 'daily';
+    // 통합 필터 상태
+    let filterDays = 1; // 기본값: 오늘
+    let filterStartDate = null;
+    let filterEndDate = null;
     let trendChart = null;
     let analyticsData = null;
 
@@ -764,17 +967,89 @@
 
     // 초기화
     document.addEventListener('DOMContentLoaded', function() {
-      initPeriodTabs();
-      initDaysSelector();
+      initUnifiedFilter();
+      initDateInputs();
 
       if (GA4_API_URL) {
-        loadAnalyticsData();
-        loadHistoryData();
-        loadCompareData();
+        loadAllDataWithFilter();
       } else {
         showApiNotConfigured();
       }
     });
+
+    // 통합 필터 초기화
+    function initUnifiedFilter() {
+      const quickBtns = document.querySelectorAll('.quick-btn');
+      quickBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          quickBtns.forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          filterDays = parseInt(this.dataset.days);
+
+          // 날짜 입력 초기화
+          filterStartDate = null;
+          filterEndDate = null;
+          document.getElementById('startDate').value = '';
+          document.getElementById('endDate').value = '';
+
+          // 모든 데이터 새로고침
+          loadAllDataWithFilter();
+        });
+      });
+    }
+
+    // 날짜 입력 초기화
+    function initDateInputs() {
+      const today = new Date();
+      const todayStr = today.toISOString().split('T')[0];
+
+      // 최대 날짜를 오늘로 설정
+      document.getElementById('startDate').max = todayStr;
+      document.getElementById('endDate').max = todayStr;
+    }
+
+    // 날짜 필터 적용
+    function applyDateFilter() {
+      const startInput = document.getElementById('startDate').value;
+      const endInput = document.getElementById('endDate').value;
+
+      if (!startInput || !endInput) {
+        alert('시작일과 종료일을 모두 선택해주세요.');
+        return;
+      }
+
+      if (startInput > endInput) {
+        alert('시작일이 종료일보다 늦을 수 없습니다.');
+        return;
+      }
+
+      filterStartDate = startInput;
+      filterEndDate = endInput;
+
+      // 빠른 선택 버튼 비활성화
+      document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active'));
+
+      // 일수 계산
+      const start = new Date(startInput);
+      const end = new Date(endInput);
+      filterDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+
+      // 모든 데이터 새로고침
+      loadAllDataWithFilter();
+    }
+
+    // 모든 데이터를 필터에 맞춰 로드
+    async function loadAllDataWithFilter() {
+      // 기간 표시 업데이트
+      updatePeriodDisplay();
+
+      // 모든 데이터 로드
+      await Promise.all([
+        loadAnalyticsDataWithFilter(),
+        loadHistoryDataWithFilter(),
+        loadCompareData()
+      ]);
+    }
 
     // API 미설정 상태 표시
     function showApiNotConfigured() {
@@ -799,28 +1074,46 @@
       document.getElementById('history-table-body').innerHTML = '<tr><td colspan="5" class="table-empty">GA4 Worker API를 먼저 설정해주세요</td></tr>';
     }
 
-    // 기간 탭 초기화
-    function initPeriodTabs() {
-      const tabs = document.querySelectorAll('.period-tab');
-      tabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-          tabs.forEach(t => t.classList.remove('active'));
-          this.classList.add('active');
-          currentPeriod = this.dataset.period;
-          if (GA4_API_URL) {
-            loadAnalyticsData();
-          }
-        });
-      });
+    // 기간 표시 업데이트
+    function updatePeriodDisplay() {
+      const today = new Date();
+      let startDate, endDate;
+
+      if (filterStartDate && filterEndDate) {
+        startDate = filterStartDate;
+        endDate = filterEndDate;
+      } else {
+        endDate = today.toISOString().split('T')[0];
+        const start = new Date(today);
+        start.setDate(today.getDate() - filterDays + 1);
+        startDate = start.toISOString().split('T')[0];
+      }
+
+      const formatKorDate = (dateStr) => {
+        const [y, m, d] = dateStr.split('-');
+        return `${y}.${m}.${d}`;
+      };
+
+      const displayText = filterDays === 1
+        ? `${formatKorDate(endDate)} (오늘)`
+        : `${formatKorDate(startDate)} ~ ${formatKorDate(endDate)} (${filterDays}일간)`;
+
+      document.getElementById('period-display').textContent = displayText;
     }
 
-    // 데이터 로드
-    async function loadAnalyticsData() {
+    // 필터 적용된 분석 데이터 로드
+    async function loadAnalyticsDataWithFilter() {
       if (!GA4_API_URL) return;
 
       try {
         showLoading();
-        const response = await fetch(`${GA4_API_URL}/analytics/all?period=${currentPeriod}`);
+
+        // 현재 필터에 맞는 period 결정
+        let period = 'daily';
+        if (filterDays >= 7 && filterDays < 30) period = 'weekly';
+        else if (filterDays >= 30) period = 'monthly';
+
+        const response = await fetch(`${GA4_API_URL}/analytics/all?period=${period}`);
 
         if (!response.ok) {
           throw new Error('API 요청 실패');
@@ -833,6 +1126,147 @@
         console.error('데이터 로드 실패:', error);
         showError('데이터를 불러올 수 없습니다. 잠시 후 다시 시도해주세요.');
       }
+    }
+
+    // 필터 적용된 히스토리 데이터 로드
+    async function loadHistoryDataWithFilter() {
+      if (!GA4_API_URL) return;
+
+      currentPage = 1;
+      historyDays = filterDays;
+
+      try {
+        const response = await fetch(`${GA4_API_URL}/history/cached?days=${filterDays}`);
+        if (!response.ok) {
+          throw new Error('히스토리 API 요청 실패');
+        }
+        historyData = await response.json();
+
+        let filteredData = historyData.data || [];
+
+        // 날짜 범위로 필터링
+        if (filterStartDate && filterEndDate) {
+          filteredData = filteredData.filter(d =>
+            d.date >= filterStartDate && d.date <= filterEndDate
+          );
+        }
+
+        renderHistoryTable(filteredData);
+        renderHistoryChart(filteredData);
+        updateLastSyncTime(filteredData);
+
+        // 분석 평가 생성
+        generateAnalysisSummary(filteredData);
+
+      } catch (error) {
+        console.error('히스토리 데이터 로드 실패:', error);
+        renderHistoryTable([]);
+        updateLastSyncTime([]);
+      }
+    }
+
+    // 분석 평가 생성
+    function generateAnalysisSummary(data) {
+      const container = document.getElementById('analysis-content');
+
+      if (!data || data.length === 0) {
+        container.innerHTML = `
+          <div class="analysis-item neutral">
+            <div class="analysis-label">데이터 없음</div>
+            <div class="analysis-text">선택한 기간에 수집된 데이터가 없습니다.</div>
+          </div>
+        `;
+        return;
+      }
+
+      // 통계 계산
+      const totalVisitors = data.reduce((sum, d) => sum + (d.visitors || 0), 0);
+      const totalPageviews = data.reduce((sum, d) => sum + (d.pageviews || 0), 0);
+      const avgDuration = data.reduce((sum, d) => sum + (d.avg_duration || 0), 0) / data.length;
+      const avgBounce = data.reduce((sum, d) => sum + (d.bounce_rate || 0), 0) / data.length;
+      const avgVisitorsPerDay = totalVisitors / data.length;
+
+      // 추세 분석 (첫 절반 vs 나중 절반)
+      const halfLen = Math.floor(data.length / 2);
+      const sortedData = [...data].sort((a, b) => a.date.localeCompare(b.date));
+      const firstHalf = sortedData.slice(0, halfLen);
+      const secondHalf = sortedData.slice(halfLen);
+
+      const firstHalfAvg = firstHalf.reduce((sum, d) => sum + (d.visitors || 0), 0) / (firstHalf.length || 1);
+      const secondHalfAvg = secondHalf.reduce((sum, d) => sum + (d.visitors || 0), 0) / (secondHalf.length || 1);
+      const trendChange = firstHalfAvg > 0 ? ((secondHalfAvg - firstHalfAvg) / firstHalfAvg * 100).toFixed(1) : 0;
+
+      // 분석 항목 생성
+      const analyses = [];
+
+      // 1. 총 방문자 분석
+      const visitorStatus = totalVisitors > 100 ? 'positive' : totalVisitors > 30 ? 'neutral' : 'negative';
+      analyses.push({
+        status: visitorStatus,
+        label: '📊 총 방문자',
+        text: `선택 기간 동안 총 ${totalVisitors.toLocaleString()}명이 방문했습니다. 일 평균 ${avgVisitorsPerDay.toFixed(1)}명입니다.`
+      });
+
+      // 2. 추세 분석
+      if (data.length >= 4) {
+        const trendStatus = parseFloat(trendChange) > 10 ? 'positive' : parseFloat(trendChange) < -10 ? 'negative' : 'neutral';
+        const trendText = parseFloat(trendChange) > 0
+          ? `방문자가 ${trendChange}% 증가하는 상승 추세입니다.`
+          : parseFloat(trendChange) < 0
+          ? `방문자가 ${Math.abs(trendChange)}% 감소하는 하락 추세입니다.`
+          : '방문자 수가 안정적으로 유지되고 있습니다.';
+        analyses.push({
+          status: trendStatus,
+          label: '📈 추세 분석',
+          text: `기간 전반부 대비 후반부 기준, ${trendText}`
+        });
+      }
+
+      // 3. 체류시간 분석
+      const durationMins = Math.floor(avgDuration / 60);
+      const durationSecs = Math.round(avgDuration % 60);
+      const durationStatus = avgDuration > 180 ? 'positive' : avgDuration > 60 ? 'neutral' : 'negative';
+      const durationAdvice = avgDuration > 180
+        ? '콘텐츠에 대한 관심도가 높습니다.'
+        : avgDuration > 60
+        ? '적정 수준의 체류시간입니다.'
+        : '콘텐츠 개선으로 체류시간을 늘려보세요.';
+      analyses.push({
+        status: durationStatus,
+        label: '⏱️ 체류시간',
+        text: `평균 체류시간 ${durationMins}분 ${durationSecs}초. ${durationAdvice}`
+      });
+
+      // 4. 이탈률 분석
+      const bouncePercent = Math.round(avgBounce * 100);
+      const bounceStatus = bouncePercent < 50 ? 'positive' : bouncePercent < 70 ? 'neutral' : 'negative';
+      const bounceAdvice = bouncePercent < 50
+        ? '우수한 이탈률입니다.'
+        : bouncePercent < 70
+        ? '평균적인 이탈률입니다.'
+        : '랜딩 페이지 개선이 필요합니다.';
+      analyses.push({
+        status: bounceStatus,
+        label: '🚪 이탈률',
+        text: `평균 이탈률 ${bouncePercent}%. ${bounceAdvice}`
+      });
+
+      // 5. 페이지뷰 분석
+      const pagesPerVisit = totalVisitors > 0 ? (totalPageviews / totalVisitors).toFixed(1) : 0;
+      const pvStatus = pagesPerVisit > 3 ? 'positive' : pagesPerVisit > 1.5 ? 'neutral' : 'negative';
+      analyses.push({
+        status: pvStatus,
+        label: '📄 페이지뷰',
+        text: `방문자당 평균 ${pagesPerVisit}개 페이지 조회. 총 ${totalPageviews.toLocaleString()}회 페이지뷰.`
+      });
+
+      // HTML 생성
+      container.innerHTML = analyses.map(a => `
+        <div class="analysis-item ${a.status}">
+          <div class="analysis-label">${a.label}</div>
+          <div class="analysis-text">${a.text}</div>
+        </div>
+      `).join('');
     }
 
     // 대시보드 렌더링
@@ -917,24 +1351,23 @@
 
     // 기간 레이블
     function getPeriodLabel() {
-      switch(currentPeriod) {
-        case 'daily': return '전일 대비';
-        case 'weekly': return '전주 대비';
-        case 'monthly': return '전월 대비';
-        default: return '';
-      }
+      if (filterDays === 1) return '전일 대비';
+      if (filterDays <= 7) return '전주 대비';
+      if (filterDays <= 30) return '전월 대비';
+      return '이전 기간 대비';
     }
 
     // 추이 차트 렌더링
     function renderTrendChart(trendData) {
       const ctx = document.getElementById('trendChart').getContext('2d');
 
-      const titleMap = {
-        daily: '일별 방문 추이 (최근 7일)',
-        weekly: '주별 방문 추이',
-        monthly: '월별 방문 추이'
-      };
-      document.getElementById('chart-title').textContent = titleMap[currentPeriod];
+      // 필터에 따른 제목 설정
+      let chartTitle = '방문 추이';
+      if (filterDays === 1) chartTitle = '오늘 방문 추이';
+      else if (filterDays <= 7) chartTitle = `일별 방문 추이 (${filterDays}일)`;
+      else if (filterDays <= 30) chartTitle = `일별 방문 추이 (${filterDays}일)`;
+      else chartTitle = `장기 방문 추이 (${filterDays}일)`;
+      document.getElementById('chart-title').textContent = chartTitle;
 
       if (trendChart) {
         trendChart.destroy();
@@ -1243,22 +1676,7 @@
     let pageSize = 20;
     let allHistoryData = []; // 전체 데이터 저장
 
-    // 기간 선택 버튼 초기화
-    function initDaysSelector() {
-      const btns = document.querySelectorAll('.days-btn');
-      btns.forEach(btn => {
-        btn.addEventListener('click', function() {
-          btns.forEach(b => b.classList.remove('active'));
-          this.classList.add('active');
-          historyDays = parseInt(this.dataset.days);
-          if (GA4_API_URL) {
-            loadHistoryData();
-          }
-        });
-      });
-    }
-
-    // 히스토리 데이터 로드 (Airtable 캐시 우선 조회)
+    // 히스토리 데이터 로드 (Airtable 캐시 우선 조회) - 레거시 지원용
     async function loadHistoryData(forceRefresh = false) {
       if (!GA4_API_URL) return;
 
