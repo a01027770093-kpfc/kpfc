@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>임직원 카드 디자인 프리뷰</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #F8FAFB;
+            color: #1B3A5F;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .section-label {
+            font-size: 15px;
+            color: #1B3A5F;
+            font-weight: 600;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-label::before {
+            content: '';
+            width: 4px;
+            height: 18px;
+            background: #1B3A5F;
+            display: inline-block;
+        }
+
+        /* ========================================
+           CEO 카드 (기존 디자인)
+        ======================================== */
+        .ceo-intro-card {
+            background: #ffffff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            margin-bottom: 60px;
+        }
+
+        .ceo-intro-content {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 0;
+        }
+
+        .ceo-image-wrapper {
+            position: relative;
+            background: linear-gradient(180deg, #E8EEF4 0%, #D4DEE8 100%);
+            min-height: 520px;
+        }
+
+        .ceo-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center top;
+        }
+
+        .ceo-text-wrapper {
+            padding: 50px 50px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .ceo-greeting {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1B3A5F;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .ceo-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1B3A5F;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .ceo-title .highlight {
+            color: #3B82F6;
+        }
+
+        .ceo-name-line {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1B3A5F;
+            margin-bottom: 35px;
+        }
+
+        .ceo-message {
+            margin-bottom: 35px;
+        }
+
+        .ceo-message p {
+            font-size: 16px;
+            color: #4A5568;
+            line-height: 1.9;
+            margin-bottom: 20px;
+        }
+
+        .ceo-message .emphasis {
+            color: #3B82F6;
+            font-weight: 600;
+        }
+
+        .ceo-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .ceo-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 2px solid #E5E7EB;
+            background: #ffffff;
+            color: #1B3A5F;
+            transition: all 0.3s ease;
+        }
+
+        .ceo-btn:hover {
+            border-color: #3B82F6;
+            color: #3B82F6;
+            background: #F0F7FF;
+        }
+
+        .ceo-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* ========================================
+           임직원 섹션
+        ======================================== */
+        .employees-section {
+            margin-top: 20px;
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1B3A5F;
+            margin-bottom: 12px;
+        }
+
+        .section-desc {
+            font-size: 16px;
+            color: #6B7280;
+            margin-bottom: 40px;
+        }
+
+        /* 임직원 그리드 - 2x2 (홀수 카드 확장 방지) */
+        .employees-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+        }
+
+        /* 임직원 카드 - 고정 너비 (확장 안 됨) */
+        .employee-card {
+            background: #ffffff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: row;
+            min-height: 200px;
+            width: calc(50% - 12px); /* 2열 고정, gap 24px의 절반 */
+            flex-grow: 0; /* 확장 방지 */
+            flex-shrink: 0; /* 축소 방지 */
+        }
+
+        .employee-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+        }
+
+        /* 왼쪽 이미지 영역 */
+        .employee-image-area {
+            flex: 0 0 40%;
+            min-height: 200px;
+            background: linear-gradient(135deg, #E5E7EB 0%, #F3F4F6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .employee-avatar {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 20%; /* 얼굴 상단 20% 지점에 맞춤 */
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .employee-avatar-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9CA3AF;
+        }
+
+        .employee-avatar-placeholder svg {
+            width: 60px;
+            height: 60px;
+        }
+
+        /* 오른쪽 정보 영역 */
+        .employee-info-area {
+            flex: 1;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .employee-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1B3A5F;
+            margin-bottom: 4px;
+        }
+
+        .employee-position {
+            font-size: 14px;
+            font-weight: 600;
+            color: #3B82F6;
+            margin-bottom: 12px;
+        }
+
+        .employee-intro {
+            font-size: 14px;
+            color: #6B7280;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        /* 전문분야 뱃지 */
+        .employee-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .employee-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 10px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .employee-badge svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        /* 자금유형 - 파랑 */
+        .badge-fund {
+            background: #EFF6FF;
+            color: #2563EB;
+        }
+
+        /* 업무영역 - 초록 */
+        .badge-work {
+            background: #ECFDF5;
+            color: #059669;
+        }
+
+        /* 산업분야 - 주황 */
+        .badge-industry {
+            background: #FFF7ED;
+            color: #EA580C;
+        }
+
+        /* ========================================
+           반응형
+        ======================================== */
+        @media (max-width: 900px) {
+            .ceo-intro-content {
+                grid-template-columns: 320px 1fr;
+            }
+
+            .ceo-image-wrapper {
+                min-height: 480px;
+            }
+
+            .ceo-text-wrapper {
+                padding: 40px 35px;
+            }
+
+            .ceo-greeting,
+            .ceo-title,
+            .ceo-name-line {
+                font-size: 22px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .ceo-intro-content {
+                grid-template-columns: 1fr;
+            }
+
+            .ceo-image-wrapper {
+                min-height: 350px;
+                max-height: 400px;
+            }
+
+            .ceo-text-wrapper {
+                padding: 35px 25px;
+            }
+
+            .ceo-greeting,
+            .ceo-title,
+            .ceo-name-line {
+                font-size: 20px;
+                text-align: center;
+            }
+
+            .ceo-message p {
+                font-size: 14px;
+                text-align: center;
+            }
+
+            .ceo-buttons {
+                justify-content: center;
+            }
+
+            .section-title {
+                font-size: 26px;
+            }
+
+            .employees-grid {
+                gap: 20px;
+            }
+
+            .employee-card {
+                flex-direction: column;
+                width: 100%; /* 모바일에서는 전체 너비 */
+            }
+
+            .employee-image-area {
+                flex: none;
+                min-height: 200px;
+            }
+
+            .employee-info-area {
+                padding: 20px;
+            }
+
+            .employee-name {
+                font-size: 18px;
+            }
+        }
+
+        /* 디자인 비교 섹션 */
+        .design-note {
+            background: #FEF3C7;
+            border: 1px solid #F59E0B;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 30px;
+            font-size: 14px;
+            color: #92400E;
+        }
+
+        .design-note strong {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 디자인 노트 -->
+        <div class="design-note">
+            <strong>임직원 카드 디자인 프리뷰</strong>
+            - CEO 카드 아래에 임직원 카드가 2x2 그리드로 배치<br>
+            - 홀수 카드도 확장 안 됨 (고정 너비)<br>
+            - 사진 포지션: 인라인 스타일로 <code>object-position</code> 개별 설정 가능<br>
+            - 예: <code>style="object-position: center 10%"</code> (얼굴 상단), <code>center 50%</code> (중앙)
+        </div>
+
+        <!-- CEO 소개 -->
+        <div class="section-label">CEO 소개</div>
+        <div class="ceo-intro-card">
+            <div class="ceo-intro-content">
+                <!-- 좌측: CEO 사진 -->
+                <div class="ceo-image-wrapper">
+                    <img src="프로필사진 (9).png" alt="이종현 대표">
+                </div>
+
+                <!-- 우측: 텍스트 -->
+                <div class="ceo-text-wrapper">
+                    <div class="ceo-greeting">안녕하세요.</div>
+                    <div class="ceo-title">
+                        <span class="highlight">KPFC 한국정책자금지원센터</span>
+                    </div>
+                    <div class="ceo-name-line">대표 이종현입니다.</div>
+
+                    <div class="ceo-message">
+                        <p>
+                            정책자금은 <span class="emphasis">서류를 대신 넣어주는 일이 아닙니다.</span><br>
+                            한 번의 잘못된 신청이 다음 심사까지 영향을 줍니다.
+                        </p>
+                        <p>
+                            그래서 KPFC는 전화로만 판단하지 않고,<br>
+                            <span class="emphasis">현장 심사</span>를 통해 기업의 상태와 대표님의 준비를 확인합니다.
+                        </p>
+                        <p>
+                            <span class="emphasis">될 수 없는 신청은 권하지 않고, 될 수 있는 구조만 설계합니다.</span>
+                        </p>
+                    </div>
+
+                    <div class="ceo-buttons">
+                        <a href="#" class="ceo-btn">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                            </svg>
+                            유튜브 보러가기
+                        </a>
+                        <a href="#" class="ceo-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <line x1="10" y1="14" x2="21" y2="3"></line>
+                            </svg>
+                            네이버 프로필
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 임직원 소개 섹션 -->
+        <section class="employees-section">
+            <div class="section-label">전문가 팀</div>
+            <h2 class="section-title">함께하는 전문가</h2>
+            <p class="section-desc">KPFC의 경험 있는 전문가 팀이 최상의 컨설팅을 제공합니다.</p>
+
+            <!-- 2x2 그리드 -->
+            <div class="employees-grid">
+                <!-- 임직원 1: object-position: center 10% (얼굴 상단) -->
+                <div class="employee-card">
+                    <div class="employee-image-area">
+                        <img src="https://via.placeholder.com/300x400/E5E7EB/9CA3AF?text=10%25" alt="김철수" class="employee-avatar" style="object-position: center 10%;">
+                    </div>
+                    <div class="employee-info-area">
+                        <h3 class="employee-name">김철수</h3>
+                        <p class="employee-position">선임 컨설턴트</p>
+                        <p class="employee-intro">포지션: center 10% (얼굴 상단)</p>
+                        <div class="employee-badges">
+                            <span class="employee-badge badge-fund">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M12 6v12M9 9h6M9 15h6"/>
+                                </svg>
+                                정책자금
+                            </span>
+                            <span class="employee-badge badge-work">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="7" width="20" height="14" rx="2"/>
+                                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                                </svg>
+                                사업계획서
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 임직원 2: object-position: center 30% -->
+                <div class="employee-card">
+                    <div class="employee-image-area">
+                        <img src="https://via.placeholder.com/300x400/E5E7EB/9CA3AF?text=30%25" alt="이영희" class="employee-avatar" style="object-position: center 30%;">
+                    </div>
+                    <div class="employee-info-area">
+                        <h3 class="employee-name">이영희</h3>
+                        <p class="employee-position">책임 컨설턴트</p>
+                        <p class="employee-intro">포지션: center 30%</p>
+                        <div class="employee-badges">
+                            <span class="employee-badge badge-fund">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M12 6v12M9 9h6M9 15h6"/>
+                                </svg>
+                                시중금리
+                            </span>
+                            <span class="employee-badge badge-industry">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M2 20h20M4 20V10l6-6 6 6v10M14 20v-6h6v6"/>
+                                </svg>
+                                IT/소프트웨어
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 임직원 3: object-position: center 50% (중앙) -->
+                <div class="employee-card">
+                    <div class="employee-image-area">
+                        <img src="https://via.placeholder.com/300x400/E5E7EB/9CA3AF?text=50%25" alt="박민준" class="employee-avatar" style="object-position: center 50%;">
+                    </div>
+                    <div class="employee-info-area">
+                        <h3 class="employee-name">박민준</h3>
+                        <p class="employee-position">주임 컨설턴트</p>
+                        <p class="employee-intro">포지션: center 50% (중앙)</p>
+                        <div class="employee-badges">
+                            <span class="employee-badge badge-work">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="7" width="20" height="14" rx="2"/>
+                                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                                </svg>
+                                정책자금 대출
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 임직원 4: 플레이스홀더 (이미지 없음) -->
+                <div class="employee-card">
+                    <div class="employee-image-area">
+                        <div class="employee-avatar-placeholder">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="employee-info-area">
+                        <h3 class="employee-name">정수연</h3>
+                        <p class="employee-position">팀장</p>
+                        <p class="employee-intro">이미지 없음 (플레이스홀더)</p>
+                        <div class="employee-badges">
+                            <span class="employee-badge badge-fund">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <path d="M12 6v12M9 9h6M9 15h6"/>
+                                </svg>
+                                정책자금
+                            </span>
+                            <span class="employee-badge badge-work">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="7" width="20" height="14" rx="2"/>
+                                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                                </svg>
+                                사업계획서
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             카드 개수별 예시
+        ======================================== -->
+        <section class="employees-section" style="margin-top: 80px; padding-top: 40px; border-top: 2px dashed #E5E7EB;">
+            <div class="design-note" style="margin-bottom: 30px;">
+                <strong>1개 카드 예시</strong>
+                홀수여도 확장되지 않고 왼쪽 상단 고정
+            </div>
+            <div class="employees-grid">
+                <div class="employee-card">
+                    <div class="employee-image-area">
+                        <img src="https://via.placeholder.com/300x400/DBEAFE/2563EB?text=1" alt="1개" class="employee-avatar" style="object-position: center 20%;">
+                    </div>
+                    <div class="employee-info-area">
+                        <h3 class="employee-name">카드 1개</h3>
+                        <p class="employee-position">왼쪽 상단 고정</p>
+                        <p class="employee-intro">확장 안 됨</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="employees-section" style="margin-top: 60px; padding-top: 40px; border-top: 2px dashed #E5E7EB;">
+            <div class="design-note" style="margin-bottom: 30px;">
+                <strong>3개 카드 예시</strong>
+                3번째 카드도 확장되지 않고 왼쪽 하단 고정
+            </div>
+            <div class="employees-grid">
+                <div class="employee-card">
+                    <div class="employee-image-area">
+                        <img src="https://via.placeholder.com/300x400/DCFCE7/059669?text=1" alt="1" class="employee-avatar">
+                    </div>
+                    <div class="employee-info-area">
+                        <h3 class="employee-name">카드 1</h3>
+                        <p class="employee-position">왼쪽 상단</p>
+                    </div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-image-area">
+                        <img src="https://via.placeholder.com/300x400/DCFCE7/059669?text=2" alt="2" class="employee-avatar">
+                    </div>
+                    <div class="employee-info-area">
+                        <h3 class="employee-name">카드 2</h3>
+                        <p class="employee-position">오른쪽 상단</p>
+                    </div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-image-area">
+                        <img src="https://via.placeholder.com/300x400/DCFCE7/059669?text=3" alt="3" class="employee-avatar">
+                    </div>
+                    <div class="employee-info-area">
+                        <h3 class="employee-name">카드 3</h3>
+                        <p class="employee-position">왼쪽 하단 (확장 안 됨)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

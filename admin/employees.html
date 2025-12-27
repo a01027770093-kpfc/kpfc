@@ -243,6 +243,61 @@
       background: #FEF3C7;
       color: #B45309;
     }
+    /* 체크박스 그룹 스타일 */
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 10px;
+      background: var(--neutral-50);
+      border: 1px solid var(--neutral-200);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-size: 13px;
+    }
+    .checkbox-item:hover {
+      background: var(--neutral-100);
+    }
+    .checkbox-item.checked {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+    .checkbox-item.checked.fund {
+      background: #1D4ED8;
+      border-color: #1D4ED8;
+    }
+    .checkbox-item.checked.work {
+      background: #047857;
+      border-color: #047857;
+    }
+    .checkbox-item.checked.industry-item {
+      background: #B45309;
+      border-color: #B45309;
+    }
+    .checkbox-item input[type="checkbox"] {
+      display: none;
+    }
+    .badge-category {
+      margin-bottom: 12px;
+    }
+    .badge-category-label {
+      font-size: 12px;
+      color: var(--neutral-500);
+      margin-bottom: 8px;
+      display: block;
+    }
+    .max-selection-hint {
+      font-size: 11px;
+      color: var(--neutral-400);
+      margin-top: 4px;
+    }
   </style>
 </head>
 <body>
@@ -487,43 +542,76 @@
             <input type="text" id="employeeIntro" class="form-input" placeholder="10년 경력의 정책자금 전문가">
           </div>
 
-          <!-- 전문분야 뱃지 -->
+          <!-- 전문분야 뱃지 (다중 선택) -->
           <div class="form-group">
-            <label>전문분야 뱃지 <span style="font-weight: 400; color: var(--neutral-500); font-size: 12px;">(카테고리별 선택)</span></label>
-            <div class="badge-selects" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
-              <div>
-                <label for="fundType" style="font-size: 12px; color: var(--neutral-500); margin-bottom: 4px; display: block;">자금유형</label>
-                <select id="fundType" class="form-input">
-                  <option value="">선택안함</option>
-                  <option value="정책자금">정책자금</option>
-                  <option value="창업자금">창업자금</option>
-                  <option value="R&D자금">R&D자금</option>
-                  <option value="시설자금">시설자금</option>
-                  <option value="운전자금">운전자금</option>
-                  <option value="수출자금">수출자금</option>
-                </select>
+            <label>전문분야 뱃지 <span style="font-weight: 400; color: var(--neutral-500); font-size: 12px;">(카테고리별 최대 4개 선택)</span></label>
+
+            <!-- 자금유형 -->
+            <div class="badge-category">
+              <span class="badge-category-label">자금유형</span>
+              <div class="checkbox-group" id="fundTypeGroup">
+                <label class="checkbox-item fund" onclick="toggleBadge(this, 'fundType')">
+                  <input type="checkbox" name="fundType" value="정책자금">정책자금
+                </label>
+                <label class="checkbox-item fund" onclick="toggleBadge(this, 'fundType')">
+                  <input type="checkbox" name="fundType" value="창업자금">창업자금
+                </label>
+                <label class="checkbox-item fund" onclick="toggleBadge(this, 'fundType')">
+                  <input type="checkbox" name="fundType" value="R&D자금">R&D자금
+                </label>
+                <label class="checkbox-item fund" onclick="toggleBadge(this, 'fundType')">
+                  <input type="checkbox" name="fundType" value="시설자금">시설자금
+                </label>
+                <label class="checkbox-item fund" onclick="toggleBadge(this, 'fundType')">
+                  <input type="checkbox" name="fundType" value="운전자금">운전자금
+                </label>
+                <label class="checkbox-item fund" onclick="toggleBadge(this, 'fundType')">
+                  <input type="checkbox" name="fundType" value="수출자금">수출자금
+                </label>
               </div>
-              <div>
-                <label for="workArea" style="font-size: 12px; color: var(--neutral-500); margin-bottom: 4px; display: block;">업무영역</label>
-                <select id="workArea" class="form-input">
-                  <option value="">선택안함</option>
-                  <option value="사업계획서">사업계획서</option>
-                  <option value="기업진단">기업진단</option>
-                  <option value="인증컨설팅">인증컨설팅</option>
-                  <option value="세무회계">세무회계</option>
-                  <option value="법률자문">법률자문</option>
-                </select>
+            </div>
+
+            <!-- 업무영역 -->
+            <div class="badge-category">
+              <span class="badge-category-label">업무영역</span>
+              <div class="checkbox-group" id="workAreaGroup">
+                <label class="checkbox-item work" onclick="toggleBadge(this, 'workArea')">
+                  <input type="checkbox" name="workArea" value="사업계획서">사업계획서
+                </label>
+                <label class="checkbox-item work" onclick="toggleBadge(this, 'workArea')">
+                  <input type="checkbox" name="workArea" value="기업진단">기업진단
+                </label>
+                <label class="checkbox-item work" onclick="toggleBadge(this, 'workArea')">
+                  <input type="checkbox" name="workArea" value="인증컨설팅">인증컨설팅
+                </label>
+                <label class="checkbox-item work" onclick="toggleBadge(this, 'workArea')">
+                  <input type="checkbox" name="workArea" value="세무회계">세무회계
+                </label>
+                <label class="checkbox-item work" onclick="toggleBadge(this, 'workArea')">
+                  <input type="checkbox" name="workArea" value="법률자문">법률자문
+                </label>
               </div>
-              <div>
-                <label for="industry" style="font-size: 12px; color: var(--neutral-500); margin-bottom: 4px; display: block;">산업분야</label>
-                <select id="industry" class="form-input">
-                  <option value="">선택안함</option>
-                  <option value="제조업">제조업</option>
-                  <option value="IT/SW">IT/SW</option>
-                  <option value="바이오">바이오</option>
-                  <option value="친환경">친환경</option>
-                  <option value="서비스업">서비스업</option>
-                </select>
+            </div>
+
+            <!-- 산업분야 -->
+            <div class="badge-category">
+              <span class="badge-category-label">산업분야</span>
+              <div class="checkbox-group" id="industryGroup">
+                <label class="checkbox-item industry-item" onclick="toggleBadge(this, 'industry')">
+                  <input type="checkbox" name="industry" value="제조업">제조업
+                </label>
+                <label class="checkbox-item industry-item" onclick="toggleBadge(this, 'industry')">
+                  <input type="checkbox" name="industry" value="IT/SW">IT/SW
+                </label>
+                <label class="checkbox-item industry-item" onclick="toggleBadge(this, 'industry')">
+                  <input type="checkbox" name="industry" value="바이오">바이오
+                </label>
+                <label class="checkbox-item industry-item" onclick="toggleBadge(this, 'industry')">
+                  <input type="checkbox" name="industry" value="친환경">친환경
+                </label>
+                <label class="checkbox-item industry-item" onclick="toggleBadge(this, 'industry')">
+                  <input type="checkbox" name="industry" value="서비스업">서비스업
+                </label>
               </div>
             </div>
           </div>
@@ -582,6 +670,60 @@
     let employees = [];
     let editingId = null;
     let deleteTargetId = null;
+
+    // 뱃지 체크박스 토글 (최대 4개 제한)
+    function toggleBadge(label, groupName) {
+      const checkbox = label.querySelector('input[type="checkbox"]');
+      const group = document.querySelectorAll(`input[name="${groupName}"]:checked`);
+
+      // 체크하려는 경우 최대 4개 제한
+      if (!checkbox.checked && group.length >= 4) {
+        alert('각 카테고리별 최대 4개까지 선택할 수 있습니다.');
+        return;
+      }
+
+      checkbox.checked = !checkbox.checked;
+      label.classList.toggle('checked', checkbox.checked);
+    }
+
+    // 선택된 뱃지 값들을 쉼표로 구분된 문자열로 반환
+    function getSelectedBadges(groupName) {
+      const checkboxes = document.querySelectorAll(`input[name="${groupName}"]:checked`);
+      return Array.from(checkboxes).map(cb => cb.value).join(',');
+    }
+
+    // 쉼표로 구분된 문자열을 체크박스에 설정
+    function setSelectedBadges(groupName, values) {
+      // 먼저 모든 체크박스 해제
+      document.querySelectorAll(`input[name="${groupName}"]`).forEach(cb => {
+        cb.checked = false;
+        cb.closest('.checkbox-item').classList.remove('checked');
+      });
+
+      if (!values) return;
+
+      // 쉼표로 구분된 값들을 배열로 변환
+      const valueArray = values.split(',').map(v => v.trim()).filter(v => v);
+
+      // 해당하는 체크박스 선택
+      valueArray.forEach(value => {
+        const checkbox = document.querySelector(`input[name="${groupName}"][value="${value}"]`);
+        if (checkbox) {
+          checkbox.checked = true;
+          checkbox.closest('.checkbox-item').classList.add('checked');
+        }
+      });
+    }
+
+    // 모든 뱃지 체크박스 초기화
+    function resetBadges() {
+      ['fundType', 'workArea', 'industry'].forEach(groupName => {
+        document.querySelectorAll(`input[name="${groupName}"]`).forEach(cb => {
+          cb.checked = false;
+          cb.closest('.checkbox-item').classList.remove('checked');
+        });
+      });
+    }
 
     // 페이지 로드 시 데이터 불러오기
     document.addEventListener('DOMContentLoaded', loadEmployees);
@@ -645,9 +787,9 @@
             <span class="intro-text">${emp.소개 || '-'}</span>
             ${(emp.자금유형 || emp.업무영역 || emp.산업분야) ? `
               <div style="margin-top: 6px; display: flex; gap: 4px; flex-wrap: wrap;">
-                ${emp.자금유형 ? `<span class="specialty-badge fund">${emp.자금유형}</span>` : ''}
-                ${emp.업무영역 ? `<span class="specialty-badge work">${emp.업무영역}</span>` : ''}
-                ${emp.산업분야 ? `<span class="specialty-badge industry">${emp.산업분야}</span>` : ''}
+                ${emp.자금유형 ? emp.자금유형.split(',').map(v => `<span class="specialty-badge fund">${v.trim()}</span>`).join('') : ''}
+                ${emp.업무영역 ? emp.업무영역.split(',').map(v => `<span class="specialty-badge work">${v.trim()}</span>`).join('') : ''}
+                ${emp.산업분야 ? emp.산업분야.split(',').map(v => `<span class="specialty-badge industry">${v.trim()}</span>`).join('') : ''}
               </div>
             ` : ''}
           </td>
@@ -689,10 +831,8 @@
       document.getElementById('uploadStatus').textContent = '';
       document.getElementById('employeeActive').checked = true;
       document.getElementById('employeeOrder').value = employees.length + 1;
-      // 뱃지 드롭다운 초기화
-      document.getElementById('fundType').value = '';
-      document.getElementById('workArea').value = '';
-      document.getElementById('industry').value = '';
+      // 뱃지 체크박스 초기화
+      resetBadges();
       // 이미지 위치 초기화
       document.getElementById('imagePosition').value = 'center 20%';
       document.getElementById('imagePositionContainer').classList.remove('active');
@@ -714,10 +854,10 @@
       document.getElementById('employeeActive').checked = emp.공개여부;
       document.getElementById('profileUrl').value = emp.프로필이미지URL || '';
       document.getElementById('uploadStatus').textContent = '';
-      // 뱃지 드롭다운 값 로드
-      document.getElementById('fundType').value = emp.자금유형 || '';
-      document.getElementById('workArea').value = emp.업무영역 || '';
-      document.getElementById('industry').value = emp.산업분야 || '';
+      // 뱃지 체크박스 값 로드
+      setSelectedBadges('fundType', emp.자금유형 || '');
+      setSelectedBadges('workArea', emp.업무영역 || '');
+      setSelectedBadges('industry', emp.산업분야 || '');
 
       // 이미지 위치 로드
       const imgPosition = emp.이미지위치 || 'center 20%';
@@ -884,9 +1024,9 @@
         공개여부: document.getElementById('employeeActive').checked,
         프로필이미지URL: document.getElementById('profileUrl').value.trim(),
         이미지위치: document.getElementById('imagePosition').value || 'center 20%',
-        자금유형: document.getElementById('fundType').value,
-        업무영역: document.getElementById('workArea').value,
-        산업분야: document.getElementById('industry').value
+        자금유형: getSelectedBadges('fundType'),
+        업무영역: getSelectedBadges('workArea'),
+        산업분야: getSelectedBadges('industry')
       };
 
       if (!data.이름 || !data.직책) {

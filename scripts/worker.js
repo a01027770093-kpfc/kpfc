@@ -1332,6 +1332,7 @@ async function handleEmployeesAPI(request, env, path) {
       console.log('📝 Creating employee:', data.이름);
 
       // 프론트엔드 한글 필드 → Airtable 영문 필드로 변환
+      // Select 필드는 빈 값이면 포함하지 않음 (Airtable 권한 오류 방지)
       const fields = {
         'name': data.이름 || '',
         'position': data.직책 || '',
@@ -1339,11 +1340,12 @@ async function handleEmployeesAPI(request, env, path) {
         'profileImageUrl': data.프로필이미지URL || '',
         'order': data.순서 || 1,
         'isActive': data.공개여부 !== false,
-        'fundType': data.자금유형 || '',
-        'workArea': data.업무영역 || '',
-        'industry': data.산업분야 || '',
         'imagePosition': data.이미지위치 || 'center 20%'
       };
+      // Select 필드는 값이 있을 때만 추가
+      if (data.자금유형) fields['fundType'] = data.자금유형;
+      if (data.업무영역) fields['workArea'] = data.업무영역;
+      if (data.산업분야) fields['industry'] = data.산업분야;
 
       const airtableResponse = await fetch(
         `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/employees`,
@@ -1401,6 +1403,7 @@ async function handleEmployeesAPI(request, env, path) {
       console.log('✏️ Updating employee:', recordId);
 
       // 프론트엔드 한글 필드 → Airtable 영문 필드로 변환
+      // Select 필드는 빈 값이면 포함하지 않음 (Airtable 권한 오류 방지)
       const fields = {};
       if (data.이름 !== undefined) fields['name'] = data.이름;
       if (data.직책 !== undefined) fields['position'] = data.직책;
@@ -1408,10 +1411,11 @@ async function handleEmployeesAPI(request, env, path) {
       if (data.프로필이미지URL !== undefined) fields['profileImageUrl'] = data.프로필이미지URL;
       if (data.순서 !== undefined) fields['order'] = data.순서;
       if (data.공개여부 !== undefined) fields['isActive'] = data.공개여부;
-      if (data.자금유형 !== undefined) fields['fundType'] = data.자금유형;
-      if (data.업무영역 !== undefined) fields['workArea'] = data.업무영역;
-      if (data.산업분야 !== undefined) fields['industry'] = data.산업분야;
       if (data.이미지위치 !== undefined) fields['imagePosition'] = data.이미지위치;
+      // Select 필드는 값이 있을 때만 추가 (빈 문자열 제외)
+      if (data.자금유형) fields['fundType'] = data.자금유형;
+      if (data.업무영역) fields['workArea'] = data.업무영역;
+      if (data.산업분야) fields['industry'] = data.산업분야;
 
       const airtableResponse = await fetch(
         `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/employees/${recordId}`,
