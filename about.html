@@ -1869,41 +1869,42 @@
         /* 전문분야 뱃지 */
         .employee-badges {
             display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
+            flex-wrap: nowrap;
+            gap: 4px;
+            justify-content: flex-start;
         }
 
         .employee-badge {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
-            padding: 5px 10px;
-            border-radius: 16px;
-            font-size: 12px;
+            gap: 3px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
             font-weight: 500;
+            white-space: nowrap;
         }
 
         .employee-badge svg {
-            width: 12px;
-            height: 12px;
+            width: 10px;
+            height: 10px;
+            flex-shrink: 0;
         }
 
-        /* 자금유형 - 파랑 */
+        /* 브랜드 컬러 기반 뱃지 - 파랑 계열 그라데이션 */
         .badge-fund {
-            background: #EFF6FF;
-            color: #2563EB;
+            background: #1B3A5F;
+            color: #ffffff;
         }
 
-        /* 업무영역 - 초록 */
         .badge-work {
-            background: #ECFDF5;
-            color: #059669;
+            background: #2563EB;
+            color: #ffffff;
         }
 
-        /* 산업분야 - 주황 */
         .badge-industry {
-            background: #FFF7ED;
-            color: #EA580C;
+            background: #3B82F6;
+            color: #ffffff;
         }
 
         .employees-empty {
