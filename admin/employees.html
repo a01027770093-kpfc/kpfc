@@ -1207,8 +1207,8 @@
         return;
       }
 
-      // 새 형식: "50% 20% 120"
-      const newMatch = position.match(/(\d+)%\s+(\d+)%\s+(\d+)/);
+      // 새 형식: "50% 20% 120" (음수 지원: "-10% 30% 150")
+      const newMatch = position.match(/(-?\d+)%\s+(-?\d+)%\s+(\d+)/);
       if (newMatch) {
         positionX = parseInt(newMatch[1]);
         positionY = parseInt(newMatch[2]);
@@ -1282,9 +1282,12 @@
         startX = e.clientX;
         startY = e.clientY;
 
-        // 드래그 방향과 위치 조정 (감도 조절)
-        positionX = Math.max(0, Math.min(100, positionX + deltaX * 0.5));
-        positionY = Math.max(0, Math.min(100, positionY + deltaY * 0.5));
+        // 드래그 방향과 위치 조정 (확대 시 더 넓은 범위 허용)
+        const extraRange = (zoomLevel - 100) / 2; // 확대 시 추가 범위
+        const minPos = -extraRange;
+        const maxPos = 100 + extraRange;
+        positionX = Math.max(minPos, Math.min(maxPos, positionX + deltaX * 0.5));
+        positionY = Math.max(minPos, Math.min(maxPos, positionY + deltaY * 0.5));
         updateImagePosition();
       };
 

@@ -2027,8 +2027,8 @@
                     const parseImagePosition = (pos) => {
                         if (!pos) return { objectPosition: 'center 20%', scale: 1 };
 
-                        // 새 형식: "50% 20% 120"
-                        const newMatch = pos.match(/(\d+)%\s+(\d+)%\s+(\d+)/);
+                        // 새 형식: "50% 20% 120" (음수 지원: "-10% 30% 150")
+                        const newMatch = pos.match(/(-?\d+)%\s+(-?\d+)%\s+(\d+)/);
                         if (newMatch) {
                             return {
                                 objectPosition: `${newMatch[1]}% ${newMatch[2]}%`,
