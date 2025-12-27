@@ -1283,7 +1283,7 @@
         startY = e.clientY;
 
         // 드래그 방향과 위치 조정 (확대 시 더 넓은 범위 허용)
-        const extraRange = (zoomLevel - 100) / 2; // 확대 시 추가 범위
+        const extraRange = (zoomLevel - 100); // 확대 비율만큼 추가 범위
         const minPos = -extraRange;
         const maxPos = 100 + extraRange;
         positionX = Math.max(minPos, Math.min(maxPos, positionX + deltaX * 0.5));
