@@ -1736,12 +1736,12 @@
 
     <style>
         .employees-section {
-            background: #ffffff;
+            background: #F8FAFC;
             padding: 80px 20px;
         }
 
         .employees-section .container {
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
@@ -1777,73 +1777,130 @@
         }
 
         .employees-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            display: flex;
+            flex-direction: column;
             gap: 24px;
         }
 
         .employee-card {
             background: #ffffff;
-            border-radius: 16px;
-            padding: 32px;
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: row;
         }
 
         .employee-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
         }
 
-        .employee-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin: 0 auto 20px;
-            background: #F3F4F6;
-        }
-
-        .employee-avatar-placeholder {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
+        /* 왼쪽 이미지 영역 (50%) */
+        .employee-image-area {
+            flex: 0 0 45%;
+            min-height: 280px;
             background: linear-gradient(135deg, #E5E7EB 0%, #F3F4F6 100%);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .employee-avatar {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .employee-avatar-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: #9CA3AF;
         }
 
         .employee-avatar-placeholder svg {
-            width: 48px;
-            height: 48px;
+            width: 80px;
+            height: 80px;
+        }
+
+        /* 오른쪽 정보 영역 (50%) */
+        .employee-info-area {
+            flex: 1;
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .employee-name {
-            font-size: 20px;
+            font-size: 24px;
             font-weight: 700;
             color: #1B3A5F;
             margin-bottom: 6px;
         }
 
         .employee-position {
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 600;
             color: #3B82F6;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
         }
 
         .employee-intro {
-            font-size: 14px;
+            font-size: 15px;
             color: #6B7280;
-            line-height: 1.6;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        /* 전문분야 뱃지 */
+        .employee-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .employee-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .employee-badge svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* 자금유형 - 파랑 */
+        .badge-fund {
+            background: #EFF6FF;
+            color: #2563EB;
+        }
+
+        /* 업무영역 - 초록 */
+        .badge-work {
+            background: #ECFDF5;
+            color: #059669;
+        }
+
+        /* 산업분야 - 주황 */
+        .badge-industry {
+            background: #FFF7ED;
+            color: #EA580C;
         }
 
         .employees-empty {
-            grid-column: 1 / -1;
             text-align: center;
             padding: 60px 20px;
             color: #9CA3AF;
@@ -1860,18 +1917,37 @@
             }
 
             .employees-grid {
-                grid-template-columns: 1fr;
                 gap: 20px;
             }
 
             .employee-card {
+                flex-direction: column;
+            }
+
+            .employee-image-area {
+                flex: none;
+                min-height: 240px;
+            }
+
+            .employee-info-area {
                 padding: 24px;
             }
 
-            .employee-avatar,
-            .employee-avatar-placeholder {
-                width: 100px;
-                height: 100px;
+            .employee-name {
+                font-size: 20px;
+            }
+
+            .employee-intro {
+                font-size: 14px;
+            }
+
+            .employee-badges {
+                gap: 6px;
+            }
+
+            .employee-badge {
+                font-size: 12px;
+                padding: 5px 10px;
             }
         }
     </style>
@@ -1893,22 +1969,74 @@
                     return;
                 }
 
-                grid.innerHTML = employees.map(emp => `
-                    <div class="employee-card">
-                        ${emp.프로필이미지URL
-                            ? `<img src="${emp.프로필이미지URL}" alt="${emp.이름}" class="employee-avatar">`
-                            : `<div class="employee-avatar-placeholder">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                                    <circle cx="12" cy="7" r="4"/>
-                                </svg>
-                              </div>`
+                grid.innerHTML = employees.map(emp => {
+                    // 뱃지 생성 함수
+                    const renderBadges = () => {
+                        const badges = [];
+
+                        // 자금유형 뱃지 (파랑)
+                        if (emp.자금유형) {
+                            badges.push(`
+                                <span class="employee-badge badge-fund">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <path d="M12 6v12M9 9h6M9 15h6"/>
+                                    </svg>
+                                    ${emp.자금유형}
+                                </span>
+                            `);
                         }
-                        <h3 class="employee-name">${emp.이름}</h3>
-                        <p class="employee-position">${emp.직책}</p>
-                        ${emp.소개 ? `<p class="employee-intro">${emp.소개}</p>` : ''}
-                    </div>
-                `).join('');
+
+                        // 업무영역 뱃지 (초록)
+                        if (emp.업무영역) {
+                            badges.push(`
+                                <span class="employee-badge badge-work">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+                                        <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                                    </svg>
+                                    ${emp.업무영역}
+                                </span>
+                            `);
+                        }
+
+                        // 산업분야 뱃지 (주황)
+                        if (emp.산업분야) {
+                            badges.push(`
+                                <span class="employee-badge badge-industry">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M2 20h20M4 20V10l6-6 6 6v10M14 20v-6h6v6"/>
+                                    </svg>
+                                    ${emp.산업분야}
+                                </span>
+                            `);
+                        }
+
+                        return badges.length > 0 ? `<div class="employee-badges">${badges.join('')}</div>` : '';
+                    };
+
+                    return `
+                        <div class="employee-card">
+                            <div class="employee-image-area">
+                                ${emp.프로필이미지URL
+                                    ? `<img src="${emp.프로필이미지URL}" alt="${emp.이름}" class="employee-avatar">`
+                                    : `<div class="employee-avatar-placeholder">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                            <circle cx="12" cy="7" r="4"/>
+                                        </svg>
+                                      </div>`
+                                }
+                            </div>
+                            <div class="employee-info-area">
+                                <h3 class="employee-name">${emp.이름}</h3>
+                                <p class="employee-position">${emp.직책}</p>
+                                ${emp.소개 ? `<p class="employee-intro">${emp.소개}</p>` : ''}
+                                ${renderBadges()}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
             } catch (error) {
                 console.error('임직원 로드 실패:', error);
                 // 오류 시 섹션 숨김
