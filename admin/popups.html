@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>팝업 관리 - 한국정책자금지원센터</title>
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <script src="/js/admin-auth.js"></script>
+  <style>
+    /* 팝업 그리드 */
+    .popup-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      padding: 20px;
+    }
+    @media (max-width: 1200px) {
+      .popup-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+    @media (max-width: 900px) {
+      .popup-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 600px) {
+      .popup-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* 팝업 카드 */
+    .popup-card {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid var(--neutral-200);
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+    .popup-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transform: translateY(-2px);
+    }
+    .popup-card.add-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 280px;
+      border: 2px dashed var(--neutral-300);
+      cursor: pointer;
+      color: var(--neutral-500);
+    }
+    .popup-card.add-card:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--neutral-50);
+    }
+    .popup-card.add-card svg {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 12px;
+    }
+
+    /* 팝업 이미지 */
+    .popup-image-wrap {
+      position: relative;
+      aspect-ratio: 1;
+      background: var(--neutral-100);
+      overflow: hidden;
+    }
+    .popup-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .popup-no-image {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--neutral-400);
+    }
+    .popup-no-image svg {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 8px;
+    }
+    .popup-order-badge {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* 팝업 정보 */
+    .popup-info {
+      padding: 16px;
+    }
+    .popup-title {
+      font-weight: 600;
+      color: var(--neutral-800);
+      margin-bottom: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .popup-date {
+      font-size: 12px;
+      color: var(--neutral-500);
+      margin-bottom: 12px;
+    }
+    .popup-status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* 상태 뱃지 */
+    .status-active {
+      background: #10B981;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .status-inactive {
+      background: var(--neutral-200);
+      color: var(--neutral-600);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .status-scheduled {
+      background: #F59E0B;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .status-expired {
+      background: #EF4444;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    /* 액션 버튼 */
+    .popup-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* 로딩 */
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .loading-overlay.hidden { display: none; }
+    .loading-spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* 이미지 업로드 영역 */
+    .image-upload-area {
+      border: 2px dashed var(--neutral-300);
+      border-radius: 12px;
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: var(--neutral-50);
+    }
+    .image-upload-area:hover {
+      border-color: var(--primary);
+      background: rgba(29, 0, 173, 0.02);
+    }
+    .image-upload-area.dragover {
+      border-color: var(--primary);
+      background: rgba(29, 0, 173, 0.05);
+    }
+    .image-upload-area svg {
+      width: 48px;
+      height: 48px;
+      color: var(--neutral-400);
+      margin-bottom: 12px;
+    }
+    .image-upload-area p {
+      color: var(--neutral-600);
+      margin-bottom: 4px;
+    }
+    .image-upload-area span {
+      font-size: 12px;
+      color: var(--neutral-400);
+    }
+    .image-preview-wrap {
+      position: relative;
+      aspect-ratio: 1;
+      max-width: 300px;
+      margin: 0 auto;
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--neutral-100);
+    }
+    .image-preview {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .image-preview-actions {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      display: flex;
+      gap: 4px;
+    }
+    .image-preview-actions button {
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+
+    /* 라디오 버튼 그룹 */
+    .radio-group {
+      display: flex;
+      gap: 16px;
+    }
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    /* 팁 박스 */
+    .tip-box {
+      background: #EFF6FF;
+      border: 1px solid #BFDBFE;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #1E40AF;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .tip-box svg {
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* 하단 여백 */
+    @media (max-width: 768px) {
+      .main-content {
+        padding-bottom: 80px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container">
+    <!-- 사이드바 오버레이 (모바일) -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- 사이드바 -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h1 class="logo">KPFC</h1>
+        <span class="logo-sub">관리자</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="/admin/" class="nav-item">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"/>
+              <rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/>
+              <rect x="3" y="14" width="7" height="7"/>
+            </svg>
+          </span>
+          <span class="nav-text">대시보드</span>
+        </a>
+        <a href="/admin/leads.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/>
+              <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
+            </svg>
+          </span>
+          <span class="nav-text">접수내역</span>
+        </a>
+        <a href="/admin/board.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </span>
+          <span class="nav-text">게시판 관리</span>
+        </a>
+        <a href="/admin/employees.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+          </span>
+          <span class="nav-text">임직원 관리</span>
+        </a>
+        <a href="/admin/popups.html" class="nav-item active">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+          </span>
+          <span class="nav-text">팝업 관리</span>
+        </a>
+        <a href="/admin/analytics.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"/>
+              <line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+          </span>
+          <span class="nav-text">방문통계</span>
+        </a>
+        <a href="/admin/pages.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            </svg>
+          </span>
+          <span class="nav-text">페이지 편집</span>
+        </a>
+        <a href="/admin/settings.html" class="nav-item">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </span>
+          <span class="nav-text">설정</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="/" class="nav-item" target="_blank">
+          <span class="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+          </span>
+          <span class="nav-text">사이트 보기</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="main-content">
+      <!-- 헤더 -->
+      <header class="dashboard-header">
+        <div class="header-left">
+          <button class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="메뉴 열기">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+          </button>
+          <div>
+            <h2 class="page-title">팝업 관리</h2>
+            <p class="page-subtitle">메인 페이지에 표시될 팝업 배너를 관리합니다</p>
+          </div>
+        </div>
+        <div class="header-right">
+          <button class="btn btn-primary" onclick="openAddModal()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            팝업 추가
+          </button>
+        </div>
+      </header>
+
+      <!-- 안내 -->
+      <section class="content-section" style="padding: 16px 20px;">
+        <div class="tip-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="16" x2="12" y2="12"/>
+            <line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          <div>
+            <strong>팝업 표시 규칙:</strong> PC에서는 4개씩 한 줄로 표시되며 최대 8개까지 표시됩니다. 모바일에서는 좌우 슬라이드로 전환됩니다. 순서 번호가 낮을수록 먼저 표시됩니다.
+          </div>
+        </div>
+      </section>
+
+      <!-- 팝업 그리드 -->
+      <section class="content-section">
+        <div class="section-header">
+          <h3>팝업 목록</h3>
+          <span class="section-count" id="popupCount">0개</span>
+        </div>
+
+        <div class="popup-grid" id="popupGrid">
+          <!-- 로딩 표시 -->
+          <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--neutral-400);">
+            로딩 중...
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- 로딩 오버레이 -->
+  <div class="loading-overlay hidden" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <!-- 팝업 추가/수정 모달 -->
+  <div class="modal-overlay" id="popupModal">
+    <div class="modal" style="max-width: 520px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modalTitle">팝업 추가</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <form id="popupForm" onsubmit="savePopup(event)">
+        <div class="modal-body">
+          <!-- 이미지 업로드 -->
+          <div class="form-group">
+            <label>팝업 이미지 <span class="required">*</span> <span style="font-weight: 400; color: var(--neutral-500); font-size: 12px;">(정사각형, 자동 WebP 100KB 압축)</span></label>
+            <input type="file" id="imageFile" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+            <input type="hidden" id="imageUrl" value="">
+
+            <div id="uploadArea" class="image-upload-area" onclick="document.getElementById('imageFile').click()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21 15 16 10 5 21"/>
+              </svg>
+              <p>클릭하여 이미지 선택</p>
+              <span>또는 드래그 앤 드롭</span>
+            </div>
+
+            <div id="previewArea" style="display: none;">
+              <div class="image-preview-wrap">
+                <img id="imagePreview" class="image-preview" src="" alt="미리보기">
+                <div class="image-preview-actions">
+                  <button type="button" class="btn btn-sm btn-outline" onclick="document.getElementById('imageFile').click()">변경</button>
+                  <button type="button" class="btn btn-sm btn-danger" onclick="removeImage()">삭제</button>
+                </div>
+              </div>
+            </div>
+            <span id="uploadStatus" style="font-size: 12px; color: var(--neutral-500); margin-top: 8px; display: block;"></span>
+          </div>
+
+          <!-- 제목 -->
+          <div class="form-group">
+            <label for="popupTitle">제목 (관리용) <span class="required">*</span></label>
+            <input type="text" id="popupTitle" class="form-input" placeholder="예: 2025 신년 이벤트" required>
+          </div>
+
+          <!-- 대체 텍스트 -->
+          <div class="form-group">
+            <label for="popupAltText">대체 텍스트 (접근성) <span class="required">*</span></label>
+            <input type="text" id="popupAltText" class="form-input" placeholder="이미지를 설명하는 텍스트" required>
+            <span style="font-size: 12px; color: var(--neutral-500);">스크린 리더 사용자에게 읽어주는 텍스트입니다.</span>
+          </div>
+
+          <!-- 링크 -->
+          <div class="form-group">
+            <label for="popupLinkUrl">클릭 시 이동 링크</label>
+            <input type="url" id="popupLinkUrl" class="form-input" placeholder="https://example.com/event">
+          </div>
+
+          <!-- 링크 타겟 -->
+          <div class="form-group">
+            <label>링크 열기</label>
+            <div class="radio-group">
+              <label>
+                <input type="radio" name="linkTarget" value="_self" checked>
+                같은 창
+              </label>
+              <label>
+                <input type="radio" name="linkTarget" value="_blank">
+                새 창
+              </label>
+            </div>
+          </div>
+
+          <!-- 순서, 게재 여부 -->
+          <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+              <label for="popupOrder">표시 순서</label>
+              <input type="number" id="popupOrder" class="form-input" value="1" min="1" max="8">
+            </div>
+            <div class="form-group">
+              <label for="popupActive">게재 여부</label>
+              <div style="display: flex; align-items: center; height: 44px;">
+                <label class="toggle-switch">
+                  <input type="checkbox" id="popupActive" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+                <span style="margin-left: 8px; color: var(--neutral-600); font-size: 14px;">게재 활성화</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 게재 기간 -->
+          <div class="form-group">
+            <label>게재 기간 (선택)</label>
+            <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center;">
+              <input type="date" id="startDate" class="form-input">
+              <span style="color: var(--neutral-400);">~</span>
+              <input type="date" id="endDate" class="form-input">
+            </div>
+            <span style="font-size: 12px; color: var(--neutral-500);">설정하지 않으면 항상 표시됩니다.</span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal()">취소</button>
+          <button type="submit" class="btn btn-primary" id="submitBtn">저장</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 삭제 확인 모달 -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal" style="max-width: 400px;">
+      <div class="modal-header">
+        <h3 class="modal-title">팝업 삭제</h3>
+        <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="color: var(--neutral-600);">
+          <strong id="deletePopupTitle"></strong> 팝업을 삭제하시겠습니까?<br>
+          삭제된 팝업은 복구할 수 없습니다.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" onclick="closeDeleteModal()">취소</button>
+        <button type="button" class="btn btn-danger" onclick="confirmDelete()">삭제</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 하단 메뉴바 (모바일) -->
+  <nav class="bottom-nav">
+    <ul class="bottom-nav-list">
+      <li class="bottom-nav-item">
+        <a href="/admin/" class="bottom-nav-link">
+          <span class="bottom-nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+            </svg>
+          </span>
+          <span class="bottom-nav-text">대시보드</span>
+        </a>
+      </li>
+      <li class="bottom-nav-item">
+        <a href="/admin/leads.html" class="bottom-nav-link">
+          <span class="bottom-nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/>
+              <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
+            </svg>
+          </span>
+          <span class="bottom-nav-text">접수</span>
+        </a>
+      </li>
+      <li class="bottom-nav-item">
+        <a href="/admin/popups.html" class="bottom-nav-link active">
+          <span class="bottom-nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+              <polyline points="21 15 16 10 5 21"/>
+            </svg>
+          </span>
+          <span class="bottom-nav-text">팝업</span>
+        </a>
+      </li>
+      <li class="bottom-nav-item">
+        <a href="/admin/analytics.html" class="bottom-nav-link">
+          <span class="bottom-nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6" y1="20" x2="6" y2="14"/>
+            </svg>
+          </span>
+          <span class="bottom-nav-text">통계</span>
+        </a>
+      </li>
+      <li class="bottom-nav-item">
+        <a href="/admin/settings.html" class="bottom-nav-link">
+          <span class="bottom-nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+          </span>
+          <span class="bottom-nav-text">설정</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <script>
+    // API 베이스 URL
+    const API_BASE = 'https://kpfc-api.a01027770093.workers.dev';
+
+    // 상태
+    let popups = [];
+    let editingId = null;
+    let deleteTargetId = null;
+
+    // 페이지 로드 시 데이터 불러오기
+    document.addEventListener('DOMContentLoaded', () => {
+      loadPopups();
+      initDragDrop();
+    });
+
+    // 팝업 목록 로드
+    async function loadPopups() {
+      try {
+        const response = await fetch(`${API_BASE}/popups/all`);
+        const data = await response.json();
+        popups = data.popups || [];
+        renderPopupGrid();
+      } catch (error) {
+        console.error('팝업 로드 실패:', error);
+        document.getElementById('popupGrid').innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--error);">
+            데이터를 불러오는데 실패했습니다.
+          </div>
+        `;
+      }
+    }
+
+    // 팝업 그리드 렌더링
+    function renderPopupGrid() {
+      const grid = document.getElementById('popupGrid');
+      document.getElementById('popupCount').textContent = `${popups.length}개`;
+
+      let html = '';
+
+      // 기존 팝업 카드들
+      popups.forEach(popup => {
+        const status = getPopupStatus(popup);
+        html += `
+          <div class="popup-card" data-id="${popup.id}">
+            <div class="popup-image-wrap">
+              ${popup.imageUrl
+                ? `<img src="${popup.imageUrl}" alt="${popup.altText || popup.title}" class="popup-image">`
+                : `<div class="popup-no-image">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                      <circle cx="8.5" cy="8.5" r="1.5"/>
+                      <polyline points="21 15 16 10 5 21"/>
+                    </svg>
+                    <span>이미지 없음</span>
+                  </div>`
+              }
+              <span class="popup-order-badge">${popup.order}번</span>
+            </div>
+            <div class="popup-info">
+              <div class="popup-title">${popup.title || '제목 없음'}</div>
+              <div class="popup-date">
+                ${popup.startDate || popup.endDate
+                  ? `${popup.startDate || ''} ~ ${popup.endDate || ''}`
+                  : '기간 제한 없음'}
+              </div>
+              <div class="popup-status">
+                <span class="${status.class}">${status.label}</span>
+                <div class="popup-actions">
+                  <button class="btn-icon" onclick="editPopup('${popup.id}')" title="수정">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                    </svg>
+                  </button>
+                  <button class="btn-icon btn-icon-danger" onclick="openDeleteModal('${popup.id}')" title="삭제">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"/>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      // 추가 카드 (8개 미만일 때만 표시)
+      if (popups.length < 8) {
+        html += `
+          <div class="popup-card add-card" onclick="openAddModal()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            <span>팝업 추가</span>
+          </div>
+        `;
+      }
+
+      grid.innerHTML = html || `
+        <div class="popup-card add-card" onclick="openAddModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          <span>첫 팝업 추가하기</span>
+        </div>
+      `;
+    }
+
+    // 팝업 상태 확인
+    function getPopupStatus(popup) {
+      if (!popup.isActive) {
+        return { label: '비활성', class: 'status-inactive' };
+      }
+
+      const today = new Date().toISOString().split('T')[0];
+
+      if (popup.startDate && popup.startDate > today) {
+        return { label: '예약됨', class: 'status-scheduled' };
+      }
+
+      if (popup.endDate && popup.endDate < today) {
+        return { label: '만료됨', class: 'status-expired' };
+      }
+
+      return { label: '게재중', class: 'status-active' };
+    }
+
+    // 추가 모달 열기
+    function openAddModal() {
+      editingId = null;
+      document.getElementById('modalTitle').textContent = '팝업 추가';
+      document.getElementById('submitBtn').textContent = '저장';
+      document.getElementById('popupForm').reset();
+      document.getElementById('imageUrl').value = '';
+      document.getElementById('uploadArea').style.display = 'block';
+      document.getElementById('previewArea').style.display = 'none';
+      document.getElementById('uploadStatus').textContent = '';
+      document.getElementById('popupActive').checked = true;
+      document.getElementById('popupOrder').value = popups.length + 1;
+      document.querySelector('input[name="linkTarget"][value="_self"]').checked = true;
+      document.getElementById('popupModal').classList.add('open');
+    }
+
+    // 수정 모달 열기
+    function editPopup(id) {
+      const popup = popups.find(p => p.id === id);
+      if (!popup) return;
+
+      editingId = id;
+      document.getElementById('modalTitle').textContent = '팝업 수정';
+      document.getElementById('submitBtn').textContent = '수정';
+      document.getElementById('popupTitle').value = popup.title || '';
+      document.getElementById('popupAltText').value = popup.altText || '';
+      document.getElementById('popupLinkUrl').value = popup.linkUrl || '';
+      document.getElementById('popupOrder').value = popup.order || 1;
+      document.getElementById('popupActive').checked = popup.isActive;
+      document.getElementById('startDate').value = popup.startDate || '';
+      document.getElementById('endDate').value = popup.endDate || '';
+      document.getElementById('imageUrl').value = popup.imageUrl || '';
+      document.getElementById('uploadStatus').textContent = '';
+
+      // 링크 타겟 설정
+      const linkTarget = popup.linkTarget || '_self';
+      document.querySelector(`input[name="linkTarget"][value="${linkTarget}"]`).checked = true;
+
+      // 이미지 미리보기
+      if (popup.imageUrl) {
+        document.getElementById('imagePreview').src = popup.imageUrl;
+        document.getElementById('uploadArea').style.display = 'none';
+        document.getElementById('previewArea').style.display = 'block';
+      } else {
+        document.getElementById('uploadArea').style.display = 'block';
+        document.getElementById('previewArea').style.display = 'none';
+      }
+
+      document.getElementById('popupModal').classList.add('open');
+    }
+
+    // 모달 닫기
+    function closeModal() {
+      document.getElementById('popupModal').classList.remove('open');
+      document.getElementById('imageFile').value = '';
+      editingId = null;
+    }
+
+    // 이미지 삭제
+    function removeImage() {
+      document.getElementById('imageUrl').value = '';
+      document.getElementById('uploadArea').style.display = 'block';
+      document.getElementById('previewArea').style.display = 'none';
+      document.getElementById('uploadStatus').textContent = '';
+      document.getElementById('imageFile').value = '';
+    }
+
+    // 드래그 앤 드롭 초기화
+    function initDragDrop() {
+      const uploadArea = document.getElementById('uploadArea');
+
+      uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('dragover');
+      });
+
+      uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('dragover');
+      });
+
+      uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        if (files.length > 0 && files[0].type.startsWith('image/')) {
+          handleImageFile(files[0]);
+        }
+      });
+    }
+
+    // 이미지 업로드 핸들러
+    function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        handleImageFile(file);
+      }
+    }
+
+    // 이미지 파일 처리
+    async function handleImageFile(file) {
+      const statusEl = document.getElementById('uploadStatus');
+      statusEl.textContent = '압축 중...';
+      statusEl.style.color = 'var(--primary)';
+
+      try {
+        // WebP 변환 및 압축
+        const { file: compressedFile, sizeKB } = await compressImageToWebP(file, 100);
+        console.log(`압축 완료: ${compressedFile.name}, ${sizeKB}KB`);
+
+        statusEl.textContent = '업로드 중...';
+        showLoading();
+
+        const formData = new FormData();
+        formData.append('file', compressedFile);
+
+        const response = await fetch(`${API_BASE}/upload`, {
+          method: 'POST',
+          body: formData
+        });
+
+        const result = await response.json();
+
+        if (result.success && result.url) {
+          document.getElementById('imageUrl').value = result.url;
+          document.getElementById('imagePreview').src = result.url;
+          document.getElementById('uploadArea').style.display = 'none';
+          document.getElementById('previewArea').style.display = 'block';
+          statusEl.textContent = `완료 (${sizeKB}KB)`;
+          statusEl.style.color = 'var(--success)';
+        } else {
+          statusEl.textContent = '';
+          alert('이미지 업로드에 실패했습니다: ' + (result.error || '알 수 없는 오류'));
+        }
+      } catch (error) {
+        console.error('업로드 오류:', error);
+        statusEl.textContent = '';
+        alert('이미지 처리 중 오류가 발생했습니다: ' + error.message);
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // 이미지를 WebP로 변환하고 100KB 이하로 압축
+    async function compressImageToWebP(file, maxSizeKB = 100) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+
+            // 정사각형으로 크롭 (중앙 기준)
+            const size = Math.min(width, height);
+            const sourceX = (width - size) / 2;
+            const sourceY = (height - size) / 2;
+
+            // 최대 800px로 리사이즈
+            const maxDimension = 800;
+            const targetSize = Math.min(size, maxDimension);
+
+            canvas.width = targetSize;
+            canvas.height = targetSize;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, sourceX, sourceY, size, size, 0, 0, targetSize, targetSize);
+
+            // 품질을 조절하며 100KB 이하가 될 때까지 압축
+            let quality = 0.9;
+            const tryCompress = () => {
+              canvas.toBlob((blob) => {
+                if (!blob) {
+                  reject(new Error('이미지 변환 실패'));
+                  return;
+                }
+
+                const sizeKB = blob.size / 1024;
+                console.log(`압축 시도: quality=${quality.toFixed(2)}, size=${sizeKB.toFixed(1)}KB`);
+
+                if (sizeKB <= maxSizeKB || quality <= 0.1) {
+                  const baseName = file.name.replace(/\.[^/.]+$/, '');
+                  const newFile = new File([blob], `${baseName}.webp`, { type: 'image/webp' });
+                  resolve({ file: newFile, sizeKB: sizeKB.toFixed(1) });
+                } else {
+                  quality -= 0.1;
+                  tryCompress();
+                }
+              }, 'image/webp', quality);
+            };
+
+            tryCompress();
+          };
+          img.onerror = () => reject(new Error('이미지 로드 실패'));
+          img.src = e.target.result;
+        };
+        reader.onerror = () => reject(new Error('파일 읽기 실패'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // 팝업 저장
+    async function savePopup(event) {
+      event.preventDefault();
+
+      const imageUrl = document.getElementById('imageUrl').value.trim();
+      if (!imageUrl) {
+        alert('팝업 이미지를 업로드해주세요.');
+        return;
+      }
+
+      const data = {
+        title: document.getElementById('popupTitle').value.trim(),
+        altText: document.getElementById('popupAltText').value.trim(),
+        imageUrl: imageUrl,
+        linkUrl: document.getElementById('popupLinkUrl').value.trim(),
+        linkTarget: document.querySelector('input[name="linkTarget"]:checked').value,
+        order: parseInt(document.getElementById('popupOrder').value) || 1,
+        isActive: document.getElementById('popupActive').checked,
+        startDate: document.getElementById('startDate').value || null,
+        endDate: document.getElementById('endDate').value || null
+      };
+
+      if (!data.title || !data.altText) {
+        alert('제목과 대체 텍스트는 필수 입력 항목입니다.');
+        return;
+      }
+
+      showLoading();
+
+      try {
+        const url = editingId
+          ? `${API_BASE}/popups/${editingId}`
+          : `${API_BASE}/popups`;
+        const method = editingId ? 'PATCH' : 'POST';
+
+        const response = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          closeModal();
+          await loadPopups();
+          alert(editingId ? '팝업이 수정되었습니다.' : '팝업이 등록되었습니다.');
+        } else {
+          alert('저장 실패: ' + (result.error || '알 수 없는 오류'));
+        }
+      } catch (error) {
+        console.error('저장 오류:', error);
+        alert('저장 중 오류가 발생했습니다.');
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // 삭제 모달 열기
+    function openDeleteModal(id) {
+      const popup = popups.find(p => p.id === id);
+      if (!popup) return;
+
+      deleteTargetId = id;
+      document.getElementById('deletePopupTitle').textContent = popup.title || '제목 없음';
+      document.getElementById('deleteModal').classList.add('open');
+    }
+
+    // 삭제 모달 닫기
+    function closeDeleteModal() {
+      document.getElementById('deleteModal').classList.remove('open');
+      deleteTargetId = null;
+    }
+
+    // 삭제 확인
+    async function confirmDelete() {
+      if (!deleteTargetId) return;
+
+      showLoading();
+
+      try {
+        const response = await fetch(`${API_BASE}/popups/${deleteTargetId}`, {
+          method: 'DELETE'
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          closeDeleteModal();
+          await loadPopups();
+          alert('팝업이 삭제되었습니다.');
+        } else {
+          alert('삭제 실패: ' + (result.error || '알 수 없는 오류'));
+        }
+      } catch (error) {
+        console.error('삭제 오류:', error);
+        alert('삭제 중 오류가 발생했습니다.');
+      } finally {
+        hideLoading();
+      }
+    }
+
+    // 로딩 표시
+    function showLoading() {
+      document.getElementById('loadingOverlay').classList.remove('hidden');
+    }
+
+    function hideLoading() {
+      document.getElementById('loadingOverlay').classList.add('hidden');
+    }
+
+    // 사이드바 토글
+    function toggleSidebar() {
+      document.querySelector('.sidebar').classList.toggle('open');
+      document.querySelector('.sidebar-overlay').classList.toggle('open');
+    }
+  </script>
+</body>
+</html>

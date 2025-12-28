@@ -703,6 +703,283 @@
     }
 </style>
 
+<!-- 팝업 배너 영역 -->
+<section class="popup-section" id="popupSection" style="display: none;" role="region" aria-label="이벤트 배너">
+    <div class="container">
+        <!-- PC: 그리드 레이아웃 -->
+        <div class="popup-grid" id="popupGrid" role="list"></div>
+        <!-- 모바일: 슬라이드 레이아웃 -->
+        <div class="popup-slider" id="popupSlider" role="listbox" aria-label="이벤트 슬라이더">
+            <div class="popup-slider-track" id="popupSliderTrack"></div>
+            <div class="popup-slider-dots" id="popupSliderDots" role="tablist" aria-label="슬라이드 탐색"></div>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* 팝업 섹션 */
+    .popup-section {
+        padding: 20px 0 0 0;
+        background: transparent;
+        margin-top: 70px; /* 헤더 높이 */
+    }
+    .popup-section .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    /* PC: 그리드 레이아웃 */
+    .popup-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+    }
+    .popup-item {
+        aspect-ratio: 1;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        background: #f5f5f5;
+    }
+    .popup-item:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+    .popup-item a {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+    .popup-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    /* 모바일: 슬라이더 레이아웃 */
+    .popup-slider {
+        display: none;
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+    }
+    .popup-slider-track {
+        display: flex;
+        transition: transform 0.3s ease;
+    }
+    .popup-slide {
+        flex: 0 0 100%;
+        aspect-ratio: 1;
+    }
+    .popup-slide a {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+    .popup-slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .popup-slider-dots {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 12px;
+    }
+    .popup-slider-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(0,0,0,0.2);
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .popup-slider-dot.active {
+        background: var(--primary, #3B82F6);
+        width: 24px;
+        border-radius: 4px;
+    }
+
+    /* 반응형 */
+    @media (max-width: 1024px) {
+        .popup-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+    @media (max-width: 768px) {
+        .popup-section {
+            margin-top: 60px;
+            padding: 16px 0 0 0;
+        }
+        .popup-grid {
+            display: none;
+        }
+        .popup-slider {
+            display: block;
+        }
+        .popup-slider-track {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+    }
+    @media (max-width: 480px) {
+        .popup-section {
+            margin-top: 56px;
+        }
+        .popup-section .container {
+            padding: 0 16px;
+        }
+    }
+</style>
+
+<script>
+(function() {
+    const API_BASE = 'https://kpfc-api.a01027770093.workers.dev';
+    let currentSlide = 0;
+    let popups = [];
+    let autoSlideInterval;
+
+    // 팝업 로드
+    async function loadPopups() {
+        try {
+            const response = await fetch(`${API_BASE}/popups`);
+            const data = await response.json();
+            popups = data.popups || [];
+
+            if (popups.length === 0) {
+                document.getElementById('popupSection').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('popupSection').style.display = 'block';
+            renderPopups();
+            initSlider();
+        } catch (error) {
+            console.error('팝업 로드 실패:', error);
+            document.getElementById('popupSection').style.display = 'none';
+        }
+    }
+
+    // 팝업 렌더링
+    function renderPopups() {
+        const grid = document.getElementById('popupGrid');
+        const track = document.getElementById('popupSliderTrack');
+        const dots = document.getElementById('popupSliderDots');
+
+        // 그리드 렌더링 (PC)
+        grid.innerHTML = popups.map(popup => `
+            <div class="popup-item" role="listitem">
+                ${popup.linkUrl
+                    ? `<a href="${popup.linkUrl}" target="${popup.linkTarget || '_self'}" rel="${popup.linkTarget === '_blank' ? 'noopener noreferrer' : ''}">
+                        <img src="${popup.imageUrl}" alt="${popup.altText || popup.title}" loading="lazy">
+                       </a>`
+                    : `<img src="${popup.imageUrl}" alt="${popup.altText || popup.title}" loading="lazy">`
+                }
+            </div>
+        `).join('');
+
+        // 슬라이더 렌더링 (모바일)
+        track.innerHTML = popups.map((popup, i) => `
+            <div class="popup-slide" role="option" aria-selected="${i === 0 ? 'true' : 'false'}">
+                ${popup.linkUrl
+                    ? `<a href="${popup.linkUrl}" target="${popup.linkTarget || '_self'}" rel="${popup.linkTarget === '_blank' ? 'noopener noreferrer' : ''}">
+                        <img src="${popup.imageUrl}" alt="${popup.altText || popup.title}" loading="lazy">
+                       </a>`
+                    : `<img src="${popup.imageUrl}" alt="${popup.altText || popup.title}" loading="lazy">`
+                }
+            </div>
+        `).join('');
+
+        // 도트 네비게이션
+        dots.innerHTML = popups.map((_, i) => `
+            <button class="popup-slider-dot ${i === 0 ? 'active' : ''}"
+                    onclick="goToSlide(${i})"
+                    role="tab"
+                    aria-selected="${i === 0 ? 'true' : 'false'}"
+                    aria-label="슬라이드 ${i + 1}"></button>
+        `).join('');
+    }
+
+    // 슬라이더 초기화
+    function initSlider() {
+        const track = document.getElementById('popupSliderTrack');
+        const slider = document.getElementById('popupSlider');
+        let startX = 0;
+        let isDragging = false;
+
+        // 터치 스와이프
+        slider.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            isDragging = true;
+            stopAutoSlide();
+        }, { passive: true });
+
+        slider.addEventListener('touchend', (e) => {
+            if (!isDragging) return;
+            const endX = e.changedTouches[0].clientX;
+            const diff = startX - endX;
+
+            if (Math.abs(diff) > 50) {
+                if (diff > 0 && currentSlide < popups.length - 1) {
+                    goToSlide(currentSlide + 1);
+                } else if (diff < 0 && currentSlide > 0) {
+                    goToSlide(currentSlide - 1);
+                }
+            }
+            isDragging = false;
+            startAutoSlide();
+        }, { passive: true });
+
+        // 자동 슬라이드
+        startAutoSlide();
+    }
+
+    // 슬라이드 이동
+    window.goToSlide = function(index) {
+        currentSlide = index;
+        const track = document.getElementById('popupSliderTrack');
+        const dots = document.querySelectorAll('.popup-slider-dot');
+        const slides = document.querySelectorAll('.popup-slide');
+
+        track.style.transform = `translateX(-${index * 100}%)`;
+
+        dots.forEach((dot, i) => {
+            dot.classList.toggle('active', i === index);
+            dot.setAttribute('aria-selected', i === index ? 'true' : 'false');
+        });
+
+        slides.forEach((slide, i) => {
+            slide.setAttribute('aria-selected', i === index ? 'true' : 'false');
+        });
+    };
+
+    // 자동 슬라이드
+    function startAutoSlide() {
+        if (popups.length <= 1) return;
+        autoSlideInterval = setInterval(() => {
+            const next = (currentSlide + 1) % popups.length;
+            goToSlide(next);
+        }, 4000);
+    }
+
+    function stopAutoSlide() {
+        clearInterval(autoSlideInterval);
+    }
+
+    // 페이지 로드 시 실행
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadPopups);
+    } else {
+        loadPopups();
+    }
+})();
+</script>
+
 <section class="hero-section">
     <div class="hero-video-bg">
         <iframe src="https://www.youtube.com/embed/HGrAntOmJtk?autoplay=1&mute=1&loop=1&playlist=HGrAntOmJtk&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>

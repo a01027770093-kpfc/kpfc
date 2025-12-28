@@ -1520,6 +1520,284 @@ async function handleEmployeesAPI(request, env, path) {
 }
 
 // ================================================
+// 팝업 관리 API 핸들러
+// ================================================
+
+async function handlePopupsAPI(request, env, path) {
+  const method = request.method;
+
+  // GET /popups - 공개 팝업 목록 조회 (활성화 + 날짜 필터링)
+  if (method === 'GET' && path === '/popups') {
+    try {
+      const today = formatDateKST(new Date());
+
+      // 활성화된 팝업만 조회, 순서대로 정렬
+      const airtableResponse = await fetch(
+        `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/popups?` +
+        `filterByFormula=AND({isActive}=TRUE(),OR({startDate}='',{startDate}<='${today}'),OR({endDate}='',{endDate}>='${today}'))` +
+        `&sort[0][field]=order&sort[0][direction]=asc`,
+        {
+          headers: { 'Authorization': `Bearer ${env.AIRTABLE_TOKEN}` }
+        }
+      );
+
+      if (!airtableResponse.ok) {
+        return new Response(JSON.stringify({ popups: [], message: 'No popups table or empty' }), {
+          headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const data = await airtableResponse.json();
+      // 최대 8개까지만 반환
+      const popups = (data.records || []).slice(0, 8).map(record => ({
+        id: record.id,
+        title: record.fields['title'] || '',
+        imageUrl: record.fields['imageUrl'] || '',
+        linkUrl: record.fields['linkUrl'] || '',
+        linkTarget: record.fields['linkTarget'] || '_self',
+        order: record.fields['order'] || 0,
+        altText: record.fields['altText'] || ''
+      }));
+
+      return new Response(JSON.stringify({ popups }), {
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    } catch (error) {
+      return new Response(JSON.stringify({ error: error.message }), {
+        status: 500,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    }
+  }
+
+  // GET /popups/all - 전체 팝업 목록 조회 (관리자용)
+  if (method === 'GET' && path === '/popups/all') {
+    try {
+      const airtableResponse = await fetch(
+        `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/popups?` +
+        `sort[0][field]=order&sort[0][direction]=asc`,
+        {
+          headers: { 'Authorization': `Bearer ${env.AIRTABLE_TOKEN}` }
+        }
+      );
+
+      if (!airtableResponse.ok) {
+        return new Response(JSON.stringify({ popups: [], message: 'No popups table or empty' }), {
+          headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const data = await airtableResponse.json();
+      const popups = (data.records || []).map(record => ({
+        id: record.id,
+        title: record.fields['title'] || '',
+        imageUrl: record.fields['imageUrl'] || '',
+        linkUrl: record.fields['linkUrl'] || '',
+        linkTarget: record.fields['linkTarget'] || '_self',
+        order: record.fields['order'] || 0,
+        isActive: record.fields['isActive'] || false,
+        startDate: record.fields['startDate'] || '',
+        endDate: record.fields['endDate'] || '',
+        altText: record.fields['altText'] || '',
+        createdTime: record.createdTime
+      }));
+
+      return new Response(JSON.stringify({ popups }), {
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    } catch (error) {
+      return new Response(JSON.stringify({ error: error.message }), {
+        status: 500,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    }
+  }
+
+  // POST /popups - 팝업 등록
+  if (method === 'POST' && path === '/popups') {
+    try {
+      const data = await request.json();
+      console.log('📝 Creating popup:', data.title);
+
+      const fields = {
+        'title': data.title || '',
+        'imageUrl': data.imageUrl || '',
+        'linkUrl': data.linkUrl || '',
+        'linkTarget': data.linkTarget || '_self',
+        'order': data.order || 1,
+        'isActive': data.isActive !== false,
+        'altText': data.altText || ''
+      };
+
+      // 날짜 필드는 값이 있을 때만 추가
+      if (data.startDate) fields['startDate'] = data.startDate;
+      if (data.endDate) fields['endDate'] = data.endDate;
+
+      const airtableResponse = await fetch(
+        `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/popups`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${env.AIRTABLE_TOKEN}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ fields })
+        }
+      );
+
+      if (!airtableResponse.ok) {
+        const error = await airtableResponse.json();
+        return new Response(JSON.stringify({
+          success: false,
+          error: error.error?.message || 'Failed to create popup'
+        }), {
+          status: 500,
+          headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const result = await airtableResponse.json();
+      console.log('✅ Popup created:', result.id);
+
+      return new Response(JSON.stringify({
+        success: true,
+        id: result.id,
+        popup: {
+          id: result.id,
+          ...fields
+        }
+      }), {
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    } catch (error) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: error.message
+      }), {
+        status: 500,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    }
+  }
+
+  // PATCH /popups/:id - 팝업 수정
+  const patchMatch = path.match(/^\/popups\/([^/]+)$/);
+  if (method === 'PATCH' && patchMatch) {
+    const recordId = patchMatch[1];
+    try {
+      const data = await request.json();
+      console.log('📝 Updating popup:', recordId);
+
+      const fields = {};
+      if (data.title !== undefined) fields['title'] = data.title;
+      if (data.imageUrl !== undefined) fields['imageUrl'] = data.imageUrl;
+      if (data.linkUrl !== undefined) fields['linkUrl'] = data.linkUrl;
+      if (data.linkTarget !== undefined) fields['linkTarget'] = data.linkTarget;
+      if (data.order !== undefined) fields['order'] = data.order;
+      if (data.isActive !== undefined) fields['isActive'] = data.isActive;
+      if (data.startDate !== undefined) fields['startDate'] = data.startDate || null;
+      if (data.endDate !== undefined) fields['endDate'] = data.endDate || null;
+      if (data.altText !== undefined) fields['altText'] = data.altText;
+
+      const airtableResponse = await fetch(
+        `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/popups/${recordId}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${env.AIRTABLE_TOKEN}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ fields })
+        }
+      );
+
+      if (!airtableResponse.ok) {
+        const error = await airtableResponse.json();
+        return new Response(JSON.stringify({
+          success: false,
+          error: error.error?.message || 'Failed to update popup'
+        }), {
+          status: 500,
+          headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const result = await airtableResponse.json();
+      console.log('✅ Popup updated:', result.id);
+
+      return new Response(JSON.stringify({
+        success: true,
+        id: result.id
+      }), {
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    } catch (error) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: error.message
+      }), {
+        status: 500,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    }
+  }
+
+  // DELETE /popups/:id - 팝업 삭제
+  const deleteMatch = path.match(/^\/popups\/([^/]+)$/);
+  if (method === 'DELETE' && deleteMatch) {
+    const recordId = deleteMatch[1];
+    try {
+      console.log('🗑️ Deleting popup:', recordId);
+
+      const airtableResponse = await fetch(
+        `https://api.airtable.com/v0/${env.AIRTABLE_BASE_ID}/popups/${recordId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${env.AIRTABLE_TOKEN}`
+          }
+        }
+      );
+
+      if (!airtableResponse.ok) {
+        const error = await airtableResponse.json();
+        return new Response(JSON.stringify({
+          success: false,
+          error: error.error?.message || 'Failed to delete popup'
+        }), {
+          status: 500,
+          headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+        });
+      }
+
+      const result = await airtableResponse.json();
+      console.log('✅ Popup deleted:', recordId);
+
+      return new Response(JSON.stringify({
+        success: true,
+        deleted: true,
+        id: result.id
+      }), {
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    } catch (error) {
+      return new Response(JSON.stringify({
+        success: false,
+        error: error.message
+      }), {
+        status: 500,
+        headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+      });
+    }
+  }
+
+  return new Response(JSON.stringify({ error: 'Not found' }), {
+    status: 404,
+    headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
+  });
+}
+
+// ================================================
 // 페이지 에디터 API 핸들러
 // GitHub API를 통한 HTML 파일 수정
 // ================================================
@@ -1811,7 +2089,7 @@ export default {
           status: 'ok',
           service: 'kpfc-api',
           version: '2.1.0',
-          features: ['analytics', 'submit', 'leads', 'board', 'employees', 'pages'],
+          features: ['analytics', 'submit', 'leads', 'board', 'employees', 'popups', 'pages'],
           env_status: {
             GA4_PROPERTY_ID: !!env.GA4_PROPERTY_ID,
             SERVICE_ACCOUNT_EMAIL: !!env.SERVICE_ACCOUNT_EMAIL,
@@ -1983,6 +2261,13 @@ export default {
       // ================================================
       if (path === '/employees' || path.startsWith('/employees/')) {
         return await handleEmployeesAPI(request, env, path);
+      }
+
+      // ================================================
+      // 팝업 관리 API (/popups)
+      // ================================================
+      if (path === '/popups' || path.startsWith('/popups/')) {
+        return await handlePopupsAPI(request, env, path);
       }
 
       // ================================================
