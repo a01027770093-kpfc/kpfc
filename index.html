@@ -826,15 +826,17 @@
     /* 모바일: 슬라이더 */
     .popup-slider {
         display: none;
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
     }
     .popup-slider-track {
         display: flex;
         transition: transform 0.3s ease;
-        border-radius: 12px;
-        overflow: hidden;
     }
     .popup-slide {
         flex: 0 0 100%;
+        width: 100%;
         aspect-ratio: 1;
     }
     .popup-slide a {
@@ -846,6 +848,7 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
+        border-radius: 12px;
     }
     .popup-slider-dots {
         display: flex;
