@@ -755,7 +755,7 @@
     }
     .popup-container {
         position: relative;
-        max-width: 1400px;
+        max-width: 1700px;
         width: 100%;
         max-height: 90vh;
         overflow: auto;
@@ -800,12 +800,11 @@
         gap: 12px;
     }
     .popup-item {
-        width: calc(25% - 12px);
-        min-width: 200px;
-        aspect-ratio: 1;
+        width: 400px;
+        height: 400px;
         border-radius: 12px;
         overflow: hidden;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         transition: transform 0.2s ease;
         background: #f5f5f5;
     }
@@ -897,20 +896,27 @@
     }
 
     /* 반응형 */
-    @media (max-width: 1200px) {
+    @media (max-width: 1700px) {
         .popup-container {
             max-width: 95%;
-            padding: 32px;
         }
         .popup-item {
-            width: calc(25% - 12px);
-            min-width: 180px;
+            width: 350px;
+            height: 350px;
+        }
+    }
+    @media (max-width: 1400px) {
+        .popup-item {
+            width: 300px;
+            height: 300px;
         }
     }
     @media (max-width: 900px) {
         .popup-item {
             width: calc(50% - 8px);
-            min-width: 150px;
+            height: auto;
+            aspect-ratio: 1;
+            min-width: 200px;
         }
     }
     @media (max-width: 600px) {
