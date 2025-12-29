@@ -625,7 +625,9 @@
     // 섹션 토글
     function toggleSection(sectionId) {
       const key = `${currentPage}-${sectionId}`;
-      collapsedSections[key] = !collapsedSections[key];
+      // 기본값이 접힌 상태(true)이므로, undefined면 접혀있음
+      const currentState = collapsedSections[key] !== false;
+      collapsedSections[key] = !currentState;
       const group = document.querySelector(`[data-section="${sectionId}"]`);
       if (group) {
         group.classList.toggle('collapsed', collapsedSections[key]);
@@ -676,7 +678,8 @@
 
         const sectionInfo = pageSections[sectionId] || { name: sectionId, icon: '📄' };
         const key = `${currentPage}-${sectionId}`;
-        const isCollapsed = collapsedSections[key] || false;
+        // 기본값을 접힌 상태(true)로 설정 - undefined 또는 true면 접힘
+        const isCollapsed = collapsedSections[key] !== false;
 
         return `
           <div class="section-group ${isCollapsed ? 'collapsed' : ''}" data-section="${sectionId}">
