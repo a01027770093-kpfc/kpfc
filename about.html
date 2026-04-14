@@ -2727,6 +2727,10 @@
                     </div>
 
                     <form id="bizenConsultForm">
+                        <!-- 허니팟 (봇 트랩 - 사람에게는 보이지 않음) -->
+<div style="position:absolute;left:-9999px;top:-9999px;opacity:0;height:0;overflow:hidden" aria-hidden="true">
+    <input type="text" name="website" tabindex="-1" autocomplete="off" value="">
+</div>
                         <!-- 모바일: 기업명/사업자번호 -->
                         <div class="form-row">
                             <div class="form-group">
@@ -2898,6 +2902,7 @@
     <script>
     // BIZEN 폼 - Cloudflare Workers 통합 연동
     const WORKER_URL = 'https://kpfc-analytics.a01027770093.workers.dev/';
+    window._formLoadTs = Date.now();
 
     async function handleBizenSubmit(event) {
         event.preventDefault();
@@ -2927,96 +2932,70 @@
         errorMessage.classList.remove('active');
 
         try {
-            // 고객용 이메일 HTML (BIZEN 브랜드 컬러)
-            const customerEmailHTML = `
-      <div style="font-family: 'Pretendard', -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0;">
-          <h2 style="margin: 0; font-size: 20px;">✅ 무료진단 신청이 접수되었습니다</h2>
-          <p style="margin: 10px 0 0 0; opacity: 0.95; font-size: 14px;">KPFC 정책자금 전문상담</p>
-        </div>
+            const fundTypeStr = Array.from(fundTypes).map(cb => cb.value).join(', ');
+            const customerEmailHTML = [
+  '<div style="max-width:580px;margin:0 auto;background:#fff;border-radius:4px;overflow:hidden;font-family:-apple-system,Apple SD Gothic Neo,Noto Sans KR,sans-serif">',
+  '<div style="background:#1e3a5f;padding:18px 32px;display:flex;align-items:center;justify-content:space-between">',
+  '<p style="color:#fff;font-size:15px;font-weight:600;letter-spacing:3px;margin:0">KPFC</p>',
+  '<p style="color:#93C5FD;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin:0">Policy Fund Center</p>',
+  '</div>',
+  '<div style="background:#EFF6FF;border-left:3px solid #3B82F6;padding:9px 24px;font-size:12px;color:#1e3a5f;letter-spacing:.3px">',
+  form.name.value + '님, 무료진단 신청이 정상 접수되었습니다',
+  '</div>',
+  '<div style="padding:24px 28px 20px">',
+  '<p style="font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#777;margin:0 0 10px;padding-bottom:7px;border-bottom:1px solid #f0f0f0">접수 내역</p>',
+  '<table style="width:100%;border-collapse:collapse;font-size:13px;color:#1a1a1a">',
+  '<tr><td style="padding:6px 0;color:#888;width:90px">기업명</td><td style="padding:6px 0">' + form.company.value + '</td></tr>',
+  '<tr><td style="padding:6px 0;color:#888">대표자명</td><td style="padding:6px 0">' + form.name.value + '</td></tr>',
+  '<tr><td style="padding:6px 0;color:#888">자금종류</td><td style="padding:6px 0;color:#3B82F6;font-weight:500">' + fundTypeStr + '</td></tr>',
+  '<tr><td style="padding:6px 0;color:#888">자금규모</td><td style="padding:6px 0">' + (form.amount.value || '미선택') + '</td></tr>',
+  '</table>',
+  '<div style="margin-top:16px;padding:14px;background:#fafafa;border-radius:2px;font-size:12px;color:#555;line-height:1.7">',
+  '담당 전문가가 <b>' + form.consultTime.value + '</b>에 연락드리겠습니다.<br>',
+  '추가 문의: <b style="color:#3B82F6">1588-9097</b>',
+  '</div>',
+  '</div>',
+  '<div style="background:#fafafa;border-top:1px solid #f0f0f0;padding:12px 28px;text-align:center">',
+  '<p style="font-size:10px;color:#888;margin:0;line-height:1.6;letter-spacing:.3px">한국정책자금지원센터 · 1588-9097</p>',
+  '</div>',
+  '</div>'
+].join('');
 
-        <div style="background: white; padding: 30px; border: 1px solid #e0e0e0; border-top: none;">
-          <div style="background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); padding: 20px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #3B82F6;">
-            <p style="margin: 0 0 15px 0; font-size: 15px; color: #000000;">안녕하세요, <strong>${form.name.value}</strong>님</p>
-            <p style="margin: 0; color: #4B5563; line-height: 1.6; font-size: 14px;">정책자금 무료진단 신청이<br>정상 접수되었습니다.</p>
-          </div>
-
-          <div style="background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%); padding: 20px; border-radius: 8px; margin-bottom: 25px;">
-            <h3 style="color: white; margin: 0 0 15px 0; font-size: 15px;">📋 접수 내용</h3>
-            <table style="width: 100%; color: white; font-size: 13px; border-collapse: separate; border-spacing: 0;">
-              <tr><td style="padding: 8px 20px 8px 0; color: #93C5FD; width: 40%; white-space: nowrap;">🏢 기업명</td><td style="padding: 8px 0;">${form.company.value}</td></tr>
-              <tr><td style="padding: 8px 20px 8px 0; color: #93C5FD; white-space: nowrap;">📞 연락처</td><td style="padding: 8px 0;">${form.phone.value}</td></tr>
-              <tr><td style="padding: 8px 20px 8px 0; color: #93C5FD; white-space: nowrap;">💰 희망자금규모</td><td style="padding: 8px 0;">${form.amount.value || '미선택'}</td></tr>
-              <tr><td style="padding: 8px 20px 8px 0; color: #93C5FD; white-space: nowrap;">⏰ 통화가능시간</td><td style="padding: 8px 0;">${form.consultTime.value}</td></tr>
-            </table>
-          </div>
-
-          <div style="background: linear-gradient(135deg, #EFF6FF, #DBEAFE); padding: 15px; border-radius: 8px; border-left: 4px solid #3B82F6; margin-bottom: 20px;">
-            <p style="margin: 0; color: #000000; font-weight: 600;">영업일 기준 <strong>24시간 이내</strong>에 KPFC 전문가가 연락드리겠습니다.</p>
-          </div>
-        </div>
-
-        <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%); border-radius: 0 0 10px 10px; color: white; font-size: 12px;">
-          <p style="margin: 0; font-weight: 600;">KPFC | 정책자금 전문상담</p>
-          <p style="margin: 5px 0 0 0; opacity: 0.9;">문의: 1668-3166 | 이메일: info@kpfc.kr</p>
-          <p style="margin: 5px 0 0 0; opacity: 0.8; font-size: 10px;">※ 본 메일은 발신 전용입니다. 문의사항은 위 연락처로 부탁드립니다.</p>
-        </div>
-      </div>
-            `;
-
-            // 담당자용 이메일 HTML (BIZEN 브랜드 컬러)
-            const staffEmailHTML = `
-      <div style="font-family: 'Pretendard', -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-        <div style="background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0;">
-          <h2 style="margin: 0; font-size: 24px;">💰 KPFC 신규 무료진단 신청</h2>
-          <p style="margin: 10px 0 0 0; opacity: 0.95;">💻 홈페이지 접수</p>
-        </div>
-
-        <div style="background: white; padding: 30px; border: 1px solid #e0e0e0; border-top: none;">
-          <div style="background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); padding: 20px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #3B82F6;">
-            <h3 style="color: #000000; margin: 0 0 15px 0; font-size: 18px; border-bottom: 2px solid #3B82F6; padding-bottom: 8px; display: inline-block;">📋 기업 정보</h3>
-            <table style="width: 100%;">
-              <tr><td style="padding: 8px 0; color: #4B5563; width: 40%; white-space: nowrap;">🏢 기업명</td><td style="font-weight: 600; color: #000000;">${form.company.value}</td></tr>
-              <tr><td style="padding: 8px 0; color: #4B5563; white-space: nowrap;">📄 사업자번호</td><td>${form.bizno.value}</td></tr>
-              <tr><td style="padding: 8px 0; color: #4B5563; white-space: nowrap;">📍 지역</td><td>${form.region.value}</td></tr>
-              <tr><td style="padding: 8px 0; color: #4B5563; white-space: nowrap;">🏭 업종</td><td>${form.industry.value || '미입력'}</td></tr>
-              <tr><td style="padding: 8px 0; color: #4B5563; white-space: nowrap;">📅 설립연도</td><td>${form.founded.value || '미입력'}</td></tr>
-              <tr><td style="padding: 8px 0; color: #4B5563; white-space: nowrap;">📊 전년도매출</td><td>${form.revenue.value || '미입력'}</td></tr>
-            </table>
-          </div>
-
-          <div style="background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); padding: 20px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #3B82F6;">
-            <h3 style="color: #000000; margin: 0 0 15px 0; font-size: 18px; border-bottom: 2px solid #3B82F6; padding-bottom: 8px; display: inline-block;">👤 담당자 정보</h3>
-            <table style="width: 100%;">
-              <tr><td style="padding: 8px 0; color: #4B5563; width: 40%; white-space: nowrap;">👤 이름</td><td>${form.name.value}</td></tr>
-              <tr><td style="padding: 8px 0; color: #4B5563; white-space: nowrap;">📞 연락처</td><td style="color: #000000; font-weight: 600;">${form.phone.value}</td></tr>
-              <tr><td style="padding: 8px 0; color: #4B5563; white-space: nowrap;">✉️ 이메일</td><td>${form.email.value}</td></tr>
-              <tr><td style="padding: 8px 0; color: #4B5563; white-space: nowrap;">⏰ 통화가능시간</td><td style="color: #3B82F6; font-weight: 600;">${form.consultTime.value}</td></tr>
-            </table>
-          </div>
-
-          <div style="background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%); padding: 20px; border-radius: 8px; margin-bottom: 25px;">
-            <h3 style="color: white; margin: 0 0 15px 0; font-size: 18px;">💰 자금 정보</h3>
-            <table style="width: 100%; color: white;">
-              <tr><td style="padding: 8px 0; color: #93C5FD; width: 40%; white-space: nowrap;">💵 희망자금규모</td><td style="color: #DBEAFE; font-weight: 700; font-size: 16px;">${form.amount.value || '미선택'}</td></tr>
-              <tr><td style="padding: 8px 0; color: #93C5FD; white-space: nowrap;">🔖 자금종류</td><td><strong>${Array.from(fundTypes).map(cb => cb.value).join(', ')}</strong></td></tr>
-            </table>
-          </div>
-
-          ${form.message.value ? `
-          <div style="background: linear-gradient(135deg, #EFF6FF, #DBEAFE); padding: 20px; border-radius: 8px; border-left: 4px solid #3B82F6; margin-bottom: 20px;">
-            <h3 style="color: #000000; margin: 0 0 10px 0; font-size: 16px;">📝 문의내용</h3>
-            <p style="margin: 0; color: #4B5563; white-space: pre-wrap;">${form.message.value}</p>
-          </div>
-          ` : ''}
-        </div>
-
-        <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%); border-radius: 0 0 10px 10px; color: white; font-size: 12px;">
-          <p style="margin: 0; font-weight: 600;">KPFC | 1668-3166</p>
-          <p style="margin: 5px 0 0 0; opacity: 0.9; font-size: 11px;">※ 홈페이지에서 자동 발송되었습니다.</p>
-        </div>
-      </div>
-            `;
+            const msgPreview = form.message.value ? (form.message.value.length > 20 ? form.message.value.substring(0, 20) + '…' : form.message.value) : '';
+            const staffEmailHTML = [
+  '<div style="max-width:580px;margin:0 auto;background:#fff;border-radius:4px;overflow:hidden;font-family:-apple-system,Apple SD Gothic Neo,Noto Sans KR,sans-serif">',
+  '<div style="background:#1e3a5f;padding:18px 32px;display:flex;align-items:center;justify-content:space-between">',
+  '<p style="color:#fff;font-size:15px;font-weight:600;letter-spacing:3px;margin:0">KPFC</p>',
+  '<p style="color:#93C5FD;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin:0">Consultation Alert</p>',
+  '</div>',
+  '<div style="background:#EFF6FF;border-left:3px solid #3B82F6;padding:9px 24px;font-size:12px;color:#1e3a5f;letter-spacing:.3px">',
+  '새로운 무료진단 신청이 접수되었습니다',
+  '</div>',
+  '<div style="padding:24px 28px 20px">',
+  '<p style="font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#777;margin:0 0 10px;padding-bottom:7px;border-bottom:1px solid #f0f0f0">Client</p>',
+  '<div style="margin-bottom:18px;display:flex;align-items:baseline;gap:16px;flex-wrap:wrap">',
+  '<p style="font-size:20px;font-weight:400;color:#1a1a1a;letter-spacing:.5px;margin:0">' + form.name.value + '</p>',
+  '<p style="font-size:14px;color:#3B82F6;font-weight:500;letter-spacing:.5px;margin:0">' + form.phone.value + '</p>',
+  '<p style="font-size:12px;color:#666;margin:0;letter-spacing:.3px">' + form.company.value + ' · ' + (form.industry.value || '업종미입력') + '</p>',
+  '</div>',
+  '<p style="font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#777;margin:0 0 10px;padding-bottom:7px;border-bottom:1px solid #f0f0f0">Details</p>',
+  '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:#f0f0f0;border:1px solid #f0f0f0;border-radius:2px;overflow:hidden">',
+  '<div style="background:#fff;padding:10px 14px"><p style="font-size:9px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:#888;margin:0 0 3px">자금종류</p><p style="font-size:13px;color:#3B82F6;font-weight:500;margin:0">' + fundTypeStr + '</p></div>',
+  '<div style="background:#fff;padding:10px 14px"><p style="font-size:9px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:#888;margin:0 0 3px">자금규모</p><p style="font-size:13px;color:#1a1a1a;margin:0">' + (form.amount.value || '미선택') + '</p></div>',
+  '<div style="background:#fff;padding:10px 14px"><p style="font-size:9px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:#888;margin:0 0 3px">통화시간</p><p style="font-size:13px;color:#1a1a1a;margin:0">' + form.consultTime.value + '</p></div>',
+  '</div>',
+  '<div style="display:flex;align-items:center;justify-content:space-between;background:#fafafa;border-radius:2px;padding:10px 14px;margin-top:14px">',
+  '<div style="display:flex;gap:16px">',
+  '<div style="display:flex;gap:6px;align-items:center"><span style="font-size:9px;letter-spacing:1px;color:#888;text-transform:uppercase">Email</span><span style="font-size:12px;color:#333">' + form.email.value + '</span></div>',
+  msgPreview ? '<div style="display:flex;gap:6px;align-items:center"><span style="font-size:9px;letter-spacing:1px;color:#888;text-transform:uppercase">Memo</span><span style="font-size:12px;color:#333">' + msgPreview + '</span></div>' : '',
+  '</div>',
+  '</div>',
+  '</div>',
+  '<div style="background:#fafafa;border-top:1px solid #f0f0f0;padding:12px 28px;text-align:center">',
+  '<p style="font-size:10px;color:#888;margin:0;line-height:1.6;letter-spacing:.3px">KPFC 한국정책자금지원센터 자동알림</p>',
+  '</div>',
+  '</div>'
+].join('');
 
             // Airtable 필드 데이터 준비
             const airtableFields = {
@@ -3027,7 +3006,7 @@
                 '이메일': form.email.value,
                 '지역': form.region.value,
                 '통화가능시간': form.consultTime.value,
-                '자금종류': Array.from(fundTypes).map(cb => cb.value).join(', ')
+                '자금종류': fundTypeStr
             };
 
             // 선택 필드 추가 (값이 있을 때만)
@@ -3047,10 +3026,9 @@
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    // Airtable 필드
                     airtableFields: airtableFields,
-
-                    // 이메일 정보
+                    _hp: form.querySelector('input[name="website"]').value,
+                    _ts: window._formLoadTs,
                     emailFrom: '한국정책자금지원센터 <noreply@mail.policy-fund.online>',
                     customerEmail: form.email.value,
                     customerSubject: '[한국정책자금지원센터] 무료진단 신청이 접수되었습니다',
@@ -3076,6 +3054,7 @@
 
             // 폼 초기화
             form.reset();
+            window._formLoadTs = Date.now();
 
             // 5초 후 성공 메시지 숨기기
             setTimeout(() => {
