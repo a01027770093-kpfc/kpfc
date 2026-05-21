@@ -14,6 +14,7 @@
 //   - TELEGRAM_BOT_TOKEN: Telegram Bot Token
 //   - TELEGRAM_CHAT_ID: Telegram Chat ID
 //   - RESEND_API_KEY: Resend API Key (이메일 발송)
+//   - TURNSTILE_SECRET_KEY: Cloudflare Turnstile Secret Key (봇 방지)
 // ================================================
 
 // ================================================
@@ -56,8 +57,8 @@ const CORS_HEADERS = {
 // ================================================
 // 스팸 방어 설정
 // ================================================
-const RATE_LIMIT_MAX = 10; // IP당 최대 제출 횟수 (모바일 NAT 공유 고려)
-const RATE_LIMIT_WINDOW = 3600; // 윈도우(초) = 1시간
+const RATE_LIMIT_MAX = 3; // IP당 최대 접수완료 횟수 (3분 이내 3회 차단)
+const RATE_LIMIT_WINDOW = 180; // 윈도우(초) = 3분
 const MIN_SUBMIT_TIME_MS = 3000; // 폼 로드 후 최소 경과 시간(ms)
 const MAX_FIELD_LENGTH = 500; // 필드 최대 길이
 
@@ -85,24 +86,89 @@ async function checkRateLimit(ip, env) {
   return { allowed: count <= RATE_LIMIT_MAX, count };
 }
 
+// 알려진 스캐너 페이로드 시그니처 (Acunetix WVS 등)
+const SCANNER_SIGNATURES = [
+  "phqghume",
+  "testing@example",
+  "555-6660-606",
+  "5556660606",
+  "acunetix",
+  "sqlmap",
+  "havij",
+  "nikto",
+  "nessus",
+];
+const DUMMY_EMAIL_DOMAINS = [
+  "example.com",
+  "example.org",
+  "example.net",
+  "test.com",
+  "test.org",
+  "localhost",
+  "tempmail",
+  "mailinator",
+  "guerrillamail",
+  "sharklasers",
+  "10minutemail",
+  "yopmail",
+  "trashmail",
+];
+const TRIVIAL_NAMES =
+  /^(test|testing|sample|demo|admin|root|user|null|undefined|none|n\/a|na|asdf|qwer|qwerty|abcd|abc)$/i;
+
 // 백엔드 필드 검증
 function validateSubmitFields(fields) {
   if (!fields || typeof fields !== "object") return "필드 데이터가 없습니다";
+
+  // 의미 있는 문자(글자/숫자) — 전각공백·zero-width·탭·줄바꿈만 있는 입력 차단
+  const hasMeaningful = (v) => /[\p{L}\p{N}]/u.test(String(v ?? ""));
+
   const required = ["기업명", "대표자명", "연락처"];
   for (const f of required) {
-    if (!fields[f] || String(fields[f]).trim().length === 0)
-      return `${f}은(는) 필수입니다`;
-    if (String(fields[f]).length > MAX_FIELD_LENGTH) return `${f} 길이 초과`;
+    const raw = fields[f];
+    if (raw === undefined || raw === null) return `${f}은(는) 필수입니다`;
+    if (String(raw).length > MAX_FIELD_LENGTH) return `${f} 길이 초과`;
+    if (!hasMeaningful(raw)) return `${f}을(를) 정확히 입력해주세요`;
   }
-  // 연락처 패턴 (숫자, 하이픈만)
+
+  // 알려진 스캐너 페이로드(Acunetix 등) 차단 — 전체 필드값 합쳐서 검사
+  const allLower = Object.values(fields)
+    .map((v) => String(v ?? "").toLowerCase())
+    .join(" ");
+  for (const sig of SCANNER_SIGNATURES) {
+    if (allLower.includes(sig)) return "잘못된 입력입니다";
+  }
+
+  // 기업명/대표자명: 글자(한글/영문) 최소 1자 필수
+  if (!/\p{L}/u.test(String(fields["기업명"])))
+    return "기업명을 정확히 입력해주세요";
+  if (!/\p{L}/u.test(String(fields["대표자명"])))
+    return "대표자명을 정확히 입력해주세요";
+
+  // test/demo/admin 같은 trivial 이름 차단
+  if (TRIVIAL_NAMES.test(String(fields["기업명"]).trim()))
+    return "기업명을 정확히 입력해주세요";
+  if (TRIVIAL_NAMES.test(String(fields["대표자명"]).trim()))
+    return "대표자명을 정확히 입력해주세요";
+
+  // 연락처: 한국 번호 형식(0으로 시작 + 9~11자리) 강제
+  const phoneDigits = String(fields["연락처"]).replace(/\D/g, "");
   if (!/^[\d\-]{9,14}$/.test(String(fields["연락처"]).replace(/\s/g, "")))
     return "연락처 형식이 올바르지 않습니다";
-  // 이메일 검증 (있는 경우)
-  if (
-    fields["이메일"] &&
-    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(fields["이메일"]))
-  )
-    return "이메일 형식이 올바르지 않습니다";
+  if (!/^0\d{8,10}$/.test(phoneDigits))
+    return "연락처는 한국 번호(0으로 시작, 9~11자리)로 입력해주세요";
+  if (/^0+$/.test(phoneDigits)) return "연락처를 정확히 입력해주세요";
+
+  // 이메일 검증 + dummy 도메인 차단
+  if (fields["이메일"]) {
+    const email = String(fields["이메일"]);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return "이메일 형식이 올바르지 않습니다";
+    const domain = (email.split("@")[1] || "").toLowerCase();
+    for (const d of DUMMY_EMAIL_DOMAINS) {
+      if (domain.includes(d)) return "유효한 이메일 주소를 입력해주세요";
+    }
+  }
   return null;
 }
 
@@ -113,7 +179,7 @@ async function sendSecurityAlert(ip, count, env) {
   const msg =
     `🚨 <b>[KPFC/security] 스팸 공격 감지</b>\n\n` +
     `├ IP: <code>${escapeHtml(ip)}</code>\n` +
-    `├ 시도 횟수: <b>${count}회</b> (제한: ${RATE_LIMIT_MAX}회/시간)\n` +
+    `├ 시도 횟수: <b>${count}회</b> (제한: ${RATE_LIMIT_MAX}회/${Math.round(RATE_LIMIT_WINDOW / 60)}분)\n` +
     `└ 시간: ${kst.toISOString().replace("T", " ").substring(0, 19)} KST`;
   try {
     await fetch(
@@ -2684,7 +2750,50 @@ export default {
           );
         }
 
-        // 5) 타임스탬프 검증 (폼 로드 후 최소 3초 경과)
+        // 5) Turnstile 검증 (봇 방지 CAPTCHA) — 시크릿 등록 시에만 강제
+        const turnstileToken = data._turnstile;
+        if (env.TURNSTILE_SECRET_KEY) {
+          if (!turnstileToken) {
+            return new Response(
+              JSON.stringify({
+                success: false,
+                error: "보안 인증이 필요합니다",
+              }),
+              {
+                status: 400,
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+              },
+            );
+          }
+          const tsRes = await fetch(
+            "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/x-www-form-urlencoded" },
+              body: new URLSearchParams({
+                secret: env.TURNSTILE_SECRET_KEY,
+                response: turnstileToken,
+                remoteip: request.headers.get("CF-Connecting-IP") || "",
+              }),
+            },
+          );
+          const tsResult = await tsRes.json();
+          if (!tsResult.success) {
+            return new Response(
+              JSON.stringify({
+                success: false,
+                error:
+                  "보안 인증에 실패했습니다. 페이지를 새로고침 후 다시 시도해주세요.",
+              }),
+              {
+                status: 403,
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+              },
+            );
+          }
+        }
+
+        // 6) 타임스탬프 검증 (폼 로드 후 최소 3초 경과)
         if (data._ts) {
           const elapsed = Date.now() - Number(data._ts);
           if (elapsed < MIN_SUBMIT_TIME_MS) {
@@ -2701,7 +2810,7 @@ export default {
           }
         }
 
-        // 6) 백엔드 필드 검증
+        // 7) 백엔드 필드 검증
         const validationError = validateSubmitFields(data.airtableFields);
         if (validationError) {
           return new Response(
@@ -2713,7 +2822,7 @@ export default {
           );
         }
 
-        // 7) Rate Limit 체크
+        // 8) Rate Limit 체크
         const clientIP =
           request.headers.get("CF-Connecting-IP") ||
           request.headers.get("X-Forwarded-For") ||
@@ -2737,6 +2846,7 @@ export default {
         // 보안 메타데이터 제거 후 핸들러에 전달
         delete data._hp;
         delete data._ts;
+        delete data._turnstile;
         return await handleSubmitWithData(data, env);
       }
 
